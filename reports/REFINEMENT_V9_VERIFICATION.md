@@ -29,7 +29,7 @@ Commands ran from the repository root with the bundled Node 24 runtime on PATH a
 
 Chrome extension browser controls were used for the actual UI interactions and DOM/screenshot evidence. The existing automated end-to-end suite was not rerun; these are explicit browser smoke checks plus the listed regression commands.
 
-- Guest Neon Sevens: five reels, 15 settled cells, visible reel translation; Stop reveals the final grid and re-enables controls. No guest credits change.
+- Guest Neon Sevens: five reels, an expanded rolling strip, 15 settled cells; Stop reveals the final grid and re-enables controls. No guest credits change.
 - Guest Coin Carnival: fast sequence completed all three respins, reported 4/5 held reels, showed four locked columns, retained exactly 15 settled cells and returned to ready.
 - Local staging: MAX selects 20.00 and disables further increment; reset to 0.25 before playing. Six Neon rounds at 0.25 each all settled with zero returns. They are preserved in history. Local sample balance changed from **1,021.00 to 1,019.50**. This small sample does not estimate a win rate. No hosted tester balance was used or adjusted.
 - Captured final visible grid and meters in `.cache/v9-displayed-round.json`; read-only PostgreSQL comparison and six-round timestamps in `.cache/v9-round-acceptance.json`.
@@ -43,7 +43,14 @@ Ignored local screenshots in `reports/screenshots-v9/`: `neon-desktop.png`, `neo
 
 ## Deployment
 
-Prepared for the existing authorized five-person Netlify test site. Live deployment verification will be recorded after publishing.
+- Pushed feature commit `c42357e6f7849f7061c79597a4af63a63dca010e` to GitHub `main`.
+- Netlify deploy `6ab3cf9f008ac70008901685` reported `ready` for that exact commit, published at `2026-09-23T13:10:23.884Z`.
+- Live site: https://new-game-tonyk006789.netlify.app/ — HTTP 200, serving the expected `index-CBVOeVIl.js` and `index-DXB_TLI1.css` assets.
+- `/v1/health` returned HTTP 200 with `status: ok`, `mode: private-test`.
+- Reloaded the live site in Chrome: Player 5's existing session restored, balance remained 1,000.00, interactive lobby opened the new five-reel Neon cabinet with the full 0.25–20.00 selector. No hosted wager or funding action was performed.
+- Screenshot: `reports/screenshots-v9/neon-netlify.png`. The first full-page capture timed out; the subsequent viewport capture succeeded and was reviewed.
+- Pre-publication audit of 300 source paths against 10 private credential values found no matches; temporary served meter fixture absent. Credentials and screenshots remain ignored local files.
+- `node .cache/check-v9-deploy.mjs` performed the deployment and HTTP checks using the existing signed-in Netlify CLI credential in memory. The sandboxed attempt could not write the CLI's config temporary file; the authorized invocation passed.
 
 ## Remaining limits and rollback
 
