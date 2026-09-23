@@ -5,9 +5,12 @@ import {hostedHandler} from './hosted-handler.js';
 export default async function vercelHandler(req:IncomingMessage,res:ServerResponse){
  try{
   const url=new URL(req.url||'/','https://player.internal');
-  if(url.pathname==='/game'&&url.searchParams.getAll('__route').length===1){
+  // Vercel preserves the original pathname while adding the rewrite query.
+  // The local Node entry point instead receives /game; accept both shapes,
+  // but never let a query choose a different route than the public pathname.
+  if(url.searchParams.getAll('__route').length===1){
    const route=url.searchParams.get('__route')!;url.searchParams.delete('__route');
-   if(!/^[a-z0-9/-]+$/.test(route)){res.writeHead(404);res.end();return;}
+   if(!/^[a-z0-9/-]+$/.test(route)||(url.pathname!=='/game'&&url.pathname!==`/v1/${route}`)){res.writeHead(404);res.end();return;}
    url.pathname=`/v1/${route}`;
   }
   const headers=new Headers();for(const [key,value]of Object.entries(req.headers)){if(value!==undefined)headers.set(key,Array.isArray(value)?value.join(','):value);}
