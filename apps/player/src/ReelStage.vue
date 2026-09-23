@@ -11,12 +11,12 @@ let animations: Animation[] = [], generation = 0, target = initial as string[][]
 function settle(grid = target, matches: { row: number; count: number }[] = []) {
   generation++; animations.forEach(animation => animation.cancel()); animations = [];
   target = grid; columns.value = Array.from({ length: grid[0].length }, (_, column) => grid.map(row => row[column]));
-  rolling.value = false; lines.value = matches; landed.value = [];
+  rolling.value = false; lines.value = matches; landed.value = props.reducedMotion ? [] : columns.value.map((_,index)=>index);
 }
 async function play(grid: string[][], matches: { row: number; count: number }[], fast = false, held: number[] = []) {
   settle(); target = grid;
   if (props.reducedMotion) { settle(grid, matches); return; }
-  const token = generation; rolling.value = true; lines.value = [];
+  const token = generation; rolling.value = true; lines.value = []; landed.value = [];
   const stripSymbols = props.stripSymbols || symbols;
   columns.value = columns.value.map((column, index) => held.includes(index) ? grid.map(row => row[index]) : [...column, ...Array.from({ length: 20 + index * 3 }, (_, n) => stripSymbols[(n * 2 + index) % stripSymbols.length]), ...grid.map(row => row[index])]);
   await nextTick();
@@ -26,12 +26,13 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
     if (held.includes(index)) return;
     const distance = (columns.value[index].length - 3) * strip.parentElement!.clientHeight / 3;
     const animation = strip.animate([
-      { transform: 'translateY(0)', filter: 'blur(0px)', offset: 0 },
-      { transform: `translateY(${-distance * .13}px)`, filter: 'blur(2px)', offset: .16 },
-      { transform: `translateY(${-distance * .94}px)`, filter: 'blur(1px)', offset: .72 },
-      { transform: `translateY(${-distance - 9}px)`, filter: 'blur(0px)', offset: .94 },
+      { transform: 'translateY(0)', filter: 'blur(0px)', offset: 0, easing: 'ease-out' },
+      { transform: 'translateY(9px)', filter: 'blur(0px)', offset: .045, easing: 'ease-in' },
+      { transform: `translateY(${-distance * .08}px)`, filter: 'blur(2px)', offset: .17, easing: 'linear' },
+      { transform: `translateY(${-distance * .89}px)`, filter: 'blur(2px)', offset: .77, easing: 'cubic-bezier(.12,.5,.3,1)' },
+      { transform: `translateY(${-distance - 8}px)`, filter: 'blur(0px)', offset: .96, easing: 'ease-out' },
       { transform: `translateY(${-distance}px)`, filter: 'blur(0px)', offset: 1 }
-    ], { duration: (1050 + index * 210) / (fast ? 1.8 : 1), easing: 'cubic-bezier(.16,.05,.25,1)', fill: 'forwards' });
+    ], { duration: (1100 + index * 170) / (fast ? 1.8 : 1), delay:index*35/(fast?1.8:1), easing:'linear', fill: 'both' });
     animations.push(animation);
     try { await animation.finished; if (token === generation) landed.value.push(index); } catch { /* Paused, resized or unmounted. */ }
   }));

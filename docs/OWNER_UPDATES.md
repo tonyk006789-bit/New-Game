@@ -78,3 +78,11 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 - Recovery uses the original actor/request lock: it returns an accepted receipt unchanged, or records an unplayed request as cancelled so a delayed original request cannot subsequently charge. No financial history is erased or overwritten.
 - Added a dedicated Ocean Lounge with four selectable seats per table, actual player names/occupancy, join/open/return controls and immediate seat release on exit. Four real authenticated clients were verified at one table; a fifth cannot take a full seat. Empty places remain open; no bots or invented occupants were added.
 - Existing math, credit balances and tester credentials are preserved. See `../reports/RECOVERY_AND_FISH_LOBBY_V8.md` for evidence.
+
+## 23 September 2026 authenticated reference study
+
+- Owner signed into JUWA and explicitly requested studying its games, UI/UX, animations and gameplay to refine this platform. This authorizes reference research; the original/licensed-art and no-provider-dependency boundaries remain.
+- Browser-accessible lobby shelves and two loaded slot cabinets were inspected. Fish and keno posters are marked app-only in that browser. The owner agreed to operate external prize-based plays and tell us when to observe; actual spin/bonus timing remains pending.
+- The resulting player refinement enlarges the five-reel cabinets, reduces surrounding prose, adds metallic controls and a committed-return count-up, adjusts reel take-up/braking/landing, expands feature-board space, and replaces simple fish-lounge symbols with original painted creatures and four cannon stations.
+- This is a presentation change. It does not change the experimental profile, stake increments, hosted tester credentials, manual funding rules or production approval status. Six explicit local sample-account test rounds used 0.25 credits each; hosted tester accounts were not used for round testing in this iteration.
+- Research coverage and limits: `JUWA_AUTHENTICATED_REFERENCE.md`. Acceptance: `../reports/REFINEMENT_V9_VERIFICATION.md`.
