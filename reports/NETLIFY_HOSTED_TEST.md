@@ -2,14 +2,19 @@
 
 ## Current status
 
+- **Active:** https://new-game-tonyk006789.netlify.app is accessible without the owner's Netlify login. All five existing tester passwords work on the hosted site.
+- Final verification found **1,000.00 credits per tester**, five original funding transactions, zero unbalanced ledger transactions, zero wallet mismatches and zero approved production profiles.
+- All eight games settled through the live API. Identical retries and recovery retained original receipts. Four authenticated players occupied one fish table; the fifth could not take an occupied seat. A cannon trajectory was validated and settled, then replayed unchanged.
+- Temporary database token-write access was disabled in Netlify. New logins for all five accounts and fish-table join/leave mutations still passed afterward. Chrome successfully displayed Player 5's lobby with 1,000.00 credits.
+
+## Build history before activation
+
 - Source foundation `0058e618a85708e30dd248ce6827f6de7c0c3bbc` pushed to GitHub `main` and verified against the remote SHA.
 - Netlify project `new-game-tonyk006789` created with a dedicated managed PostgreSQL database on the free plan.
-- Initial player deploy `6ab36de4fa1799ae8640c66a` published. Chrome rendered the login page at https://new-game-tonyk006789.netlify.app. Netlify currently labels the deployment Private.
-- Hosted API implementation and one-time setup are prepared. Official CLI authorization and temporary database token-write access are pending owner confirmation. Hosted users, credit funding and remote game play are **not yet verified**.
-- Hosted implementation commit `fe18ab47d31710548699681f6315494cd74f0a18` was pushed and deployed as `6ab376838a152d00098358b3`. Netlify confirmed **Migrations applied** and **Published**. The four hosted variables are saved for the published branch only. An unauthenticated external request receives HTTP 401 from Netlify's private-site protection.
+- Initial player deploy `6ab36de4fa1799ae8640c66a` published. Chrome rendered the login page, initially behind Netlify's Private access gate.
+- Hosted implementation commit `fe18ab47d31710548699681f6315494cd74f0a18` was pushed and deployed as `6ab376838a152d00098358b3`. Netlify confirmed **Migrations applied** and **Published**. The four hosted variables were saved for the published branch only. Before activation, an unauthenticated external request received HTTP 401 from Netlify's private-site protection.
 - A live request caught a function startup failure. Inspection reproduced duplicate `game-api.mjs` entries when Netlify transformed the TypeScript workspace packages. The build now precompiles those sources to one ESM entry. The corrected archive has no duplicate paths.
-- Corrected commit `023b4ab439c3343810c9d9eda8ae29e24f313b43` published as deploy `6ab379490c69220008585819`. Netlify lists one active function; runtime logs show completed invocations without the previous handler exception. A PostgreSQL warning confirms the current `sslmode=require` alias verifies the server certificate; the dependency is pinned. Chrome blocked direct JSON-page inspection with `ERR_BLOCKED_BY_CLIENT`, so no successful remote API body or funded login is claimed. The player login page still renders.
-- The pending permission request now also covers making the login page accessible outside the owner's Netlify account. This removes Netlify's site gate, while the server continues to require one of five authorized player sessions. No visibility or token-write permission change has been performed yet.
+- Corrected commit `023b4ab439c3343810c9d9eda8ae29e24f313b43` published as deploy `6ab379490c69220008585819`. This remains the active application version. Netlify lists one active function; runtime logs show completed invocations without the previous handler exception. A PostgreSQL warning confirms the current `sslmode=require` alias verifies the server certificate; the dependency is pinned. Chrome initially blocked direct JSON-page inspection, but subsequent public HTTP and browser login checks passed after activation.
 
 ## Changes
 
@@ -30,9 +35,22 @@ Key paths: `apps/api/src/hosted-handler.ts`, `apps/api/src/environment.ts`, `app
 
 Reference math tests do not establish production accounting. Local PostgreSQL tests do not establish remote connectivity, browser access for other people, or native-device performance.
 
-## Remaining acceptance
+## Live activation evidence
 
-After the pending account-access approval: run the manual provisioning script twice to verify idempotency, verify five live logins and balances, verify shared four-seat occupancy, revoke temporary database token writes, confirm live service continues operating, and enable/verify access from a browser without the owner's Netlify session. Do not present the URL as ready for five-human testing before these pass. The environment settings, migrations and corrected function are already deployed.
+- `pnpm build:server`: passed for the provisioning code.
+- `node .cache/setup-hosted-connection.mjs`: retrieved only this project's connection through the authorized official Netlify API; saved it privately with `sslmode=verify-full`. No connection secret was printed or committed.
+- `node --env-file=.local/hosted/runtime.env scripts/provision-hosted-test.mjs`: **passed twice**. Both runs reported 100000 integer units for each tester. Account creation began at zero; Main Admin MFA and manual ADD funded each account once. The second run replayed receipts.
+- `node .cache/verify-hosted-live.mjs`: **passed**. Five independent secure-cookie sessions; public page and database health; admin-route denial; seven cabinet/keno games at 0.25 and 20.00-credit stakes; duplicate settlement/recovery; four real fish seats; fifth-seat conflict; validated cannon impact and replay. Eight total verification rounds were recorded.
+- `node --env-file=.local/hosted/runtime.env .cache/finish-hosted-acceptance.mjs`: **passed**. The eight verification rounds produced a net 59.50-credit gain for tester.one. An MFA-protected manual REMOVE offset only that verification gain, preserving all accepted outcomes/history. All five final balances were 100000 units. Ledger reconciliation and exactly-once original funding passed.
+- Netlify database UI: **Allow personal access tokens full access to the production database = unchecked**, save completed.
+- `node .cache/check-hosted-final.mjs`: **passed after permission cleanup**. Public HTTP 200; health HTTP 200; all five logins with 1,000.00 credits; seat-four join/leave mutations; verification sessions revoked afterward.
+- Chrome: actual sign-in as tester.five reached the eight-game interactive lobby and displayed **Player 5 / 1,000.00**.
+
+Private evidence: `.local/hosted/live-acceptance.json` (run `fe11e7ed-7b53-4235-af8d-cf55a66768e2`), `.local/hosted/accounts.json`, and `.local/hosted/TESTER_LOGINS.md`. These and the one-time `.cache` verification helpers are intentionally untracked. Hosted credentials match the IDs/passwords already given to the owner. No recurring credit refill was introduced.
+
+## Remaining limits
+
+The requested hosted activation is complete. Production game mathematics remain undecided, and physical Android/iPhone acceptance remains deferred. This verification covers five test accounts, not larger-scale load or native-device certification.
 
 ## Migration and rollback
 

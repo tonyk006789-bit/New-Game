@@ -2,6 +2,8 @@
 
 Player site: https://new-game-tonyk006789.netlify.app
 
+**Active and verified on 23 September 2026.** The login page is accessible without a Netlify account. The five tester IDs (`tester.one` through `tester.five`) use their previously supplied passwords; each wallet had 1,000.00 play credits at final verification. Temporary database token-write access is disabled. The game continues to require an authenticated tester session.
+
 Project ID: `df1f4e3c-07cc-4d97-af78-27bb84e9225f`. The site builds `main` from `tonyk006789-bit/New-Game`, at the repository root, using `pnpm build:netlify`. Only `apps/player/dist` is published. The admin console, local account files and development servers are not published.
 
 ## Hosted player API
@@ -40,7 +42,7 @@ The private file needs `DATABASE_URL`, the hosted variables above, `SITE_ID`, an
 
 The script bootstraps an isolated zero-balance Main Admin, then signs in with MFA and uses ordinary authenticated account creation and manual ADD operations. Each of the five existing tester IDs/passwords is reused for this separate database. Every player starts at zero and receives exactly one authorized 1,000-credit adjustment. Persisted request IDs and receipts make reruns replay that adjustment rather than refill the wallet. Existing account identity, role, branch and credentials must match. Keep `.local/hosted/accounts.json` so interrupted setup remains recoverable.
 
-Private tester instructions are written to `.local/hosted/TESTER_LOGINS.md`; credentials are never returned by the hosted environment endpoint. The local staging database and its balances are unchanged. Test accounts and credits are not yet considered ready until the live acceptance checks in the deployment report pass.
+Private tester instructions are written to `.local/hosted/TESTER_LOGINS.md`; credentials are never returned by the hosted environment endpoint. The local staging database and its balances are unchanged. Live acceptance passed for all five logins, eight games, durable round replay/recovery and shared four-seat fishing. Setup was run twice and retained exactly five original funding transactions.
 
 ## Validation and rollback
 
