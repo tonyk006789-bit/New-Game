@@ -7,6 +7,7 @@
 - `reef-ballistics-v3`: scheduled arrivals six seconds apart, at most nine active targets and one boss; sizes span radii 8–100. Captured target IDs never respawn. Uncaught targets can return after the 480-second migration cycle.
 - Owner selected **a separate Vercel test environment**, not a migration of the existing Netlify wallets. The five-player test setup uses its own database identity, accounts and one-time authenticated manual funding. Existing Netlify balances/history are preserved. No paid infrastructure or public admin console is authorized.
 - Owner explicitly approved GitHub sign-in to Vercel. Provider prompts that require human security/legal choices remain human steps.
+- Owner subsequently approved accepting the Vercel Marketplace addendum and Neon terms, including account ID, email and usage-data sharing, to create a separate free PostgreSQL database. The Vercel test is now live at `https://new-game-test-topaz.vercel.app/`, with its own five accounts and one-time manual 1,000-credit funding. Netlify data and deployment were not replaced.
 
 ## 23 September 2026 daily wheel, account controls and aquatic refinement
 
