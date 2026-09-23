@@ -7,7 +7,9 @@
 - Initial player deploy `6ab36de4fa1799ae8640c66a` published. Chrome rendered the login page at https://new-game-tonyk006789.netlify.app. Netlify currently labels the deployment Private.
 - Hosted API implementation and one-time setup are prepared. Official CLI authorization and temporary database token-write access are pending owner confirmation. Hosted users, credit funding and remote game play are **not yet verified**.
 - Hosted implementation commit `fe18ab47d31710548699681f6315494cd74f0a18` was pushed and deployed as `6ab376838a152d00098358b3`. Netlify confirmed **Migrations applied** and **Published**. The four hosted variables are saved for the published branch only. An unauthenticated external request receives HTTP 401 from Netlify's private-site protection.
-- A live request caught a function startup failure. Inspection reproduced duplicate `game-api.mjs` entries when Netlify transformed the TypeScript workspace packages. The build now precompiles those sources to one ESM entry. The corrected archive has no duplicate paths; cloud verification of the correction follows.
+- A live request caught a function startup failure. Inspection reproduced duplicate `game-api.mjs` entries when Netlify transformed the TypeScript workspace packages. The build now precompiles those sources to one ESM entry. The corrected archive has no duplicate paths.
+- Corrected commit `023b4ab439c3343810c9d9eda8ae29e24f313b43` published as deploy `6ab379490c69220008585819`. Netlify lists one active function; runtime logs show completed invocations without the previous handler exception. A PostgreSQL warning confirms the current `sslmode=require` alias verifies the server certificate; the dependency is pinned. Chrome blocked direct JSON-page inspection with `ERR_BLOCKED_BY_CLIENT`, so no successful remote API body or funded login is claimed. The player login page still renders.
+- The pending permission request now also covers making the login page accessible outside the owner's Netlify account. This removes Netlify's site gate, while the server continues to require one of five authorized player sessions. No visibility or token-write permission change has been performed yet.
 
 ## Changes
 
@@ -30,7 +32,7 @@ Reference math tests do not establish production accounting. Local PostgreSQL te
 
 ## Remaining acceptance
 
-Configure the exact hosted environment, deploy migrations/function, run the manual provisioning script twice to verify idempotency, verify five live logins and balances, verify shared four-seat occupancy, revoke temporary database token writes, confirm live service continues operating, and verify access from a browser without the owner's Netlify session. Do not present the URL as ready for five-human testing before these pass.
+After the pending account-access approval: run the manual provisioning script twice to verify idempotency, verify five live logins and balances, verify shared four-seat occupancy, revoke temporary database token writes, confirm live service continues operating, and enable/verify access from a browser without the owner's Netlify session. Do not present the URL as ready for five-human testing before these pass. The environment settings, migrations and corrected function are already deployed.
 
 ## Migration and rollback
 
