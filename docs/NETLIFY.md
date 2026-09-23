@@ -33,6 +33,8 @@ A dedicated Netlify Database was created for this site on 23 September 2026. The
 
 Migrations create schema only. They do not create people, allocate credits or refill wallets. The separate manual command below requires an explicitly confirmed site ID and a private environment file:
 
+The next additive migration, `0002_daily_wheel`, contains repository SQL 009–010 for the owner-approved test daily wheel. Use Netlify's migration pipeline for this database; the generic local `scripts/database.mjs migrate` runner tracks a different migration table and must not be run against the hosted baseline. The new migration does not claim a spin or change any player's balance.
+
 ```sh
 pnpm build:server
 node --env-file=.local/hosted/runtime.env scripts/provision-hosted-test.mjs

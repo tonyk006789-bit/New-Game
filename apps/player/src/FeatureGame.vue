@@ -6,6 +6,7 @@ import Icon from '@new-game/ui/Icon.vue';
 import { api } from './api';
 import BetControls from './BetControls.vue';
 import {stage} from './staging-state';
+import {creditPresentation} from './credit-presentation';
 const staked=computed(()=>stage.enabled&&props.authenticated);
 const props = defineProps<{ game: 'aurora-vault' | 'ember-relics'; running: boolean; reducedMotion: boolean; authenticated: boolean; balance: string }>();
 const isVault = computed(() => props.game === 'aurora-vault');
@@ -48,7 +49,7 @@ function reveal(token: number) {
   }
 }
 async function play() {
-  if (!props.running || active.value || saving.value || loading.value) return;
+  if (creditPresentation.held!==null || !props.running || active.value || saving.value || loading.value) return;
   saving.value = true; phase.value = 'preparing'; notice.value = props.authenticated ? 'Preparing your saved sequence…' : 'Preparing storyboard…';
   try {
     let accepted: FeatureResult;
@@ -92,7 +93,7 @@ onBeforeUnmount(() => { disposed = true; generation++; clearTimeout(timer); });
       <div v-else class="cascade-machine"><div class="cascade-counter"><span>THE FALLING SANCTUARY</span><b>CASCADE {{ result ? Math.min(frame + 1, sequence.frames.length - 1) : 0 }} / 6</b></div><div class="cascade-board" aria-label="Six column five row relic board"><template v-for="(row, r) in cascade.grid" :key="r"><div v-for="(symbol, c) in row" :key="`${frame}-${r}-${c}`" class="relic-cell" :class="{ 'cluster-cell': cascade.removed.includes(r * 6 + c) }" :style="{ '--cell-delay': `${(r + c) * 22}ms` }" :data-symbol="symbol" :aria-label="`${symbol} relic`"><ArcadeSymbol :symbol="symbol" /></div></template></div><div class="board-engraving">✧ FOUR CONNECTED RELICS IGNITE ✧</div></div>
       <aside class="feature-guide"><strong>{{ phase === 'complete' ? 'SEQUENCE COMPLETE' : isVault ? 'LOCK & COLLECT' : 'CLUSTER CASCADES' }}</strong><span>{{ isVault ? '01' : '04' }}<small>{{ isVault ? 'CRYSTAL AT A TIME' : 'MATCH TO CLEAR' }}</small></span><p>{{ isVault ? 'Empty cells pulse with new possibilities.' : 'Relics drop into the spaces you clear.' }}</p><div class="no-award-tag">{{staked ? "WIN" : "NO STAKE"}}<br>{{staked ? "PLAY CREDITS" : "NO CREDIT AWARD"}}</div></aside>
     </div>
-    <div class="feature-console"><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="active||saving" /><div class="console-value"><small>PLAY CREDITS</small><strong>{{ balance }}</strong></div><button class="speed-control" :aria-pressed="fast" :disabled="saving" aria-label="Fast animations" @click="fast = !fast"><Icon name="chevron" :size="17" />{{ fast ? 'FAST' : 'NORMAL' }}</button><button v-if="active" class="feature-play" @click="finish()"><Icon name="arrow" />SHOW RESULT</button><button v-else class="feature-play" :disabled="!running || saving || loading" @click="play"><Icon :name="saving ? 'clock' : 'gem'" />{{ loading ? 'LOADING' : saving ? 'SAVING' : pendingKey ? 'RETRY SEQUENCE' : isVault ? 'OPEN VAULT' : 'START CASCADE' }}</button><div class="console-value practice-tag"><small>{{ authenticated ? 'SAVED ON SERVER' : 'LOCAL STORYBOARD' }}</small><strong>{{staked ? "PLAY" : "FREE PRACTICE"}}</strong></div></div>
+    <div class="feature-console"><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="active||saving" /><div class="console-value"><small>PLAY CREDITS</small><strong>{{ balance }}</strong></div><button class="speed-control" :aria-pressed="fast" :disabled="saving" aria-label="Fast animations" @click="fast = !fast"><Icon name="chevron" :size="17" />{{ fast ? 'FAST' : 'NORMAL' }}</button><button v-if="active" class="feature-play" @click="finish()"><Icon name="arrow" />SHOW RESULT</button><button v-else class="feature-play" :disabled="creditPresentation.held!==null || !running || saving || loading" @click="play"><Icon :name="saving ? 'clock' : 'gem'" />{{ loading ? 'LOADING' : saving ? 'SAVING' : pendingKey ? 'RETRY SEQUENCE' : isVault ? 'OPEN VAULT' : 'START CASCADE' }}</button><div class="console-value practice-tag"><small>{{ authenticated ? 'SAVED ON SERVER' : 'LOCAL STORYBOARD' }}</small><strong>{{staked ? "PLAY" : "FREE PRACTICE"}}</strong></div></div>
     <p class="feature-notice" aria-live="polite">{{ notice }}</p>
   </section>
 </template>

@@ -38,7 +38,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);});
    <article v-for="table in cards" :key="table.id" class="fish-table-card" :data-table-id="table.id">
     <header><div><small>REEF PARTY</small><h3>{{table.id==='new'?'OPEN A TABLE':`TABLE ${String(table.number).padStart(2,'0')}`}}</h3></div><span class="table-occupancy">{{table.seats.length}} / 4 <Icon name="user" :size="14"/></span></header>
     <div class="lounge-table">
-     <div class="table-water" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in [3,0,1,7,5,6]" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">REEF <b>PARTY</b></div></div>
+     <div class="table-water" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in [14,9,15,8,10,12]" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">REEF <b>PARTY</b></div></div>
      <div class="table-machine-front" aria-hidden="true"><i></i><span>NEW GAME<br><b>OCEAN SERIES</b></span><i></i></div>
      <AquaticSprite v-for="seat in 4" :key="`cannon-${seat}`" :cannon="seat-1" class="table-cannon" :class="`position-${seat}`"/>
      <button v-for="seat in 4" :key="seat" class="lounge-seat" :class="[`position-${seat}`,{occupied:table.seats.some(s=>s.seat===seat),yours:table.seats.some(s=>s.seat===seat&&s.yours)}]" :disabled="busy||!running||table.seats.some(s=>s.seat===seat&&!s.yours)" :aria-label="`${table.id==='new'?'New table':`Table ${table.number}`} seat ${seat}${table.seats.some(s=>s.seat===seat)?' occupied':' open'}`" @click="join(table,seat)">

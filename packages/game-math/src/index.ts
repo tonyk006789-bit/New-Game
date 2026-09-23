@@ -226,8 +226,8 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
  throw new Error('Experimental sampler exhausted; no round accepted.');
 }
 
-export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon'] as const;
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v1'} as const;
+export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish'] as const;
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v2'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
 export function reefLeadAngle(seat:number,targetId:number,time:number){
@@ -261,9 +261,10 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
  return {targetId:null,time:reefBallistics.lifetime,x:previous.x,y:previous.y,origin,vx,vy,angle};
 }
 export function reefTarget(id:number,time:number){
- const species=id%20===0?7:id%13===0?3:id%11===0?5:id%9===0?4:id%7===0?6:id%3;
- const direction=id%3===0?-1:1,speed=[32,40,28,48,19,24,14,34][species];
- const x=((id*157+time*speed*direction)%1320+1320)%1320-60;
- const y=85+(id*37%420)+Math.sin(time*.65+id*.8)*20;
- return {x,y,direction,species,radius:[26,28,30,48,34,48,30,56][species]};
+ const species=id%40===0?8:id%20===0?9:id%23===0?7:id%17===0?10:id%19===0?13:id%11===0?11:id%13===0?12:id%7===0?3:id%9===0?4:id%8===0?0:id%6===0?6:id%5===0?5:id%4===0?2:id%3===0?1:id%2===0?15:14;
+ const direction=id%3===0?-1:1,speed=[32,40,28,39,19,24,14,29,27,24,18,24,21,26,49,42][species];
+ // A long shared migration lane keeps most of the 80 targets offscreen, not stacked in the water.
+ const x=((id*197+time*speed*direction)%4800+4800)%4800-1800;
+ const y=100+(id*37%390)+Math.sin(time*.65+id*.8)*(species>=8&&species<=10?12:20);
+ return {x,y,direction,species,radius:[15,18,20,42,25,35,24,48,62,52,34,39,22,29,9,12][species]};
 }

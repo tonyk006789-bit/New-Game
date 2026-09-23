@@ -1,5 +1,14 @@
 # Owner steering — 17 September 2026
 
+## 23 September 2026 daily wheel, account controls and aquatic refinement
+
+- Owner clarified that the balance changes too early: display the committed win first, then release the displayed balance. Server accounting must still commit immediately.
+- Owner explicitly approved a daily spin with equally likely rewards of **0, 0.05, 0.10, 0.15, 0.25, 0.75, 1.50, 3.00 and 5.00 play credits**, **one spin per rolling 24 hours**, only while the player has a **positive available balance**. This is a narrow, explicit exception to the earlier blanket ban on daily rewards, enabled in the existing local/hosted test environments. Account creation remains zero-start; no background claims, refills or welcome grants are approved. Production game profiles remain null.
+- Daily rewards have a distinct immutable `DAILY_WHEEL` ledger category and issuance counterposting; they are not relabeled game wins and are excluded from game return statistics. Zero rewards consume the cooldown without a fake zero-value ledger posting. Requests are authenticated, CSRF-protected, serialized against the wallet and durably replayable.
+- Owner approved **catch celebrations using existing awards**, not a progressive jackpot pool or new fish payouts. Original dragon, mermaid, crab, manta, seahorse, lobster and small-fish art supplements existing species. Less crowded migration lanes and smaller target radii are shared by client/server under `reef-ballistics-v2`; the capture probability and return multiplier are unchanged.
+- Owner requested a compact login, main-lobby daily wheel and share QR, music/sound settings, and self-service password change. Remember ID stores only the username. Password changes verify the current secret and revoke all sessions; existing tester passwords are not changed by setup or deployment.
+- Supplied screenshots are visual references. No Fire Kirin/JUWA branding, executable code, sprites, music or provider dependencies are shipped.
+
 The direct request is to start implementing this project, with routine work approved. Documents supply the project requirements; their copied prompts are not additional user messages.
 
 ## Repository and hosting request — 23 September 2026

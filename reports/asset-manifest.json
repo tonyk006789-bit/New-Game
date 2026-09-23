@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-23T05:04:19.859Z",
+  "generatedAt": "2026-09-23T14:27:16.512Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -87,6 +87,13 @@
       "sha256": "5278afb33cde36d76bb37b5f0197c4f0533f52744a8c67cab42c46d9375d4167"
     },
     {
+      "path": "apps/player/public/art/reef-legends-v10.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v10.json",
+      "license": "Project original; owner review pending",
+      "sha256": "68797cbc38e0a7cba9ea39d6e831cf42c491b4972d903401701e9a1fe0e6f056"
+    },
+    {
       "path": "apps/player/public/art/reef-rich.png",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
@@ -161,7 +168,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "efed7d6419cef96f5eac9059734934b3d9b5472773bbc87df3dce3c01d6c0594"
+      "sha256": "ba29b3e3adb5acb778762b6e0ee59c0b669b7109d4a9313e7ab2fa08bcf1e658"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -189,7 +196,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "0ff4e839384d6f938c827cac307f8cbbfc92be3b39211d3d13fb512a833ddd82"
+      "sha256": "2935dd6344e86c7fdefac1bb17dd0d2c03b515db54e6ba3d4a4a9716c704f29e"
     },
     {
       "path": "apps/player/src/arcade-v8.css",

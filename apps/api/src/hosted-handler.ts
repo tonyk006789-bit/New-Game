@@ -6,10 +6,12 @@ import {environment, stagingRound, stagingHistory, stagingStats, recoverStagingR
 import {reefRoom, reefTables, reefLeave} from './practice.js';
 import {transaction, fail} from './store.js';
 import {hostedTest, validateHostedTest} from './environment.js';
+import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
+import {changePassword} from './password.js';
 
 export const testAudience = new Set(['tester.one','tester.two','tester.three','tester.four','tester.five']);
-const reads = new Set(['/v1/environment','/v1/health','/v1/games','/v1/me','/v1/history','/v1/staging/history','/v1/staging/stats','/v1/practice/reef/room','/v1/practice/reef/tables']);
-const writes = new Set(['/v1/auth/login','/v1/auth/logout','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
+const reads = new Set(['/v1/environment','/v1/health','/v1/games','/v1/me','/v1/history','/v1/staging/history','/v1/staging/stats','/v1/practice/reef/room','/v1/practice/reef/tables','/v1/daily-wheel']);
+const writes = new Set(['/v1/auth/login','/v1/auth/logout','/v1/auth/password','/v1/daily-wheel/spin','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
 const rounds = /^\/v1\/staging\/(neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party)\/rounds$/;
 export function playerRoute(method:string, path:string){return method==='GET'?reads.has(path):method==='POST'&&(writes.has(path)||rounds.test(path));}
 const json=(body:unknown,status=200,extra:Record<string,string>={})=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY',...extra}});
@@ -45,6 +47,9 @@ export async function hostedHandler(request:Request, context:{ip?:string}={}){
   await transaction(async db=>{const actor=await actorFor(db,req,request.method==='POST');if(actor.role!=='PLAYER'||!testAudience.has(actor.username))fail(403,'TEST_ACCOUNT_REQUIRED');});
   let result:unknown;
   if(path==='/v1/me')result=await me(req);
+  else if(path==='/v1/daily-wheel')result=await dailyWheelStatus(req);
+  else if(path==='/v1/daily-wheel/spin')result=await spinDailyWheel(req,body);
+  else if(path==='/v1/auth/password')result=await changePassword(req,res,body);
   else if(path==='/v1/history')result=await history(req);
   else if(path==='/v1/staging/history')result=await stagingHistory(req);
   else if(path==='/v1/staging/stats')result=await stagingStats(req);

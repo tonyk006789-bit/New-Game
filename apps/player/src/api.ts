@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import {stage,savePending,clearPending,restorePending} from './staging-state';
+import {holdCredits,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
 export const session: {current:Account|null} = {current:null};
 export const expiredSession=(error:unknown):boolean=>error instanceof Error && 'status' in error && error.status===401;
@@ -25,10 +26,11 @@ export async function api<T>(path:string,body?:unknown):Promise<T>{
 async function settle<T>():Promise<T>{
  if(!stage.pending||!session.current||stage.pending.accountId!==session.current.id)throw new Error('Sign in to the account with the pending round.');
  const pending=stage.pending;stage.busy=true;
+ holdCredits(pending.path.split('/')[1],session.current.id,session.current.wallet.available);
  try{
   const result=await request<T&{game:string;stake:string;award:string;net:string}>(pending.path,pending.body);
   if(stage.pending===pending&&session.current?.id===pending.accountId){clearPending();stage.last=result;stage.revision++;}return result;
- }catch(error){if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status)))clearPending();else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
+ }catch(error){revealCredits();if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status)))clearPending();else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
 }
 export async function recoverRound(){
  const pending=stage.pending;

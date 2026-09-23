@@ -9,6 +9,8 @@ import { accounts, createAccount, history, me, report, auditHistory, manageAccou
 import { adjust, transfer, reverse } from './ledger.js';
 import { practiceHistory, practiceRound, reefRoom, reefShot, reefTables, reefLeave } from './practice.js';
 import { environment, stagingRound, stagingHistory, stagingStats, recoverStagingRound } from './staging.js';
+import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
+import {changePassword} from './password.js';
 @Catch()
 class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost){
  const res=host.switchToHttp().getResponse();
@@ -17,6 +19,9 @@ class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost
 } }
 @Controller('v1')
 class ArcadeController {
+ @Get('daily-wheel') wheel(@Req() req:Request){return dailyWheelStatus(req);}
+ @Post('daily-wheel/spin') wheelSpin(@Req() req:Request,@Body() body:unknown){return spinDailyWheel(req,body);}
+ @Post('auth/password') password(@Req() req:Request,@Res({passthrough:true}) res:Response,@Body() body:unknown){return changePassword(req,res,body);}
  @Get('environment') environment(){return environment();}
  @Post('staging/:id/rounds') staging(@Req() req:Request,@Param('id') id:string,@Body() body:unknown){return stagingRound(req,id,body);}
  @Get('staging/history') stagingHistory(@Req() req:Request){return stagingHistory(req);}

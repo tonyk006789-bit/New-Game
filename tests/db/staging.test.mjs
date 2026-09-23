@@ -110,7 +110,7 @@ test('isolated staging accounting and outcomes',async t=>{
   const teleport=aim();delete teleport.firedAt;delete teleport.angle;assert.equal((await call('staging/reef-party/rounds',teleport,playerAuth)).status,400);
   assert.equal((await wallet(player)).settled,before);
   let captured=false,last;
-  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v1');assert.equal(r.data.award,captured?'75':'0');assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
+  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v2');assert.equal(r.data.award,captured?'75':'0');assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
   assert.equal(captured,true);await sleep();assert.equal((await call('staging/reef-party/rounds',{...last,requestKey:randomUUID()},playerAuth)).status,409);
   // A durable v5 receipt is replayable after the trajectory-proof upgrade.
   const legacy={...last,profileId:'stage-paying30-v1',requestKey:randomUUID()};delete legacy.firedAt;delete legacy.angle;
@@ -120,6 +120,45 @@ test('isolated staging accounting and outcomes',async t=>{
   await control.query('UPDATE practice_targets SET captured_by=$1,captured_at=now() WHERE room_id=$2',[player,room.id]);
   const replacement=(await call('practice/reef/join',{},playerAuth)).data;
   assert.notEqual(replacement.id,room.id);assert.equal(replacement.targets.length,80);assert.ok(replacement.targets.every(t=>!t.captured));
+ });
+ await t.test('daily wheel enforces positive available balance, roles, cooldown, durable replay and balanced awards',async()=>{
+  assert.equal((await call('daily-wheel')).status,401);
+  assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID()},admin)).status,403);
+  assert.equal((await call('daily-wheel',undefined,peerAuth)).data.eligible,false);
+  assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID()},peerAuth)).data.code,'WHEEL_NEEDS_CREDITS');
+  assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID(),award:'500'},playerAuth)).status,400);
+  assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID()},playerAuth,{'X-CSRF-Token':'wrong'})).status,403);
+  const before=await wallet(player),data={requestKey:randomUUID()};
+  const replies=await Promise.all(Array.from({length:6},()=>call('daily-wheel/spin',data,playerAuth)));
+  assert.ok(replies.every(r=>r.status===201),JSON.stringify(replies));for(const r of replies)assert.deepEqual(r.data,replies[0].data);
+  const receipt=replies[0].data;assert.ok(['0','5','10','15','25','75','150','300','500'].includes(receipt.award));
+  assert.equal(receipt.nextAt-receipt.createdAt,86400000);
+  assert.equal(BigInt((await wallet(player)).available),BigInt(before.available)+BigInt(receipt.award));
+  assert.equal((await control.query('SELECT count(*)::int n FROM daily_wheel_spins WHERE account_id=$1',[player])).rows[0].n,1);
+  assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID()},playerAuth)).data.code,'WHEEL_COOLDOWN');
+  const realNow=Date.now;Date.now=()=>receipt.nextAt-1;
+  try{assert.equal((await call('daily-wheel/spin',{requestKey:randomUUID()},playerAuth)).data.code,'WHEEL_COOLDOWN');}finally{Date.now=realNow;}
+  Date.now=()=>receipt.nextAt;
+  try{const race=await Promise.all(Array.from({length:5},()=>call('daily-wheel/spin',{requestKey:randomUUID()},playerAuth)));assert.equal(race.filter(r=>r.status===201).length,1);assert.equal(race.filter(r=>r.status===409).length,4);}finally{Date.now=realNow;}
+  await assert.rejects(()=>control.query('UPDATE daily_wheel_spins SET award_units=0'),/immutable/);
+  const mismatches=(await control.query("SELECT count(*)::int n FROM daily_wheel_spins d LEFT JOIN ledger_postings p ON p.transaction_id=d.award_transaction AND p.wallet_id IS NOT NULL WHERE d.award_units>0 AND (p.units IS NULL OR p.units<>d.award_units)")).rows[0].n;assert.equal(mismatches,0);
+  const available=(await wallet(player)).available;await control.query('UPDATE wallets SET reserved_units=settled_units WHERE account_id=$1',[player]);
+  try{assert.equal((await call('daily-wheel',undefined,playerAuth)).data.hasCredits,false);assert.deepEqual((await call('daily-wheel/spin',data,playerAuth)).data,receipt);}finally{await control.query('UPDATE wallets SET reserved_units=0 WHERE account_id=$1',[player]);}
+  assert.equal((await wallet(player)).available,available);
+ });
+ await t.test('player password changes require current secret and CSRF, revoke every session, and preserve credits',async()=>{
+  const second=await signin('stage.peer'),before=(await call('me',undefined,peerAuth)).data.wallet;
+  const password='Changed-Private-Test-Password-123';
+  assert.equal((await call('auth/password',{currentPassword:adminPassword,newPassword:password},peerAuth,{'X-CSRF-Token':'wrong'})).status,403);
+  assert.equal((await call('auth/password',{currentPassword:'wrong',newPassword:password},peerAuth)).status,400);
+  assert.equal((await call('auth/password',{currentPassword:adminPassword,newPassword:'short'},peerAuth)).status,400);
+  assert.equal((await call('auth/password',{currentPassword:adminPassword,newPassword:password},peerAuth)).status,201);
+  assert.equal((await call('me',undefined,peerAuth)).status,401);assert.equal((await call('me',undefined,second)).status,401);
+  assert.equal((await call('auth/login',{username:'stage.peer',password:adminPassword})).status,401);
+  peerAuth=await signin('stage.peer',password);assert.deepEqual((await call('me',undefined,peerAuth)).data.wallet,before);
+  for(let i=0;i<8;i++)assert.equal((await call('auth/password',{currentPassword:'wrong',newPassword:adminPassword},peerAuth)).status,400);
+  assert.equal((await call('auth/password',{currentPassword:password,newPassword:adminPassword},peerAuth)).status,429);
+  const audit=(await control.query("SELECT details FROM audit_events WHERE event_type='PASSWORD_CHANGED'")).rows;assert.equal(audit.length,1);assert.ok(!JSON.stringify(audit).includes(password));
  });
  await t.test('statistics exclude grants, scope to player, and match immutable history',async()=>{
   const rows=(await control.query('SELECT * FROM staging_rounds WHERE account_id=$1',[player])).rows;
