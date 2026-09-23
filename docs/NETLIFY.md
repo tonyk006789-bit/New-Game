@@ -8,6 +8,8 @@ Project ID: `df1f4e3c-07cc-4d97-af78-27bb84e9225f`. The site builds `main` from 
 
 `netlify/functions/game-api.ts` adapts native HTTP requests to the existing PostgreSQL authentication, room, round and ledger functions. It accepts only the player route allowlist and five named tester accounts. It exposes no account-management, credit-adjustment or admin routes. Sessions are secure HttpOnly cookies; mutations require the exact allowed origin and CSRF token. Bodies are limited to 16 KiB. API responses are uncached JSON; they never fall through to the app shell.
 
+The build first compiles workspace code into one ESM entry in the ignored `netlify/functions-build` directory, which is the deployment function directory. This avoids duplicate function filenames produced when the hosted bundler transforms multiple TypeScript workspace package exports. Netlify then traces normal runtime dependencies.
+
 Use these environment variables in the Netlify production deployment context. This context identifies the published Git branch, not approved production game mathematics:
 
 ```text
@@ -50,6 +52,7 @@ pnpm test:netlify
 pnpm build:server
 node --env-file=.local/staging/runtime.env --test tests/db/hosted.test.mjs
 pnpm build:netlify
+pnpm test:netlify-bundle
 ```
 
 The hosted integration test uses a disposable schema in local PostgreSQL. It covers five independent logins, secure cookies, branch restrictions, origin/CSRF checks, durable round retries and recovery, four seats with a fifth-player conflict, database identity mismatch and logout. It is evidence for server behavior, not proof that the remote deployment is configured.

@@ -1,7 +1,7 @@
 [build]
   command = "pnpm build:netlify"
   publish = "apps/player/dist"
-  functions = "netlify/functions"
+  functions = "netlify/functions-build"
 
 [build.environment]
   NODE_VERSION = "24.19.0"

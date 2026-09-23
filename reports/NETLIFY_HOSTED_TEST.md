@@ -6,6 +6,8 @@
 - Netlify project `new-game-tonyk006789` created with a dedicated managed PostgreSQL database on the free plan.
 - Initial player deploy `6ab36de4fa1799ae8640c66a` published. Chrome rendered the login page at https://new-game-tonyk006789.netlify.app. Netlify currently labels the deployment Private.
 - Hosted API implementation and one-time setup are prepared. Official CLI authorization and temporary database token-write access are pending owner confirmation. Hosted users, credit funding and remote game play are **not yet verified**.
+- Hosted implementation commit `fe18ab47d31710548699681f6315494cd74f0a18` was pushed and deployed as `6ab376838a152d00098358b3`. Netlify confirmed **Migrations applied** and **Published**. The four hosted variables are saved for the published branch only. An unauthenticated external request receives HTTP 401 from Netlify's private-site protection.
+- A live request caught a function startup failure. Inspection reproduced duplicate `game-api.mjs` entries when Netlify transformed the TypeScript workspace packages. The build now precompiles those sources to one ESM entry. The corrected archive has no duplicate paths; cloud verification of the correction follows.
 
 ## Changes
 
@@ -21,6 +23,7 @@ Key paths: `apps/api/src/hosted-handler.ts`, `apps/api/src/environment.ts`, `app
 - `pnpm test`: **50 reference + 70 unit + 16 integration = 136 passed**.
 - `pnpm test:netlify`: **3 passed**.
 - `pnpm build:netlify`: passed; publishes player assets and same-origin function rewrites.
+- After the startup fix, `pnpm build:netlify`, `pnpm test:netlify-bundle` (1 passed), and `pnpm lint` passed. The official function builder produced a 770-file archive with exactly one entry module and zero duplicate paths. Publication scan checked 295 source paths against 17 private credential values, with no findings.
 - `node .cache/netlify-tools/node_modules/netlify-cli/bin/run.js functions:build --filter @new-game/player --src "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/netlify/functions" --functions "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.cache/netlify-functions"`: passed with official Netlify CLI 27.8.1. Initial invocation without the explicit workspace stopped at the monorepo-selection prompt; the explicit invocation succeeded.
 
 Reference math tests do not establish production accounting. Local PostgreSQL tests do not establish remote connectivity, browser access for other people, or native-device performance.

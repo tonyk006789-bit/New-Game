@@ -10,6 +10,7 @@ reports/recordings*/
 reports/SHARED_TEST_VERIFICATION.json
 reports/LOCAL_SHARED_GATEWAY_VERIFICATION.json
 .netlify/
+netlify/functions-build/
 *.pem
 *.key
 *.keystore
