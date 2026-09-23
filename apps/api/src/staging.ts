@@ -7,7 +7,7 @@ import {transaction,fail,idempotent} from './store.js';
 import {lockWallets,posting,beginLedger} from './ledger.js';
 import {canonical,digest} from './security.js';
 export const profileHash=digest(canonical(stagingProfile));
-export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null};}
+export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null};}
 function gate(){if(!stagingEnabled())fail(404,'STAGING_DISABLED');}
 const schema=z.object({requestKey:z.string().min(8).max(128),stake:z.string().refine(validStake),profileId:z.string().min(1).max(80),picks:z.array(z.number().int().min(1).max(80)).min(4).max(10).optional(),roomId:z.uuid().optional(),targetId:z.number().int().min(1).max(80).optional(),aimX:z.number().min(0).max(1200).optional(),aimY:z.number().min(0).max(600).optional(),observedAt:z.number().int().optional(),firedAt:z.number().int().optional(),angle:z.number().min(-Math.PI).max(Math.PI).optional()}).strict();
 export async function stagingRound(req:Request,id:string,body:unknown){

@@ -1,40 +1,61 @@
-# Netlify deployment setup
+# Netlify private-group test
 
-The repository is prepared for a new Netlify **player** site. The current API is a long-running NestJS service backed by PostgreSQL. Deploying the static player does not create that service, copy the local database or create test accounts.
+Player site: https://new-game-tonyk006789.netlify.app
 
-## Import the repository
+Project ID: `df1f4e3c-07cc-4d97-af78-27bb84e9225f`. The site builds `main` from `tonyk006789-bit/New-Game`, at the repository root, using `pnpm build:netlify`. Only `apps/player/dist` is published. The admin console, local account files and development servers are not published.
 
-1. In Netlify, choose **Add new project → Import an existing project → GitHub** and select `tonyk006789-bit/New-Game`.
-2. Select the pushed branch. Leave the base directory at the repository root. The committed `netlify.toml` supplies build command `pnpm build:netlify`, publish directory `apps/player/dist` and functions directory `netlify/functions`.
-3. Node is pinned to `24.19.0`; pnpm is pinned to `11.19.0` in `package.json`. The lockfile is used for installation. Do not set `NODE_ENV=production` during dependency installation, which needs development build tools.
-4. Initially leave `GAME_API_ORIGIN` unset. Netlify will serve the guest preview and return a clear JSON service-unavailable message for online sign-in. No credentials are bundled and API paths cannot fall through to the HTML app shell.
+## Hosted player API
 
-Only the player output is published. The operator console, repository sources, reports and `.local` directory are outside the publish directory. Search indexing is disabled, but that is not access control: use Netlify access protection where available if the preview itself must be private.
+`netlify/functions/game-api.ts` adapts native HTTP requests to the existing PostgreSQL authentication, room, round and ledger functions. It accepts only the player route allowlist and five named tester accounts. It exposes no account-management, credit-adjustment or admin routes. Sessions are secure HttpOnly cookies; mutations require the exact allowed origin and CSRF token. Bodies are limited to 16 KiB. API responses are uncached JSON; they never fall through to the app shell.
 
-## Connect online play later
+Use these environment variables in the Netlify production deployment context. This context identifies the published Git branch, not approved production game mathematics:
 
-`GAME_API_ORIGIN` is an optional **build-time** Netlify environment variable such as `https://your-player-api.example`. It must be the HTTPS origin of the hosted player service, without a path or credentials. A build generates a same-origin `/v1/*` proxy, so browser sessions keep the existing cookie/CSRF model. Changing this variable requires a rebuild. Never put a database password, connection string or admin credential in this variable or a `VITE_*` variable.
+```text
+GAME_ENV=hosted-test
+HOSTED_TEST_SITE_ID=df1f4e3c-07cc-4d97-af78-27bb84e9225f
+HOSTED_TEST_PROFILE=stage-paying30-v2
+ALLOWED_ORIGINS=https://new-game-tonyk006789.netlify.app
+```
 
-Before connecting it, the backend work still required is:
+Netlify supplies `SITE_ID` and the managed `NETLIFY_DB_URL`; the official `@netlify/database` package retrieves the connection string at runtime. No database secret belongs in a `VITE_*` setting, source file or build output. Leave `GAME_API_ORIGIN` unset for this function. It remains an optional, validated external HTTPS player-service override.
 
-- Provision a dedicated PostgreSQL database and deploy the API/player gateway. The existing loopback listener, process startup and local-only fixture scripts need a hosted deployment path; the Netlify frontend build does not run them.
-- Configure TLS, secure session cookies and `ALLOWED_ORIGINS` for the exact Netlify site origin. Keep player routing and the five-account test audience restrictions; do not expose admin routes through the player service. Preview branch domains need their own explicitly permitted origins and isolated data if used.
-- Implement an explicit private hosted-test environment. `GAME_ENV=staging` currently deliberately requires the local staging database and rejects production mode. Do not bypass that check or mark the experimental math as approved production math to make a deployment start.
-- Apply database migrations and provision accounts through the existing authenticated administrative workflow. Account creation starts at zero. An authorized, idempotent manual adjustment may fund the five test accounts once. No automatic refill is part of deployment.
-- Verify five separate logins, four shared fish seats, automatic round reconciliation, immutable balances and idempotency against the hosted database before sharing a playable test link.
+Hosted mode requires the exact project ID, the experimental profile, a remote PostgreSQL URL with required TLS, and a matching `hosted_test_environment` database marker. The local staging guard still rejects remote databases. Production targets and profiles remain undecided. A missing or inconsistent hosted configuration fails closed.
 
-Keep `GAME_API_ORIGIN` unset until that backend exists. The local tester credentials and balances remain on the development computer; this setup does not upload them.
+The pool uses at most three connections per function instance. Four-seat fishing uses the existing transactional room membership and polling API; it does not require a long-running Colyseus server. Real-device performance and native app distribution remain unverified.
 
-## Local validation and rollback
+## Database and one-time account setup
+
+A dedicated Netlify Database was created for this site on 23 September 2026. The baseline `netlify/database/migrations/0001_arcade_test/migration.sql` contains repository migrations 001–008, generated once by `scripts/netlify-migrations.mjs`. Netlify applies SQL migrations before publishing. Future schema changes require a new numbered migration; do not regenerate or edit an applied baseline.
+
+Migrations create schema only. They do not create people, allocate credits or refill wallets. The separate manual command below requires an explicitly confirmed site ID and a private environment file:
 
 ```sh
-pnpm install --frozen-lockfile
+pnpm build:server
+node --env-file=.local/hosted/runtime.env scripts/provision-hosted-test.mjs
+```
+
+The private file needs `DATABASE_URL`, the hosted variables above, `SITE_ID`, and `CONFIRM_HOSTED_SETUP` equal to the site ID. Obtain the dedicated connection string through the official Netlify CLI/API without printing it. If database token-write access is enabled for setup, disable it afterward.
+
+The script bootstraps an isolated zero-balance Main Admin, then signs in with MFA and uses ordinary authenticated account creation and manual ADD operations. Each of the five existing tester IDs/passwords is reused for this separate database. Every player starts at zero and receives exactly one authorized 1,000-credit adjustment. Persisted request IDs and receipts make reruns replay that adjustment rather than refill the wallet. Existing account identity, role, branch and credentials must match. Keep `.local/hosted/accounts.json` so interrupted setup remains recoverable.
+
+Private tester instructions are written to `.local/hosted/TESTER_LOGINS.md`; credentials are never returned by the hosted environment endpoint. The local staging database and its balances are unchanged. Test accounts and credits are not yet considered ready until the live acceptance checks in the deployment report pass.
+
+## Validation and rollback
+
+```sh
+pnpm lint
+pnpm typecheck
+pnpm test
 pnpm test:netlify
+pnpm build:server
+node --env-file=.local/staging/runtime.env --test tests/db/hosted.test.mjs
 pnpm build:netlify
 ```
 
-No database migration is introduced by this hosting configuration. Remove `GAME_API_ORIGIN` and redeploy to disconnect the hosted API, or restore a previous Netlify deploy to roll back the player. Neither action rewinds committed rounds or balances.
+The hosted integration test uses a disposable schema in local PostgreSQL. It covers five independent logins, secure cookies, branch restrictions, origin/CSRF checks, durable round retries and recovery, four seats with a fifth-player conflict, database identity mismatch and logout. It is evidence for server behavior, not proof that the remote deployment is configured.
 
-Acceptance screenshots and recordings referenced by historical reports remain local because they may contain disposable passwords and account information. They are intentionally absent from the source repository.
+Unsetting `GAME_ENV` disables the function. Restoring an earlier Netlify deployment rolls back code and player assets without rewinding accepted rounds or ledger entries. Leave applied schema and ledger history intact. No down migration deletes accounts or balances. A site rollback alone is not a database rollback.
 
-References: [Netlify file configuration](https://docs.netlify.com/build/configure-builds/file-based-configuration/), [Vite setup](https://docs.netlify.com/build/frameworks/framework-setup-guides/vite/), [dependency management](https://docs.netlify.com/build/configure-builds/manage-dependencies/), [proxy rewrites](https://docs.netlify.com/manage/routing/redirects/rewrites-proxies/).
+Node is pinned to `24.19.0`, pnpm to `11.19.0`, and database SDK to `2.0.1`. Do not set `NODE_ENV=production` during dependency installation because the build needs development tools. Historical screenshots and recordings remain local and are excluded from publication.
+
+References: [managed PostgreSQL](https://docs.netlify.com/build/data-and-storage/netlify-database/), [connection API](https://docs.netlify.com/build/data-and-storage/netlify-database/api/), [SQL migrations](https://docs.netlify.com/build/data-and-storage/netlify-database/migrations/), [Functions request API](https://docs.netlify.com/build/functions/api/).

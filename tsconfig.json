@@ -6,6 +6,6 @@
     "emitDecoratorMetadata": true, "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "vite/client"]
   },
-  "include": ["apps/**/*.ts", "apps/**/*.vue", "packages/**/*.ts", "packages/**/*.vue", "tests/**/*.ts", "*.ts"],
+  "include": ["apps/**/*.ts", "apps/**/*.vue", "packages/**/*.ts", "packages/**/*.vue", "netlify/functions/**/*.ts", "tests/**/*.ts", "*.ts"],
   "exclude": ["node_modules", "dist", "apps/mobile/android", "apps/mobile/ios"]
 }

@@ -3,7 +3,7 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 
 export function routing(apiOrigin = '') {
-  let target = '/.netlify/functions/api-unavailable';
+  let target = '/.netlify/functions/game-api/v1/:splat';
   if (apiOrigin) {
     const url = new URL(apiOrigin);
     // This is build-time configuration, never a browser-provided proxy target.
@@ -18,5 +18,5 @@ export function routing(apiOrigin = '') {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   await writeFile('apps/player/dist/_redirects', routing(process.env.GAME_API_ORIGIN));
   await writeFile('apps/player/dist/robots.txt', 'User-agent: *\nDisallow: /\n');
-  console.log(process.env.GAME_API_ORIGIN ? 'Netlify player build: hosted API proxy configured.' : 'Netlify player build: guest preview ready; hosted API not configured.');
+  console.log(process.env.GAME_API_ORIGIN ? 'Netlify player build: hosted API proxy configured.' : 'Netlify player build: same-origin player function configured; hosted-test settings are required for online play.');
 }

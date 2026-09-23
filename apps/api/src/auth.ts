@@ -2,13 +2,13 @@ import { type PoolClient } from 'pg';
 import { z } from 'zod';
 import { type Actor, audit, fail, transaction } from './store.js';
 import { digest, passwordMatches, token, validTotp } from './security.js';
-import { stagingEnabled } from './environment.js';
+import { stagingEnabled, hostedTest } from './environment.js';
 export interface Request { headers: Record<string,string|string[]|undefined>; ip?: string }
 export interface Response { setHeader(name: string, value: string): unknown }
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://127.0.0.1:5173,http://127.0.0.1:5174').split(',');
 export function checkOrigin(req: Request) { if (!allowedOrigins.includes(String(req.headers.origin || ''))) fail(403,'ORIGIN_REJECTED'); }
-const cookieName=stagingEnabled()?'ng_staging_session':'ng_session';
-export const sessionCookie = (value: string, maxAge=43200) => `${cookieName}=${value}; HttpOnly; SameSite=Strict; Path=/v1; Max-Age=${maxAge}${process.env.NODE_ENV==='production'?'; Secure':''}`;
+const cookieName=stagingEnabled()?(hostedTest()?'ng_hosted_test_session':'ng_staging_session'):'ng_session';
+export const sessionCookie = (value: string, maxAge=43200) => `${cookieName}=${value}; HttpOnly; SameSite=Strict; Path=/v1; Max-Age=${maxAge}${process.env.NODE_ENV==='production'||hostedTest()?'; Secure':''}`;
 export function readToken(req: Request) { return String(req.headers.cookie||'').split(';').map(part=>part.trim()).find(part=>part.startsWith(`${cookieName}=`))?.slice(cookieName.length+1) || ''; }
 export async function actorFor(db: PoolClient, req: Request, mutation=false): Promise<Actor> {
  const session=readToken(req); if(!/^[a-f0-9]{64}$/.test(session))fail(401,'AUTH_REQUIRED','Please sign in.');

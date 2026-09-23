@@ -1,14 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {routing} from '../../scripts/netlify-setup.mjs';
-import unavailable from '../../netlify/functions/api-unavailable.mjs';
 
-test('an unconfigured deployment responds to API requests with JSON, not the app shell', async () => {
-  assert.equal(routing().split('\n')[0], '/v1/* /.netlify/functions/api-unavailable 200!');
-  const response = await unavailable();
-  assert.equal(response.status, 503);
-  assert.equal(response.headers.get('cache-control'), 'no-store');
-  assert.equal((await response.json()).code, 'API_NOT_CONFIGURED');
+test('API requests route to the player function before the app shell', () => {
+  assert.equal(routing().split('\n')[0], '/v1/* /.netlify/functions/game-api/v1/:splat 200!');
 });
 
 test('configured API uses a same-origin rewrite before the SPA fallback', () => {

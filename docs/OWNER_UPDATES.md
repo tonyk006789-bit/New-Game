@@ -9,6 +9,13 @@ The direct request is to start implementing this project, with routine work appr
 - The Netlify configuration publishes the player only. Shared login/credits remain dependent on a hosted player API and PostgreSQL; the current local-only staging guard and undecided production math are preserved. See `NETLIFY.md`.
 - Source publication excludes local credentials, databases, test-session files and browser recordings. Existing tester passwords and balances are unchanged.
 
+## Hosted test deployment follow-up — 23 September 2026
+
+- After the source push and explanation of the remaining backend requirements, the owner instructed **“Do it yourself.”** Together with the earlier five-person shareable-test request, this authorizes completing the Netlify player/API/database deployment on the free plan. No paid service, production mathematics or admin-console publication is authorized.
+- Created `new-game-tonyk006789` on Netlify and its dedicated managed PostgreSQL database. The separate `hosted-test` mode reuses `stage-paying30-v2` and preserves the original local-staging restriction and null production profile.
+- Hosted setup must create zero-start accounts and use the authenticated MFA/manual ADD workflow to fund the five testers once. It must not copy local balances, silently refill wallets or expose credentials in public source or responses.
+- Official Netlify CLI authorization and temporary database token-write access were requested separately because they expand account access. Live setup and acceptance remain pending until that access is approved and the deployment report records verification.
+
 - D01: owner chose **keep undecided while building previews**. All credit-staked game play remains disabled. No sample math becomes a production default.
 - D02: owner approved **branch transfers of existing credits** by sub-distributors/agents. No lower role may issue or retire supply. Implementation remains unavailable until authenticated branch authorization, availability checks, transactional ledger postings and idempotency are implemented and tested. Cross-branch transfers remain forbidden. The direction/recipient matrix will be documented before enabling this feature.
 - D03: owner has no Android/iPhone devices at present and will test once the MVP is available. Physical-device acceptance is deferred by the owner, not passed. No macOS/Xcode/signing access or distribution route has been supplied.

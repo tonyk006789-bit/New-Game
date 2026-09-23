@@ -2,12 +2,22 @@ import pg, { type PoolClient, type QueryResultRow } from 'pg';
 import { HttpException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { canonical, digest } from './security.js';
+import { hostedTest, validateHostedTest } from './environment.js';
 export const fail = (status: number, code: string, message: string = code): never => { throw new HttpException({ code, message }, status); };
-export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 12 });
+export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: hostedTest()?3:12, connectionTimeoutMillis:10000, idleTimeoutMillis:30000 });
+pool.on('error',()=>console.error('An idle database connection closed.'));
 export async function transaction<T>(run: (db: PoolClient) => Promise<T>) {
  if (!process.env.DATABASE_URL) fail(503, 'DATABASE_UNAVAILABLE', 'The account service is not configured.');
  const db = await pool.connect();
- try { await db.query('BEGIN'); const result = await run(db); await db.query('COMMIT'); return result; }
+ try {
+  await db.query('BEGIN');
+  if(hostedTest()){
+   validateHostedTest();
+   const marker=await db.query('SELECT site_id FROM hosted_test_environment WHERE singleton=true');
+   if(marker.rows[0]?.site_id!==process.env.HOSTED_TEST_SITE_ID)fail(503,'TEST_DATABASE_MISMATCH','The private test database is not configured.');
+  }
+  const result = await run(db); await db.query('COMMIT'); return result;
+ }
  catch (error) { await db.query('ROLLBACK'); throw error; } finally { db.release(); }
 }
 export interface Actor extends QueryResultRow { id: string; branch_id: string; role: 'MAIN_ADMIN'|'SUB_DISTRIBUTOR'|'AGENT'|'PLAYER'; display_name: string; username: string; token_hash: string; csrf_token: string; verified_at: Date | null }
