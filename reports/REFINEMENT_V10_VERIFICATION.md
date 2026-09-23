@@ -41,7 +41,9 @@ Local screenshots are ignored because they can contain sample account state: `re
 
 ## Deployment and migration
 
-Pending final publish verification. Netlify uses its own `netlify.migrations` tracking for the installed 001–008 baseline. The generic local migration command was initially attempted against the hosted test DB; its transaction rolled back at the already-existing enum before any changes. The deployment now supplies the correct additive `netlify/database/migrations/0002_daily_wheel/migration.sql`, containing repository migrations 009–010. The original baseline is unchanged.
+Published at `https://new-game-tonyk006789.netlify.app/`. Netlify deploy `6ab3ed87ce7b9500083d836f` is ready for commit `3ff9254b03d51a8a1ec1d04dc76e87adf122b19e`, published 2026-09-23 15:18:04 UTC. Public root and `/v1/health` return 200; live assets match the final build (`index-Sl6PUkk5.js`, `index-B4zkq4HQ.css`). All five existing tester accounts passed ordinary login, wallet read, daily-wheel status/reward configuration and logout at 15:21 UTC. No hosted credit or password mutation was performed. The production QR panel rendered under the deployed content security policy, and the existing browser player session restored successfully.
+
+Netlify uses its own `netlify.migrations` tracking for the installed 001–008 baseline. The generic local migration command was initially attempted against the hosted test DB; its transaction rolled back at the already-existing enum before any changes. The deployment supplies the correct additive `netlify/database/migrations/0002_daily_wheel/migration.sql`, containing repository migrations 009–010. The original baseline is unchanged. Successful hosted wheel-status queries verify that the added table is available.
 
 Rollback code by redeploying the prior version; keep added tables and all committed daily receipts/ledger postings. Never restore balances from screenshots or remove accepted rewards. Existing tester logins are unchanged.
 
