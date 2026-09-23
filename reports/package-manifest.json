@@ -1,0 +1,230 @@
+{
+  "version": "2.0",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 128,
+      "sha256": "e0d1620dca18efa1aeea6ec19d743c0bd2f4f04b9d7535d4725ebec19f1ae141"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 4679,
+      "sha256": "15c21268f974797d8a904104d91a160a3a801d244574a331d30b70f5ec1ee520"
+    },
+    {
+      "path": "New_Game_Codex_Build_Plan_v2.pdf",
+      "bytes": 1339620,
+      "sha256": "22da7b74c7e6fd12d5f821da9424b476f7eb0ec3f96442b74b44dc5e5b53042a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2913,
+      "sha256": "96a68147a7ff4351c23c9a1e288390ba195511149ecc4e2ffdfb52ce53bb11a0"
+    },
+    {
+      "path": "config/product-decisions.json",
+      "bytes": 1790,
+      "sha256": "cf799ecd98b30f3916e2dc019d3b6336c6dd6ca7376e27af778bfd4a4f163dcd"
+    },
+    {
+      "path": "contracts/README.md",
+      "bytes": 3628,
+      "sha256": "7b11a709834eadf626c64c0f3a86dcf9599969ed6a06b6646f186ad5b8643dd5"
+    },
+    {
+      "path": "docs/BUILD_SPEC.md",
+      "bytes": 10056,
+      "sha256": "b4660fed7c42e197b31dbdcf283f2d33993ec48438ccc8080e7a5318b09c445c"
+    },
+    {
+      "path": "docs/CHANGELOG_V2.md",
+      "bytes": 2370,
+      "sha256": "8e2debc073840cf1cc31fa3b2fe7424abbb14ce416510f096532d65ce1bedf07"
+    },
+    {
+      "path": "docs/CREDIT_CONTROL.md",
+      "bytes": 3373,
+      "sha256": "70a3cce918d42d5ba61bf8d9a437a6d3394e469120ddfe15b788305690413db8"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "bytes": 2699,
+      "sha256": "3ff9d06d3f73ea8d762d47e4b137b2b20b2988d0306d30b0d5c7bd733b28c452"
+    },
+    {
+      "path": "docs/DESIGN_BRIEF.md",
+      "bytes": 2942,
+      "sha256": "542f15f12da4120f791b46b34f446fd7c62e47e8229c8ab41969573f5f6abd06"
+    },
+    {
+      "path": "docs/MATH_CLARIFICATION.md",
+      "bytes": 2924,
+      "sha256": "b597eba41da409e23cf71e5998391d14af9c471b6dd65fd1c900d85a0f998c0c"
+    },
+    {
+      "path": "docs/MOBILE_DELIVERY.md",
+      "bytes": 4487,
+      "sha256": "3c3028fa5444bfab09fd2a504e03e0749aa83205c02db8297a10c5b21788d284"
+    },
+    {
+      "path": "docs/RESEARCH.md",
+      "bytes": 14191,
+      "sha256": "704f275ab44724bdffb7527fd16d1ee5b249cd87d1678c84b30a7977b14b62ae"
+    },
+    {
+      "path": "docs/SECURITY_TEST_PLAN.md",
+      "bytes": 3475,
+      "sha256": "144e27955d170f826d1898e2246e7ba319c60b46d94d7b34c9e686db47b22898"
+    },
+    {
+      "path": "docs/SPRINT_PLAN.md",
+      "bytes": 3368,
+      "sha256": "c130d1c47149bf59413b4ec108b61df68ba222b82ba46a336838d79eca47b713"
+    },
+    {
+      "path": "docs/backlog.json",
+      "bytes": 18634,
+      "sha256": "ea4086234accece566d558b05cd072c0a5bd1a669d0c1a4483ae7bac5a67c514"
+    },
+    {
+      "path": "docs/backlog.md",
+      "bytes": 14479,
+      "sha256": "5d720518c1369d05ecbf254cf02884a88f2fabd949be359b70a300c3dd6ff6bb"
+    },
+    {
+      "path": "docs/sources.json",
+      "bytes": 16079,
+      "sha256": "9f6cfe3af88cef07d706beaab75349b1e290ec745dd61f439bdbdffccae8d31d"
+    },
+    {
+      "path": "math-reference/game-math.mjs",
+      "bytes": 5874,
+      "sha256": "b2adcf8b654bc672b6eff0e0d7c5f8bca889d9e657331fc8fb93215f00bdc308"
+    },
+    {
+      "path": "math-reference/game-math.test.mjs",
+      "bytes": 4882,
+      "sha256": "5af7abc226ef38b0aa4b5e2d86602948e2897e1590cb5c8f7bfcb9708fc09c75"
+    },
+    {
+      "path": "math-reference/report.mjs",
+      "bytes": 947,
+      "sha256": "5c0c0c2ff9ad96a5667fc2ba77a17e51d18d910bd60b59752de36f6550f69309"
+    },
+    {
+      "path": "policy-reference/README.md",
+      "bytes": 737,
+      "sha256": "65cd3d94beb09f2d14adc59c5dc802650944e7eb9836ec9cbff3bc376d446011"
+    },
+    {
+      "path": "policy-reference/product-policy.mjs",
+      "bytes": 3575,
+      "sha256": "abc968b34686942f4d2c848c17f4724d2844dfab22fbd3512bef2d6cce4e5c0d"
+    },
+    {
+      "path": "policy-reference/product-policy.test.mjs",
+      "bytes": 5338,
+      "sha256": "36d5a9f9129d3317df719496dcc6e958a2dceb6bec7e6357a80ef8326d6b15e1"
+    },
+    {
+      "path": "prompts/00_START_HERE.md",
+      "bytes": 2449,
+      "sha256": "76c9d720ceaceb7bc3389273977ef39f4440379c1bf33b7165685c8b7a08b244"
+    },
+    {
+      "path": "prompts/01_SPRINT_1.md",
+      "bytes": 2442,
+      "sha256": "4bc80784a5ea0041c2cd3370efac502c94c98d9c2e2a5075826d287826d0d6ca"
+    },
+    {
+      "path": "prompts/02_SPRINT_2.md",
+      "bytes": 2436,
+      "sha256": "24e3c836043063cdd37a3b2d2207032e1da909f513ed6dcd24e189b0000425f5"
+    },
+    {
+      "path": "prompts/03_SPRINT_3.md",
+      "bytes": 2407,
+      "sha256": "1902694c9d94964482d224e401e4be240dc669f3310f01b546a9cd55ea0551d8"
+    },
+    {
+      "path": "prompts/04_SPRINT_4.md",
+      "bytes": 2426,
+      "sha256": "753aa927e16e1d4c9249be7b85f52814808079ad8ec4ef8e940059f9d01d7982"
+    },
+    {
+      "path": "prompts/05_SPRINT_5.md",
+      "bytes": 2440,
+      "sha256": "400444e89af3626426458fb5ca693a5fe5450bb7af33c994902a4a834e853d21"
+    },
+    {
+      "path": "prompts/06_SPRINT_6.md",
+      "bytes": 2451,
+      "sha256": "7f80ce85e6d6aa1890966854982c55760f8ff35fd73c1b40ba72e5fd5c4d1f3b"
+    },
+    {
+      "path": "references/README.md",
+      "bytes": 473,
+      "sha256": "335e78e8874b06a5d7331d9ef7190ee0b8fb5213d245417e494197150ea9986f"
+    },
+    {
+      "path": "references/private/game-reference-01.png",
+      "bytes": 843934,
+      "sha256": "a053a984594e624121497fc541f8143c07a416a578ba33578d0a6ebd58cec101"
+    },
+    {
+      "path": "references/private/game-reference-02.png",
+      "bytes": 832967,
+      "sha256": "8e72b21494712213a881f726f503c71f212ae7e9b23eae7e77a55f087b643402"
+    },
+    {
+      "path": "references/private/game-reference-03.png",
+      "bytes": 783261,
+      "sha256": "645a0f9870fdf35c7a809875be9e770d839c803ad48e7474dd56ee2e1ffd2ba0"
+    },
+    {
+      "path": "references/private/game-reference-04.png",
+      "bytes": 933409,
+      "sha256": "0863d35633ce7c426b023ad8917540f5fe8ebb2f19da26e789029d8a517f7016"
+    },
+    {
+      "path": "references/private/game-reference-05.png",
+      "bytes": 690591,
+      "sha256": "aa92d565b5e6be4b5ec11fa48fde96a2240047f9369fd9c7845671a6b264c820"
+    },
+    {
+      "path": "references/private/game-reference-06.png",
+      "bytes": 572393,
+      "sha256": "4a30297f41d7d384284422544b3c2b98a2b137b9fca88edd947733abd30adb0c"
+    },
+    {
+      "path": "references/private/game-reference-07.png",
+      "bytes": 886933,
+      "sha256": "723580b906778aee0c5fe7e599a4278a2950cbf5b963349a96177f3ffb0938d2"
+    },
+    {
+      "path": "references/private/game-reference-08.png",
+      "bytes": 903215,
+      "sha256": "c641584d2ae582343f71b6b40ab59a9e9a3115a946191b08cfaf6b98f6f93ac8"
+    },
+    {
+      "path": "reports/VERIFICATION.md",
+      "bytes": 1082,
+      "sha256": "7283c8f04a7457fe41e39cd932a9dcd41c4c01d2aae2646bde3552800ce9e33d"
+    },
+    {
+      "path": "reports/math-metrics.json",
+      "bytes": 11211,
+      "sha256": "31e213b259281e35ed83c372941c97298dad652fd12ba543b65868a03aea4ace"
+    },
+    {
+      "path": "reports/reference-tests.txt",
+      "bytes": 8213,
+      "sha256": "a1f8de02807a0ca7a27bf1064aa358b83274be36621deea9eb7c28be993257cc"
+    },
+    {
+      "path": "reports/sprint-summary.json",
+      "bytes": 1550,
+      "sha256": "321402cad4a5b38df5af38c50d3749924dc301ea4d10586ae5faf93c7cf77158"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+import { readFile,writeFile,access } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
+import { totp } from '../dist/server/apps/api/src/security.js';
+try{await access('.local/player-credentials.json');console.log('Local player credentials already exist; no accounts were changed.');process.exit(0);}catch{/* First local setup. */}
+const credentials=JSON.parse(await readFile('.local/admin-credentials.json','utf8'));let cookie='',csrf='';
+async function request(path,body){const res=await fetch(`http://127.0.0.1:3000/v1/${path}`,{method:body?'POST':'GET',headers:{Origin:'http://127.0.0.1:5174','Content-Type':'application/json',Cookie:cookie,'X-CSRF-Token':csrf},...(body?{body:JSON.stringify(body)}:{})});const data=await res.json();if(!res.ok)throw new Error(data.message||data.code);if(res.headers.get('set-cookie'))cookie=res.headers.get('set-cookie').split(';')[0];return data;}
+const login=await request('auth/login',{username:credentials.username,password:credentials.password,code:totp(credentials.totpSecret)});csrf=login.csrf;const admin=await request('me');
+const created=[];async function create(parentId,username,displayName){const password=randomBytes(15).toString('base64url');const result=await request('admin/accounts',{parentId,username,displayName,password});created.push({username,password,displayName,role:result.role,id:result.id});return result.id;}
+const distributor=await create(admin.id,'preview.circle','Preview Circle');const agent=await create(distributor,'preview.agent','Preview Agent');await create(agent,'player.one','Player One');await create(agent,'player.two','Player Two');
+await writeFile('.local/player-credentials.json',JSON.stringify({note:'Local development accounts, created through authenticated Main Admin workflow. All balances are zero.',accounts:created},null,2),{flag:'wx',mode:0o600});await request('auth/logout',{});console.log('Created four local zero-balance accounts. Credentials saved privately in .local/player-credentials.json.');

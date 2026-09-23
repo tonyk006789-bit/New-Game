@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+minimumReleaseAge: 1440
+storeDir: .pnpm-store
+allowBuilds:
+  esbuild: true
+  '@nestjs/core': true
+  msgpackr-extract: false

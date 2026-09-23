@@ -1,0 +1,2 @@
+# Owner-supplied private references
+The eight gameplay images are carried forward for behavior and art-direction study only. They are not original release assets or evidence of hidden algorithms. Do not publish them, include them in an APK/IPA/web asset bundle, or infer reuse rights. No provider credentials or backend-login/IP screenshots are included. The .gitignore excludes references/private/ from source control; verify your upload tool also respects this boundary.

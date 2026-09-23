@@ -1,0 +1,344 @@
+[
+  {
+    "id": "S01",
+    "title": "PixiJS",
+    "url": "https://github.com/pixijs/pixijs",
+    "license": "MIT",
+    "note": "Selected rendering dependency; 2D rendering, assets and input. Not game math.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S02",
+    "title": "Colyseus",
+    "url": "https://github.com/colyseus/colyseus",
+    "license": "MIT",
+    "note": "Selected room/state synchronization foundation. Custom settlement and fish rules still required.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S03",
+    "title": "vue-pure-admin",
+    "url": "https://github.com/pure-admin/vue-pure-admin",
+    "license": "MIT",
+    "note": "Selected administration-template candidate. Re-skin and replace demo authorization.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S04",
+    "title": "NestJS",
+    "url": "https://github.com/nestjs/nest",
+    "license": "MIT",
+    "note": "Selected application framework; our domain services remain custom.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S05",
+    "title": "Engine math SDK",
+    "url": "https://github.com/engineio/math-sdk",
+    "license": "MIT",
+    "note": "Offline slot math, simulations and distribution tooling. Not a full operator platform.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S06",
+    "title": "Engine web SDK",
+    "url": "https://github.com/engineio/web-sdk",
+    "license": "Root package declares MIT",
+    "note": "Reference for event-driven slot presentation; Svelte-based, not our Vue shell.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S07",
+    "title": "vFair Games",
+    "url": "https://github.com/vfairgames/vfair-games",
+    "license": "Apache-2.0",
+    "note": "Additional research lead: Keno, game-math and verification infrastructure. Not security-audited here.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S08",
+    "title": "vFair license",
+    "url": "https://raw.githubusercontent.com/vfairgames/vfair-games/main/LICENSE",
+    "license": "Apache-2.0",
+    "note": "Root license text inspected. Review individual files, assets and notices before reuse.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S09",
+    "title": "Keno Server",
+    "url": "https://github.com/charliegdev/keno-server",
+    "license": "MIT",
+    "note": "Small Express/AngularJS reference with a separate keno-math module. Do not adopt its old stack or branded paytable unchanged.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S10",
+    "title": "Keno Server license",
+    "url": "https://raw.githubusercontent.com/charliegdev/keno-server/master/LICENSE",
+    "license": "MIT",
+    "note": "Root license text inspected.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S11",
+    "title": "Keno Plus",
+    "url": "https://github.com/kewlinnn/keno-plus",
+    "license": "Not established",
+    "note": "Vue simulation and interaction reference only. No root license established; do not import code.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S12",
+    "title": "dwg255/fish",
+    "url": "https://github.com/dwg255/fish",
+    "license": "README claims MIT; unresolved",
+    "note": "Fish-game reference only. Linked root license could not be verified; no approval for reuse.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S13",
+    "title": "Slotopol",
+    "url": "https://github.com/slotopol/server",
+    "license": "MIT",
+    "note": "Research only; documented user-specific RTP and bank-dependent outcome skipping excluded from this project.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S14",
+    "title": "Howler.js",
+    "url": "https://github.com/goldfire/howler.js",
+    "license": "MIT",
+    "note": "Optional audio dependency; audio assets need separate provenance.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S15",
+    "title": "Playwright",
+    "url": "https://github.com/microsoft/playwright",
+    "license": "Apache-2.0",
+    "note": "Browser end-to-end and screenshot testing.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S16",
+    "title": "Kenney asset licensing",
+    "url": "https://kenney.nl/support",
+    "license": "CC0 asset pages",
+    "note": "Starter asset source; confirm the included license of each downloaded pack.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S17",
+    "title": "Hypergeometric distribution",
+    "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html",
+    "license": "Documentation",
+    "note": "Primary technical reference for exact keno match probabilities.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S18",
+    "title": "Node cryptography",
+    "url": "https://nodejs.org/api/crypto.html",
+    "license": "Documentation",
+    "note": "crypto.randomInt provides unbiased integer sampling; production RNG is server-only.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S19",
+    "title": "PostgreSQL explicit locking",
+    "url": "https://www.postgresql.org/docs/current/explicit-locking.html",
+    "license": "Documentation",
+    "note": "Row locking and transaction coordination for credit mutations.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S20",
+    "title": "OWASP authorization",
+    "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+    "license": "Documentation",
+    "note": "Deny by default and enforce authorization on every request.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S21",
+    "title": "OWASP WebSocket security",
+    "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+    "license": "Documentation",
+    "note": "Handshake/message authorization, origin checks, limits, and logging.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S22",
+    "title": "Codex getting started",
+    "url": "https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan",
+    "license": "Official OpenAI",
+    "note": "Codex clients, account sign-in and product entry points.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S23",
+    "title": "Codex AGENTS.md",
+    "url": "https://developers.openai.com/codex/guides/agents-md/",
+    "license": "Official OpenAI documentation redirect",
+    "note": "Repository instructions loaded by Codex; scope rules and testing expectations.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "S24",
+    "title": "Phaser",
+    "url": "https://github.com/phaserjs/phaser",
+    "license": "MIT",
+    "note": "Alternative full client engine. Not added alongside PixiJS in the proposed v1.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Carried from the v1 source register, not re-audited in v2; recheck the chosen commit and all assets in S0."
+  },
+  {
+    "id": "M01",
+    "title": "Capacitor cross-platform runtime",
+    "url": "https://capacitorjs.com/",
+    "license": "Official project",
+    "note": "Shared web application packaged for Android/iOS; proposed addition to the v1 stack.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M02",
+    "title": "Capacitor environment setup",
+    "url": "https://capacitorjs.com/docs/getting-started/environment-setup",
+    "license": "Official documentation",
+    "note": "macOS/Xcode for iOS; Android Studio/SDK for Android; pin exact compatible tooling in S0.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M03",
+    "title": "Capacitor source and MIT license",
+    "url": "https://raw.githubusercontent.com/ionic-team/capacitor/main/LICENSE",
+    "license": "MIT",
+    "note": "Root license verified for research; preserve notices and recheck at selected revision.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M04",
+    "title": "Android alternative distribution",
+    "url": "https://developer.android.com/distribute/marketing-tools/alternative-distribution",
+    "license": "Official Android documentation",
+    "note": "Direct APK and marketplace options; route needs owner approval.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M05",
+    "title": "Android bundle FAQ and signing",
+    "url": "https://developer.android.com/guide/app-bundle/faq",
+    "license": "Official Android documentation",
+    "note": "APK installable versus AAB publishing format; signing requirements referenced separately.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M06",
+    "title": "TestFlight overview",
+    "url": "https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/",
+    "license": "Official Apple documentation",
+    "note": "90-day build test duration; review and tester distribution.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M07",
+    "title": "Unlisted app distribution",
+    "url": "https://developer.apple.com/support/unlisted-app-distribution/",
+    "license": "Official Apple documentation",
+    "note": "Approved limited-audience distribution candidate; link discoverability is not login authorization.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M08",
+    "title": "Apple App Review Guidelines",
+    "url": "https://developer.apple.com/app-store/review/guidelines/",
+    "license": "Official Apple documentation",
+    "note": "Original app-like functionality, truthful metadata/review access and policy review; no acceptance guarantee.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M09",
+    "title": "Apple age ratings",
+    "url": "https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions",
+    "license": "Official Apple documentation",
+    "note": "Disclose simulated gambling accurately; country and rating review before release.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M10",
+    "title": "Capacitor privacy manifest",
+    "url": "https://capacitorjs.com/docs/ios/privacy-manifest",
+    "license": "Official project documentation",
+    "note": "Review used APIs/plugins and required reasons; not a claim all plugins need the same manifest.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M11",
+    "title": "Capacitor app lifecycle API",
+    "url": "https://capacitorjs.com/docs/apis/app",
+    "license": "Official project documentation",
+    "note": "Lifecycle events for background/resume; durable game recovery remains application work.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M12",
+    "title": "Android developer verification",
+    "url": "https://developer.android.com/developer-verification/guides/android-developer-console",
+    "license": "Official Android documentation",
+    "note": "Current identity/package registration guidance for out-of-Play distribution; review rollout and applicable region.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M13",
+    "title": "Android signing",
+    "url": "https://developer.android.com/studio/publish/app-signing",
+    "license": "Official Android documentation",
+    "note": "Signed release APKs/AABs and protection of release keys.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  },
+  {
+    "id": "M14",
+    "title": "Codex repository instructions",
+    "url": "https://developers.openai.com/codex/guides/agents-md/",
+    "license": "Official OpenAI documentation",
+    "note": "AGENTS.md workflow; official address currently redirects to ChatGPT Learn.",
+    "reviewed": "2026-09-17",
+    "verification_scope": "Official documentation consulted for iteration 2; no SDK execution or device validation performed."
+  }
+]

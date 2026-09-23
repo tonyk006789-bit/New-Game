@@ -1,0 +1,70 @@
+{
+  "version": "2.0",
+  "status": "LOCAL_ACCOUNTS_LEDGER_AND_PRACTICE_IMPLEMENTED",
+  "date": "2026-09-17",
+  "product": {
+    "privateGroup": true,
+    "realMoney": false,
+    "creditPurchases": false,
+    "redemptionForValue": false,
+    "providerIntegration": false
+  },
+  "platforms": {
+    "android": true,
+    "ios": true,
+    "adminResponsiveWeb": true,
+    "clientRuntime": "Capacitor (proposed; S0 device gate)",
+    "minimumOs": "Owner device inventory + pinned-runtime check pending"
+  },
+  "credits": {
+    "initialPlayerBalanceUnits": "0",
+    "minorUnitsPerCredit": 100,
+    "automaticGrants": false,
+    "scheduledGrants": false,
+    "welcomeGrants": false,
+    "dailyRewards": false,
+    "automaticRefills": false,
+    "promotionalGrants": false,
+    "manualAdjustmentRoles": [
+      "MAIN_ADMIN"
+    ],
+    "gameSettlementCredits": true,
+    "negativePlayerBalances": false,
+    "removeReservedCredits": false,
+    "lowerTierTransfers": "APPROVED_BRANCH_EXISTING_CREDITS",
+    "transferImplementation": "ENABLED_SELF_TO_LOWER_BRANCH_ROLES",
+    "transferApprovalRef": "Owner reply in workspace task, 2026-09-17"
+  },
+  "hierarchy": {
+    "proposedRoles": [
+      "MAIN_ADMIN",
+      "SUB_DISTRIBUTOR",
+      "AGENT",
+      "PLAYER"
+    ],
+    "separateMainDistributor": "NOT_ENABLED_PENDING_CONFIRMATION"
+  },
+  "slotMath": {
+    "status": "PENDING_OWNER_CLARIFICATION",
+    "ownerWording": "Slots target payout is around 30% in general with multiple attempts.",
+    "metric": null,
+    "targetHitRate": null,
+    "targetRtp": null,
+    "approvedProfileId": null,
+    "approvedMathHash": null,
+    "v1Rtp96ExampleApproved": false,
+    "forceSessionWinQuota": false
+  },
+  "kenoMath": {
+    "status": "PENDING_OWN_RULES_APPROVAL"
+  },
+  "fishMath": {
+    "status": "PENDING_OWN_RULES_APPROVAL"
+  },
+  "planning": {
+    "baselineWeeks": 15,
+    "concurrentBetaPlayers": 50,
+    "syntheticLoadPlayers": 100,
+    "numbersArePlanningAssumptions": true
+  }
+}

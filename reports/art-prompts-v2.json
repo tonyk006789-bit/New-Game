@@ -1,0 +1,26 @@
+{
+  "tool": "built-in image_gen",
+  "created": "2026-09-18",
+  "assets": [
+    {
+      "key": "arcade-city",
+      "prompt": "Use case: stylized-concept. Asset type: original game environment background for a fullscreen mobile/desktop social arcade lobby and member login. Create a lavish 3D illustrated neon entertainment boulevard at night, cinematic panoramic 16:9 landscape, high detail polished mobile arcade game art. Symmetrical grand illuminated art-deco arcade palace centered in the distant skyline, tall gold-trimmed dark violet buildings on both sides, bright cyan and electric magenta neon architectural strips, sapphire starry sky, spotlights, pink-violet atmospheric bloom, luminous reflections on a dark polished plaza in foreground. A vibrant welcoming illustrated fantasy arcade, richly rendered not a flat vector. Foreground lower half is dark plum reflective ground and uncluttered, leaving room for game tiles. Upper center palace has a luminous blank marquee, no letters. No interface, no cards, no words, no logos, no dollar signs, no branded characters, no people, no watermark. Entirely original scene."
+    },
+    {
+      "key": "temple-rich",
+      "prompt": "Use case: stylized-concept. Asset type: original key art and backdrop for the fantasy slot game Temple Lights. 16:9 panoramic landscape, richly rendered 3D mobile arcade illustration, opulent gold and saturated royal sapphire and emerald, spectacular luminous ancient celestial temple with towering carved pillars left and right. An original majestic golden phoenix sculpture with spread wings is in the upper central distance, rays of amber light through the shrine, jewel-encrusted architecture, glossy emerald and ruby gems, ancient stone steps, warm torchlight. Composition: giant temple portal and warm dark gold shadowed area center to support a reel-board UI placed later, architecture richly detailed around edges, jewel treasure piles near bottom corners. Gold trim and sculptural depth, extravagant console-arcade visual richness, polished painted rendering, crisp detail. No words, no letters, no digits, no logos, no interface, no copyrighted characters, no watermark."
+    },
+    {
+      "key": "orchard-rich",
+      "prompt": "Use case: stylized-concept. Asset type: original key art and background for Orchard Numbers keno arcade game. 16:9 panoramic landscape. Beautiful highly polished 3D storybook arcade illustration of an enchanted fruit orchard at golden hour, richly sculpted lush apple trees, peaches and ripe apples, rustic curved wooden fences, verdant rolling hills, a cozy red-roofed barn in the distance, tall golden wheat and sunflowers in lower corners. On far right an original friendly little red fox mascot with bright amber eyes sits beside a basket of glossy red apples. Warm glowing sunlight, saturated emerald grass and golden amber details. Middle center is an open darker green grassy area for an 80-number UI overlay later; decorative foliage and structures frame the screen edges. Rich dimensional mobile game art, not flat vector. No words, no letters, no digits, no UI, no logos, no watermark."
+    },
+    {
+      "key": "reef-rich",
+      "prompt": "Use case: stylized-concept. Asset type: original top-down underwater arena environment for a four-seat fish arcade game called Reef Party. 16:9 panoramic landscape, camera directly overhead. Luminous turquoise and rich sapphire water with elaborate underwater terrain, dappled caustic light, deep blue channels winding through the center, lush magenta purple coral, anemones, emerald kelp and ancient gold-trimmed sunken stone ruins hugging the perimeter, a few pearl shells and shiny stones. Darker rocks give the outer border dimensional depth. Center 65 percent is mostly open translucent turquoise water over textured sand, excellent visibility for moving fish that will be rendered in code. Extravagant richly detailed high-quality 3D painted mobile arcade game art, vibrant and glossy. No fish, no characters, no UI, no words, no digits, no coins, no guns, no logos, no watermark."
+    },
+    {
+      "key": "tropical-fish",
+      "prompt": "Use case: stylized-concept. Asset type: one production game sprite for an original top-down fish arcade. A single magnificent tropical fish with glossy gold-orange scales, electric turquoise blue fins, small bright expressive eye, three-quarter overhead view, head pointing to the RIGHT and tail to the LEFT. Fish centered and fully visible with generous transparent margin. Elegant flowing fins, richly dimensional sculpted 3D animated-film quality, strong silhouette, clean edges, polished specular highlights, saturated jewel colors. No water, no backdrop, no floor, no cast shadow outside the silhouette, no other fish, no text, no letters, no UI, no watermark. Genuinely transparent PNG background; output one isolated fish sprite in landscape orientation."
+    }
+  ]
+}

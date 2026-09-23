@@ -1,0 +1,399 @@
+{
+  "status": "Original reference metrics only. No production profile approved.",
+  "activeSlotProfile": null,
+  "slotApprovalStatus": "PENDING_OWNER_CLARIFICATION",
+  "illustrations": {
+    "slotHit30Rtp96": {
+      "ticketCount": 10000,
+      "hitRate": 0.3,
+      "netWinRate": 0.3,
+      "rtp": 0.96
+    },
+    "slotHit10Rtp30": {
+      "ticketCount": 10000,
+      "hitRate": 0.1,
+      "netWinRate": 0.1,
+      "rtp": 0.3
+    },
+    "fishUnapprovedIllustration": {
+      "ticketCount": 10000,
+      "hitRate": 0.3,
+      "netWinRate": 0.3,
+      "rtp": 0.96
+    }
+  },
+  "kenoWarning": "Proposed 20-from-80 draw references, not approved production paytables. Slot target not inherited.",
+  "keno": [
+    {
+      "picks": 4,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "1090013712241956540",
+          "denominator": "3535316142212174320",
+          "probability": 0.308321425410033
+        },
+        {
+          "hits": 1,
+          "numerator": "1529843806655377600",
+          "denominator": "3535316142212174320",
+          "probability": 0.43273182513688846
+        },
+        {
+          "hits": 2,
+          "numerator": "751733594649625200",
+          "denominator": "3535316142212174320",
+          "probability": 0.21263546580002277
+        },
+        {
+          "hits": 3,
+          "numerator": "152894968403313600",
+          "denominator": "3535316142212174320",
+          "probability": 0.04324789134915717
+        },
+        {
+          "hits": 4,
+          "numerator": "10830060261901380",
+          "denominator": "3535316142212174320",
+          "probability": 0.003063392303898633
+        }
+      ]
+    },
+    {
+      "picks": 5,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "803167998494073240",
+          "denominator": "3535316142212174320",
+          "probability": 0.2271842081968664
+        },
+        {
+          "hits": 1,
+          "numerator": "1434228568739416500",
+          "denominator": "3535316142212174320",
+          "probability": 0.4056860860658329
+        },
+        {
+          "hits": 2,
+          "numerator": "956152379159611000",
+          "denominator": "3535316142212174320",
+          "probability": 0.27045739071055525
+        },
+        {
+          "hits": 3,
+          "numerator": "296736945256431000",
+          "denominator": "3535316142212174320",
+          "probability": 0.08393505228948266
+        },
+        {
+          "hits": 4,
+          "numerator": "42750237875926500",
+          "denominator": "3535316142212174320",
+          "probability": 0.012092338041705128
+        },
+        {
+          "hits": 5,
+          "numerator": "2280012686716080",
+          "denominator": "3535316142212174320",
+          "probability": 0.0006449246955576069
+        }
+      ]
+    },
+    {
+      "picks": 6,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "588989865562320376",
+          "denominator": "3535316142212174320",
+          "probability": 0.16660175267770205
+        },
+        {
+          "hits": 1,
+          "numerator": "1285068797590517184",
+          "denominator": "3535316142212174320",
+          "probability": 0.3634947331149863
+        },
+        {
+          "hits": 2,
+          "numerator": "1090013712241956540",
+          "denominator": "3535316142212174320",
+          "probability": 0.308321425410033
+        },
+        {
+          "hits": 3,
+          "numerator": "458953141996613280",
+          "denominator": "3535316142212174320",
+          "probability": 0.12981954754106653
+        },
+        {
+          "hits": 4,
+          "numerator": "100890561387186540",
+          "denominator": "3535316142212174320",
+          "probability": 0.02853791777842411
+        },
+        {
+          "hits": 5,
+          "numerator": "10944060896237184",
+          "denominator": "3535316142212174320",
+          "probability": 0.0030956385386765135
+        },
+        {
+          "hits": 6,
+          "numerator": "456002537343216",
+          "denominator": "3535316142212174320",
+          "probability": 0.0001289849391115214
+        }
+      ]
+    },
+    {
+      "picks": 7,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "429803415410341896",
+          "denominator": "3535316142212174320",
+          "probability": 0.12157425195399879
+        },
+        {
+          "hits": 1,
+          "numerator": "1114305151063849360",
+          "denominator": "3535316142212174320",
+          "probability": 0.3151925050659228
+        },
+        {
+          "hits": 2,
+          "numerator": "1154825338375262064",
+          "denominator": "3535316142212174320",
+          "probability": 0.32665405070468356
+        },
+        {
+          "hits": 3,
+          "numerator": "618656431272461820",
+          "denominator": "3535316142212174320",
+          "probability": 0.17499324144893766
+        },
+        {
+          "hits": 4,
+          "numerator": "184511567221611420",
+          "denominator": "3535316142212174320",
+          "probability": 0.05219096674792877
+        },
+        {
+          "hits": 5,
+          "numerator": "30539845609094304",
+          "denominator": "3535316142212174320",
+          "probability": 0.008638504841036487
+        },
+        {
+          "hits": 6,
+          "numerator": "2588122509245280",
+          "denominator": "3535316142212174320",
+          "probability": 0.00073207668144377
+        },
+        {
+          "hits": 7,
+          "numerator": "86270750308176",
+          "denominator": "3535316142212174320",
+          "probability": 0.00002440255604812567
+        }
+      ]
+    },
+    {
+      "picks": 8,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "312049055023946856",
+          "denominator": "3535316142212174320",
+          "probability": 0.08826623772002652
+        },
+        {
+          "hits": 1,
+          "numerator": "942034883091160320",
+          "denominator": "3535316142212174320",
+          "probability": 0.26646411387177815
+        },
+        {
+          "hits": 2,
+          "numerator": "1160098513436336320",
+          "denominator": "3535316142212174320",
+          "probability": 0.3281456217124676
+        },
+        {
+          "hits": 3,
+          "numerator": "759337208794692864",
+          "denominator": "3535316142212174320",
+          "probability": 0.21478622512088785
+        },
+        {
+          "hits": 4,
+          "numerator": "288141351551557560",
+          "denominator": "3535316142212174320",
+          "probability": 0.08150370149676549
+        },
+        {
+          "hits": 5,
+          "numerator": "64705426313332224",
+          "denominator": "3535316142212174320",
+          "probability": 0.01830258559927365
+        },
+        {
+          "hits": 6,
+          "numerator": "8367080988792960",
+          "denominator": "3535316142212174320",
+          "probability": 0.0023667136550784896
+        },
+        {
+          "hits": 7,
+          "numerator": "567259728053760",
+          "denominator": "3535316142212174320",
+          "probability": 0.00016045516305616877
+        },
+        {
+          "hits": 8,
+          "numerator": "15363284301456",
+          "denominator": "3535316142212174320",
+          "probability": 0.000004345660666104571
+        }
+      ]
+    },
+    {
+      "picks": 9,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "225368761961739396",
+          "denominator": "3535316142212174320",
+          "probability": 0.06374783835335249
+        },
+        {
+          "hits": 1,
+          "numerator": "780122637559867140",
+          "denominator": "3535316142212174320",
+          "probability": 0.2206655943000663
+        },
+        {
+          "hits": 2,
+          "numerator": "1118666423670752880",
+          "denominator": "3535316142212174320",
+          "probability": 0.3164261352227366
+        },
+        {
+          "hits": 3,
+          "numerator": "870073885077252240",
+          "denominator": "3535316142212174320",
+          "probability": 0.24610921628435067
+        },
+        {
+          "hits": 4,
+          "numerator": "403397892172180584",
+          "denominator": "3535316142212174320",
+          "probability": 0.11410518209547169
+        },
+        {
+          "hits": 5,
+          "numerator": "115256540620623024",
+          "denominator": "3535316142212174320",
+          "probability": 0.03260148059870619
+        },
+        {
+          "hits": 6,
+          "numerator": "20220445722916320",
+          "denominator": "3535316142212174320",
+          "probability": 0.005719557999773016
+        },
+        {
+          "hits": 7,
+          "numerator": "2091770247198240",
+          "denominator": "3535316142212174320",
+          "probability": 0.0005916784137696224
+        },
+        {
+          "hits": 8,
+          "numerator": "115224632260920",
+          "denominator": "3535316142212174320",
+          "probability": 0.000032592454995784283
+        },
+        {
+          "hits": 9,
+          "numerator": "2560547383576",
+          "denominator": "3535316142212174320",
+          "probability": 7.242767776840952e-7
+        }
+      ]
+    },
+    {
+      "picks": 10,
+      "distribution": [
+        {
+          "hits": 0,
+          "numerator": "161884603662657876",
+          "denominator": "3535316142212174320",
+          "probability": 0.04579070078902785
+        },
+        {
+          "hits": 1,
+          "numerator": "634841582990815200",
+          "denominator": "3535316142212174320",
+          "probability": 0.17957137564324643
+        },
+        {
+          "hits": 2,
+          "numerator": "1043826064340667300",
+          "denominator": "3535316142212174320",
+          "probability": 0.2952567811057225
+        },
+        {
+          "hits": 3,
+          "numerator": "945351907327396800",
+          "denominator": "3535316142212174320",
+          "probability": 0.2674023677938619
+        },
+        {
+          "hits": 4,
+          "numerator": "520818874870186200",
+          "denominator": "3535316142212174320",
+          "probability": 0.14731889707161835
+        },
+        {
+          "hits": 5,
+          "numerator": "181813134500137728",
+          "denominator": "3535316142212174320",
+          "probability": 0.05142768770500132
+        },
+        {
+          "hits": 6,
+          "numerator": "40583288950923600",
+          "denominator": "3535316142212174320",
+          "probability": 0.011479394577009222
+        },
+        {
+          "hits": 7,
+          "numerator": "5695900203638400",
+          "denominator": "3535316142212174320",
+          "probability": 0.0016111430985276101
+        },
+        {
+          "hits": 8,
+          "numerator": "478750232633400",
+          "denominator": "3535316142212174320",
+          "probability": 0.00013541935526417413
+        },
+        {
+          "hits": 9,
+          "numerator": "21638428593600",
+          "denominator": "3535316142212174320",
+          "probability": 0.000006120648825499396
+        },
+        {
+          "hits": 10,
+          "numerator": "396704524216",
+          "denominator": "3535316142212174320",
+          "probability": 1.122118951341556e-7
+        }
+      ]
+    }
+  ]
+}

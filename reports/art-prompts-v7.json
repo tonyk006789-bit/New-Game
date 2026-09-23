@@ -1,0 +1,19 @@
+{
+  "tool": "Built-in ImageGen",
+  "prompts": [
+    {
+      "key": "hall",
+      "prompt": "Use case: stylized-concept. Asset type: original 2D arcade game lobby background, landscape 1536x1024. Create a richly painted casino arcade hall viewed slightly from above, colorful classic coin-op game aesthetic, not photorealistic. Purple velvet, carved gold columns, electric blue arch lighting, warm chandeliers, decorative wall panels, small coffee counter at far left, aquarium glowing at far right. Important composition: upper half has decorative architecture and empty illuminated alcoves. Lower half is unobstructed burgundy diamond carpet for a walking player and separately composited game cabinets. Wide symmetrical welcoming room, crisp painted material details, polished brass. No people, no characters, no gaming machines in foreground, no text, no logos, no UI, no watermark. This is a real game environment plate, not a screenshot mockup."
+    },
+    {
+      "key": "avatar",
+      "prompt": "Use case: stylized-concept. Asset type: game character animation sprite strip on transparent background. Landscape 1536x1024 with exactly three equal 512px-wide columns. Same original adult male arcade host in each cell, full body including shoes, dark wavy hair, expressive friendly face, royal purple fitted jacket with gold lapels over white shirt, dark trousers and polished shoes. Rich hand-painted 2.5D classic arcade aesthetic, precise warm highlights, not flat vector or realistic photograph. Three distinct poses facing three-quarter right: column1 relaxed standing, column2 walking left foot forward right arm forward, column3 walking right foot forward left arm forward. Feet all at same horizontal baseline, exact same scale and head height, each figure fully contained with generous blank margins, no overlaps, no text or labels or scenery or shadows outside figure. Genuinely transparent background with alpha."
+    }
+  ],
+  "matteEdit": "Edit target: the attached original three-pose sprite strip. Keep the three characters EXACTLY the same pose, size, colors and position. Replace ONLY the entire backdrop and all cast shadows with a perfectly uniform pure bright chroma green RGB(0,255,0), including gaps between arms/legs. Hard clean opaque sprite silhouette edges. No gradient, no green spill, no glow, no shadow, no borders, no text. Keep the three complete full-body figures, unchanged landscape image dimensions.",
+  "assets": [
+    "apps/player/public/art/arcade-hall-v7.png",
+    "apps/player/public/art/arcade-host-v7.png"
+  ],
+  "notes": "Original hall and three-pose host integrated into the walkable lobby. Avatar request returned an opaque backdrop; a second ImageGen edit produced a green matte, keyed in the runtime SVG filter."
+}

@@ -1,0 +1,310 @@
+TAP version 13
+# Subtest: slot weights partition 10000 tickets
+ok 1 - slot weights partition 10000 tickets
+  ---
+  duration_ms: 1.285051
+  type: 'test'
+  ...
+# Subtest: exhaustive slot tickets have 30% positive and net wins, 96% RTP
+ok 2 - exhaustive slot tickets have 30% positive and net wins, 96% RTP
+  ---
+  duration_ms: 25.313024
+  type: 'test'
+  ...
+# Subtest: slot boundaries cannot overlap
+ok 3 - slot boundaries cannot overlap
+  ---
+  duration_ms: 0.224094
+  type: 'test'
+  ...
+# Subtest: invalid tickets fail closed
+ok 4 - invalid tickets fail closed
+  ---
+  duration_ms: 0.600442
+  type: 'test'
+  ...
+# Subtest: malformed profiles rejected
+ok 5 - malformed profiles rejected
+  ---
+  duration_ms: 0.311045
+  type: 'test'
+  ...
+# Subtest: profile metrics agree
+ok 6 - profile metrics agree
+  ---
+  duration_ms: 0.335753
+  type: 'test'
+  ...
+# Subtest: integer units can exceed JS safe integer
+ok 7 - integer units can exceed JS safe integer
+  ---
+  duration_ms: 0.156806
+  type: 'test'
+  ...
+# Subtest: zero, negative, and non-bigint stakes rejected
+ok 8 - zero, negative, and non-bigint stakes rejected
+  ---
+  duration_ms: 0.122814
+  type: 'test'
+  ...
+# Subtest: fractional minor units are rejected rather than rounded
+ok 9 - fractional minor units are rejected rather than rounded
+  ---
+  duration_ms: 0.34312
+  type: 'test'
+  ...
+# Subtest: injected ticket maps to deterministic outcome
+ok 10 - injected ticket maps to deterministic outcome
+  ---
+  duration_ms: 0.304308
+  type: 'test'
+  ...
+# Subtest: binomial coefficient fixtures
+ok 11 - binomial coefficient fixtures
+  ---
+  duration_ms: 0.147618
+  type: 'test'
+  ...
+# Subtest: crypto keno draws contain exactly 20 unique in-range values
+ok 12 - crypto keno draws contain exactly 20 unique in-range values
+  ---
+  duration_ms: 3.287754
+  type: 'test'
+  ...
+# Subtest: deterministic partial shuffle fixture
+ok 13 - deterministic partial shuffle fixture
+  ---
+  duration_ms: 1.120464
+  type: 'test'
+  ...
+# Subtest: bad rng values rejected
+ok 14 - bad rng values rejected
+  ---
+  duration_ms: 0.519307
+  type: 'test'
+  ...
+# Subtest: selection limits validated
+ok 15 - selection limits validated
+  ---
+  duration_ms: 0.149458
+  type: 'test'
+  ...
+# Subtest: keno match count is deterministic
+ok 16 - keno match count is deterministic
+  ---
+  duration_ms: 0.16668
+  type: 'test'
+  ...
+# Subtest: invalid result draws rejected
+ok 17 - invalid result draws rejected
+  ---
+  duration_ms: 0.114764
+  type: 'test'
+  ...
+# Subtest: all seven keno distributions normalize exactly as integers
+ok 18 - all seven keno distributions normalize exactly as integers
+  ---
+  duration_ms: 0.843686
+  type: 'test'
+  ...
+# Subtest: keno expected matches equal picks/4
+ok 19 - keno expected matches equal picks/4
+  ---
+  duration_ms: 0.666966
+  type: 'test'
+  ...
+# Subtest: 8-pick 3-or-more rate is 31.7124%, not 30%
+ok 20 - 8-pick 3-or-more rate is 31.7124%, not 30%
+  ---
+  duration_ms: 0.179905
+  type: 'test'
+  ...
+# Subtest: paytable metrics distinguish positive payouts from net wins
+ok 21 - paytable metrics distinguish positive payouts from net wins
+  ---
+  duration_ms: 0.194142
+  type: 'test'
+  ...
+# Subtest: invalid keno tables and pick counts rejected
+ok 22 - invalid keno tables and pick counts rejected
+  ---
+  duration_ms: 0.404465
+  type: 'test'
+  ...
+# Subtest: fish concept yields 30% capture and 96% expected return per accepted attempt
+ok 23 - fish concept yields 30% capture and 96% expected return per accepted attempt
+  ---
+  duration_ms: 0.080986
+  type: 'test'
+  ...
+# Subtest: profile must be supplied explicitly; no live 96% default
+ok 24 - profile must be supplied explicitly; no live 96% default
+  ---
+  duration_ms: 0.104902
+  type: 'test'
+  ...
+# Subtest: contrasting example has 10% hits and 30% return
+ok 25 - contrasting example has 10% hits and 30% return
+  ---
+  duration_ms: 0.050465
+  type: 'test'
+  ...
+# Subtest: contrasting example exact total is 300000 minor units on 10000 stakes of 100
+ok 26 - contrasting example exact total is 300000 minor units on 10000 stakes of 100
+  ---
+  duration_ms: 8.965605
+  type: 'test'
+  ...
+# Subtest: new player is zero with no automatic reserve
+ok 27 - new player is zero with no automatic reserve
+  ---
+  duration_ms: 6.916569
+  type: 'test'
+  ...
+# Subtest: all grant/refill flags disabled in v2 decisions
+ok 28 - all grant/refill flags disabled in v2 decisions
+  ---
+  duration_ms: 0.882904
+  type: 'test'
+  ...
+# Subtest: ordinary game settlement remains permitted, distinct from grants
+ok 29 - ordinary game settlement remains permitted, distinct from grants
+  ---
+  duration_ms: 1.61739
+  type: 'test'
+  ...
+# Subtest: Android and iOS both required
+ok 30 - Android and iOS both required
+  ---
+  duration_ms: 0.101053
+  type: 'test'
+  ...
+# Subtest: lower-tier transfer policy stays default-denied pending owner decision
+ok 31 - lower-tier transfer policy stays default-denied pending owner decision
+  ---
+  duration_ms: 0.220766
+  type: 'test'
+  ...
+# Subtest: admin ADD proposes balanced exact postings and expected new amount
+ok 32 - admin ADD proposes balanced exact postings and expected new amount
+  ---
+  duration_ms: 0.436736
+  type: 'test'
+  ...
+# Subtest: admin REMOVE uses available credits without taking a reserve
+ok 33 - admin REMOVE uses available credits without taking a reserve
+  ---
+  duration_ms: 0.172296
+  type: 'test'
+  ...
+# Subtest: remove beyond available is rejected even below settled total
+ok 34 - remove beyond available is rejected even below settled total
+  ---
+  duration_ms: 0.489054
+  type: 'test'
+  ...
+# Subtest: remove exactly available preserves the reserved amount
+ok 35 - remove exactly available preserves the reserved amount
+  ---
+  duration_ms: 3.608908
+  type: 'test'
+  ...
+# Subtest: all lower roles are denied adjustment even with a forged step-up flag
+ok 36 - all lower roles are denied adjustment even with a forged step-up flag
+  ---
+  duration_ms: 1.593755
+  type: 'test'
+  ...
+# Subtest: inactive root is denied
+ok 37 - inactive root is denied
+  ---
+  duration_ms: 0.225445
+  type: 'test'
+  ...
+# Subtest: root requires trusted step-up claim
+ok 38 - root requires trusted step-up claim
+  ---
+  duration_ms: 0.096775
+  type: 'test'
+  ...
+# Subtest: reason must be meaningful and bounded
+ok 39 - reason must be meaningful and bounded
+  ---
+  duration_ms: 0.184343
+  type: 'test'
+  ...
+# Subtest: idempotency key is mandatory but helper does not persist it
+ok 40 - idempotency key is mandatory but helper does not persist it
+  ---
+  duration_ms: 0.065853
+  type: 'test'
+  ...
+# Subtest: stale preview fails
+ok 41 - stale preview fails
+  ---
+  duration_ms: 0.060951
+  type: 'test'
+  ...
+# Subtest: negative zero float and oversized amounts fail
+ok 42 - negative zero float and oversized amounts fail
+  ---
+  duration_ms: 2.681146
+  type: 'test'
+  ...
+# Subtest: addition overflow fails rather than wrapping
+ok 43 - addition overflow fails rather than wrapping
+  ---
+  duration_ms: 0.297865
+  type: 'test'
+  ...
+# Subtest: invalid reserve state rejected
+ok 44 - invalid reserve state rejected
+  ---
+  duration_ms: 0.074689
+  type: 'test'
+  ...
+# Subtest: no direct set-balance command
+ok 45 - no direct set-balance command
+  ---
+  duration_ms: 0.052656
+  type: 'test'
+  ...
+# Subtest: planning helper does not mutate wallet data
+ok 46 - planning helper does not mutate wallet data
+  ---
+  duration_ms: 0.067136
+  type: 'test'
+  ...
+# Subtest: pending shipped slot record fails closed
+ok 47 - pending shipped slot record fails closed
+  ---
+  duration_ms: 0.109465
+  type: 'test'
+  ...
+# Subtest: complete illustrative approval record validates structurally, not cryptographically
+ok 48 - complete illustrative approval record validates structurally, not cryptographically
+  ---
+  duration_ms: 0.164464
+  type: 'test'
+  ...
+# Subtest: approval status alone does not enable a slot
+ok 49 - approval status alone does not enable a slot
+  ---
+  duration_ms: 0.065374
+  type: 'test'
+  ...
+# Subtest: approval with missing target rejected
+ok 50 - approval with missing target rejected
+  ---
+  duration_ms: 0.095124
+  type: 'test'
+  ...
+1..50
+# tests 50
+# suites 0
+# pass 50
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 143.007734

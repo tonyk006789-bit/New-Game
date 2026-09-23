@@ -1,0 +1,10 @@
+{
+ "mode":"Built-in image_gen",
+ "date":"2026-09-22",
+ "assets":[{
+  "file":"apps/player/public/art/reef-seabed-v5.png",
+  "original":"C:/Users/kcdre/.codex/generated_images/01a0ad92-88df-7e62-81d5-36028373cfbd/exec-3f514418-c4b8-4ee6-9b4a-2795fd5d4715.png",
+  "prompt":"Use case: stylized-concept. Asset type: opaque landscape background for an original arcade fish-table game, 1536x1024. Richly detailed hand-painted 2D top-down tropical seabed, bright turquoise blue playing field with darker deep blue channels. Frame the outer 20 percent with specific aquatic objects: branching violet and orange corals, green anemones, red sea stars, purple tube sponges, pearl clam shells, rounded rocks with barnacles, swaying sea grass, a small broken wooden shipwreck and rusty anchor in lower left corner, a small open treasure chest with gold coins upper right. The central 65 percent must remain an uncluttered blue sandy underwater floor for moving fish gameplay, with subtle caustic light patterns and a winding shallow sand path. Perspective directly overhead, not a side-view landscape. Vivid 2010s illustrated casino fish shooter arcade texture, outlined forms, bright jewel colors, pleasing dimensional painted shading; not photorealistic, not cinematic 3D, not minimalist flat vector. NO FISH, no characters, no text, no logos, no numbers, no buttons or interface, no game mechanics shown. Entirely original artwork."
+ }],
+ "spriteNote":"Two generated atlas attempts had opaque backgrounds and were not integrated. Eight species are original code-native Pixi graphics in reef-art.ts."
+}

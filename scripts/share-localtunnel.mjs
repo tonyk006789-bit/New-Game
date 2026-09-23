@@ -1,0 +1,10 @@
+import {createRequire} from 'node:module';
+import {writeFile} from 'node:fs/promises';
+const require=createRequire(import.meta.url);
+const localtunnel=require('../.cache/share-tools/node_modules/localtunnel');
+const tunnel=await localtunnel({port:5185});
+await writeFile('.local/staging/share-link.json',JSON.stringify({url:tunnel.url,provider:'localtunnel',createdAt:new Date().toISOString(),tunnelPid:process.pid,note:'Session-long tester link; keep this computer and process running.'},null,2)+'\n');
+console.log(tunnel.url);
+tunnel.on('error',error=>console.error(error.message));
+tunnel.on('close',()=>process.exit(1));
+process.on('SIGTERM',()=>{tunnel.close();process.exit(0);});

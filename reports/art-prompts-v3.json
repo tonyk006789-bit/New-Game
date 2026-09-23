@@ -1,0 +1,14 @@
+{
+  "mode": "Built-in image_gen",
+  "date": "2026-09-18",
+  "assets": [
+    {
+      "file": "apps/player/public/art/aurora-vault.png",
+      "prompt": "Use case: stylized-concept. Asset type: original illustrated environment for a playable premium arcade game, landscape 1536x1024. Primary request: Aurora Vault, a luxurious frozen crystal observatory floating above a midnight fjord. A massive circular gold and blackened silver celestial vault arch, exquisite etched metal filigree, faceted blue and violet crystals growing at the bottom corners, northern lights across a deep teal sky. Luminous faceted diamond suspended near top center. Cinematic polished 3D game art, crisp specular highlights, elegant turquoise, midnight blue, amethyst and warm gold palette, rich layered depth. Composition: ornate architectural detail toward left/right edges, darker calm recessed center area to place a real interactive 5x3 game board later. Upper diamond visible above the center board. It must look like a professionally art-directed fantasy game environment, not a website mockup. No text, no logos, no interface, no numbers, no reels, no existing branded characters. Original artwork."
+    },
+    {
+      "file": "apps/player/public/art/ember-relics.png",
+      "prompt": "Use case: stylized-concept. Asset type: original premium arcade game environment, landscape 1536x1024. Primary request: Ember Relics, the interior of an ancient volcanic treasure sanctuary above a glowing caldera. Warm copper and obsidian stone pillars at the left and right with ornate carved phoenix reliefs, molten seams in dark rocks, blazing orange sunset seen through a central ancient doorway, tiny glowing floating embers, hanging weathered bronze bells, lush turquoise accents contrasting hot red orange golden firelight. Polished high-end 3D fantasy game illustration with beautiful material texture and layered cinematic lighting. Wide symmetric composition for a playable six-column board to overlay the calm darker center; architectural decoration on sides and uppermost margin, bottom gold altar steps. Ornate carved phoenix sculpture at top center. Energetic, rich, tactile. No text, no numbers, no interface, no reels, no logos, no existing game characters. Entirely original scene."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "profile": {
+    "id": "stage-paying30-v1",
+    "payingProbability": 0.3,
+    "stakes": [
+      "25",
+      "50",
+      "75"
+    ],
+    "method": "Independent 30% paying-round draw, followed by conditional sampling of a complete valid sequence. Awards are evaluated from that sequence.",
+    "rules": {
+      "neon-sevens": "Each 3-symbol line: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add all 5 lines.",
+      "jade-fortune": "Each left-to-right line: 3 matches 2×, 4 matches 4×, 5 matches 8×. Dragon substitutes. Add all 9 lines.",
+      "coin-carnival": "3 center coins locked after up to 3 respins pays 3×. Fewer pays zero.",
+      "temple-lights": "Each horizontal row from the left: 3 matches 2×, 4 matches 3×, 5 matches 5×. Add all 3 rows.",
+      "aurora-vault": "8 or more locked crystals pays (collected minus 7)×. Fewer pays zero.",
+      "ember-relics": "12 or more cleared relics pays floor(cleared / 12)×. Fewer pays zero. Six cascades maximum.",
+      "orchard-numbers": "Pick 4–10. Draw 20 of 80. With 4–6 picks, 2+ hits pays (hits minus 1)×; with 7–10 picks, 3+ hits pays (hits minus 2)×.",
+      "reef-party": "Separate experimental fish model: each valid targeted shot independently has 30% capture probability and pays 3× stake on capture. All species use the same odds and award. Missed/expired/already caught targets are rejected without a charge."
+    }
+  },
+  "generatedAt": "2026-09-22T16:50:39.310Z",
+  "note": "Offline independent simulation using server math and crypto RNG. No accounts or balances touched. Keno uses six picks; this is an experimental profile, not a production return promise.",
+  "results": [
+    {
+      "game": "neon-sevens",
+      "rounds": 10000,
+      "paying": 3037,
+      "payingPercent": 30.37,
+      "netWinPercent": 24.7,
+      "returnPercent": 86.5
+    },
+    {
+      "game": "jade-fortune",
+      "rounds": 10000,
+      "paying": 3060,
+      "payingPercent": 30.6,
+      "netWinPercent": 30.6,
+      "returnPercent": 177
+    },
+    {
+      "game": "coin-carnival",
+      "rounds": 10000,
+      "paying": 2964,
+      "payingPercent": 29.64,
+      "netWinPercent": 29.64,
+      "returnPercent": 88.92
+    },
+    {
+      "game": "temple-lights",
+      "rounds": 10000,
+      "paying": 3015,
+      "payingPercent": 30.15,
+      "netWinPercent": 30.15,
+      "returnPercent": 71.88
+    },
+    {
+      "game": "aurora-vault",
+      "rounds": 10000,
+      "paying": 2988,
+      "payingPercent": 29.88,
+      "netWinPercent": 26.21,
+      "returnPercent": 118.42
+    },
+    {
+      "game": "ember-relics",
+      "rounds": 10000,
+      "paying": 3000,
+      "payingPercent": 30,
+      "netWinPercent": 7.82,
+      "returnPercent": 39.7
+    },
+    {
+      "game": "orchard-numbers",
+      "rounds": 10000,
+      "paying": 2976,
+      "payingPercent": 29.76,
+      "netWinPercent": 10.36,
+      "returnPercent": 42.46
+    },
+    {
+      "game": "reef-party",
+      "rounds": 10000,
+      "paying": 2939,
+      "payingPercent": 29.39,
+      "netWinPercent": 29.39,
+      "returnPercent": 88.17
+    }
+  ]
+}

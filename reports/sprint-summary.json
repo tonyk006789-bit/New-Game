@@ -1,0 +1,44 @@
+[
+  {
+    "sprint": "S0",
+    "window": "Weeks 1-2",
+    "objective": "Foundations + native proof",
+    "exit": "Reproducible workspace, original UI baseline, Android/iPhone lifecycle and fish-density smoke; unresolved math stays disabled"
+  },
+  {
+    "sprint": "S1",
+    "window": "Weeks 3-4",
+    "objective": "Main-admin credits + hierarchy",
+    "exit": "Zero-start accounts; audited ADD/REMOVE; branch permissions; no grant paths; concurrency/retry tests"
+  },
+  {
+    "sprint": "S2",
+    "window": "Weeks 5-7",
+    "objective": "Mobile lobby + first slot",
+    "exit": "Approved slot math before staked play; one complete admin-to-player flow on both platforms; durable recovery"
+  },
+  {
+    "sprint": "S3",
+    "window": "Weeks 8-9",
+    "objective": "Keno + accurate reporting",
+    "exit": "Approved per-selection rules/paytables; recoverable draws; admin changes excluded from game return"
+  },
+  {
+    "sprint": "S4",
+    "window": "Weeks 10-11",
+    "objective": "Four-seat fish tables",
+    "exit": "Independently approved capture model; atomic single-target awards; reconnect and room-failure tests"
+  },
+  {
+    "sprint": "S5",
+    "window": "Weeks 12-13",
+    "objective": "Polish + hardening",
+    "exit": "Original assets/audio; real-device performance; security/load/restore results; release candidates"
+  },
+  {
+    "sprint": "S6",
+    "window": "Weeks 14-15",
+    "objective": "Closed beta + release preparation",
+    "exit": "Signed distributions with owner accounts; review evidence; rollback, operations and handover"
+  }
+]

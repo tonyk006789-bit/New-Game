@@ -1,0 +1,1 @@
+{ "name": "@new-game/ui", "private": true, "version": "0.1.0", "type": "module", "exports": { "./Icon.vue": "./src/Icon.vue", "./theme.css": "./src/theme.css" } }

@@ -1,0 +1,202 @@
+{
+  "generatedAt": "2026-09-23T05:04:19.859Z",
+  "privateReferencesShipped": false,
+  "assets": [
+    {
+      "path": "apps/player/public/art/arcade-city.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
+      "license": "Project original; owner review pending",
+      "sha256": "df22cc3a11a2210d4867604ca70b7809f26e8f678d536b0158f9ec1261aea71c"
+    },
+    {
+      "path": "apps/player/public/art/arcade-floor.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "884e532ad54cea246ba3536bb6a29a3de9019220a06d5a90f8634b02cfc2053e"
+    },
+    {
+      "path": "apps/player/public/art/arcade-hall-v7.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v7.json",
+      "license": "Project original; owner review pending",
+      "sha256": "e02ca9d6aebc3d44fbdc9292889d8946881803215306d3179ef32571e45738dc"
+    },
+    {
+      "path": "apps/player/public/art/arcade-host-v7.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v7.json",
+      "license": "Project original; owner review pending",
+      "sha256": "f8dbef88648cdee7246864b4a4fdd9dd8e1ce7240e8bc50c5a47ea577786dcd3"
+    },
+    {
+      "path": "apps/player/public/art/aurora-vault.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v3.json",
+      "license": "Project original; owner review pending",
+      "sha256": "029fee580d466d9fd60bce56f404217059e0f52607dfb0b265f1e866b3afe7ae"
+    },
+    {
+      "path": "apps/player/public/art/casino-symbols-v6.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v6.json",
+      "license": "Project original; owner review pending",
+      "sha256": "b91c55aa4f617903cab373f043eae9da3e9cfebd114c12f0a4ad9410706f1000"
+    },
+    {
+      "path": "apps/player/public/art/ember-relics.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v3.json",
+      "license": "Project original; owner review pending",
+      "sha256": "99d2b2dc763e1f992895334e1309f944be51f3e53f2b724574089609a505c11b"
+    },
+    {
+      "path": "apps/player/public/art/mark.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "25eb02f25c29182e0638f8bffcc70658088588e583d6d02c0dcc8b14e2f6ffdc"
+    },
+    {
+      "path": "apps/player/public/art/orchard-rich.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
+      "license": "Project original; owner review pending",
+      "sha256": "785c425f4a415c1f53dd0300fbee9522c3ed71c943b48212c4ebdaf4adc8b84d"
+    },
+    {
+      "path": "apps/player/public/art/orchard.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "3b2aaf6f301211b2ba411e85e8f912a1906e9e167252aba57aec48f09f5146e3"
+    },
+    {
+      "path": "apps/player/public/art/reef-cannons-v6.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v6.json",
+      "license": "Project original; owner review pending",
+      "sha256": "9f57a4345fa247f52913237354c68875a7f8b7c1dd319ed30eeca88991d653aa"
+    },
+    {
+      "path": "apps/player/public/art/reef-creatures-v6.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v6.json",
+      "license": "Project original; owner review pending",
+      "sha256": "5278afb33cde36d76bb37b5f0197c4f0533f52744a8c67cab42c46d9375d4167"
+    },
+    {
+      "path": "apps/player/public/art/reef-rich.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
+      "license": "Project original; owner review pending",
+      "sha256": "f85f96b6c8bed8d4fe4438cc0a4a5781dcab39a896110a763e63555c7ff419a5"
+    },
+    {
+      "path": "apps/player/public/art/reef-seabed-v5.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v5.json",
+      "license": "Project original; owner review pending",
+      "sha256": "8c0817a6d055183b101348b4a94b432b06425d72914dc2116a3e7396a9da6564"
+    },
+    {
+      "path": "apps/player/public/art/reef-table.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "b04541c43d4beee740d73ed629729acbe789e775e96351fedad969108554449f"
+    },
+    {
+      "path": "apps/player/public/art/reef.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "80b01af9a23a1eca26969f3e6b7f05c09bc7577ed44ffe6b7a6ab5ea5a57d5df"
+    },
+    {
+      "path": "apps/player/public/art/temple-rich.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
+      "license": "Project original; owner review pending",
+      "sha256": "15aa8e2e90cdf23216a5dbcd32a1766994b503296fdf1182691d36dfd0e6f4c1"
+    },
+    {
+      "path": "apps/player/public/art/temple.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "6cad43b3357ffd3b269bfb58aed16fae18772b64105c9cb770bc172a5dd832cd"
+    },
+    {
+      "path": "apps/player/public/art/tropical-fish.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v2.json",
+      "license": "Project original; owner review pending",
+      "sha256": "b8ca39bc9ce4fbc06e6c550400a41644691eb5f399eed60ddb12dae819fd031f"
+    },
+    {
+      "path": "apps/player/src/ArcadeSymbol.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "60c9c339980afa5d63a2e4be3044ed65a279d5e36616c8127f1f6a442414c4e2"
+    },
+    {
+      "path": "apps/player/src/GamePoster.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "81c3c2512eade4b1a3b8f487deac574e33e7ede4d7ff96fc4a4d682ffb0061b3"
+    },
+    {
+      "path": "apps/player/src/arcade-v4.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "064948fc0d0d5ac0589ed71001fc6d5ec15bf4d6d4d46bbf645cd7e04740dc4a"
+    },
+    {
+      "path": "apps/player/src/reef-textures.ts",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "efed7d6419cef96f5eac9059734934b3d9b5472773bbc87df3dce3c01d6c0594"
+    },
+    {
+      "path": "apps/player/src/arcade-v6.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "e7864089ad12c98cd2da0fd02d3f07edb0bacadbcf0f3613dc21ef71706f7d3c"
+    },
+    {
+      "path": "apps/player/src/arcade-v7.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "6884784a46c6c3396f1e43b50428e48f4d82ff2fa154772f464b18fc4876dc6c"
+    },
+    {
+      "path": "apps/player/src/ArcadeLobby.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "80f3131f8e12141819fcf5e4d60e8881914166508d2371b6b9d19ec79d87b410"
+    },
+    {
+      "path": "apps/player/src/FishingLobby.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "0ff4e839384d6f938c827cac307f8cbbfc92be3b39211d3d13fb512a833ddd82"
+    },
+    {
+      "path": "apps/player/src/arcade-v8.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "6f0249fd10f5713810082800b70e4fe5e77b7dbb90aa78edd57cbe15871a479a"
+    }
+  ]
+}

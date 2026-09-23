@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17.6
+    environment:
+      POSTGRES_USER: newgame
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: new_game_dev
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - new-game-postgres:/var/lib/postgresql/data
+volumes:
+  new-game-postgres:
