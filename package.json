@@ -13,6 +13,8 @@
     "dev:admin": "vite --config apps/admin/vite.config.ts",
     "build:player": "vite build --config apps/player/vite.config.ts",
     "build:netlify": "pnpm build:player && node scripts/netlify-function.mjs && node scripts/netlify-setup.mjs",
+    "build:vercel": "pnpm build:player && node scripts/vercel-build.mjs",
+    "test:vercel": "node --test tests/deployment/vercel.test.mjs",
     "test:netlify": "node --test tests/deployment/netlify.test.mjs",
     "test:netlify-bundle": "node --test tests/deployment/netlify-bundle.test.mjs",
     "build:admin": "vite build --config apps/admin/vite.config.ts",

@@ -2,6 +2,8 @@ import { test,after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile,readdir } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
+import crypto from 'node:crypto';
+import {syncBuiltinESMExports} from 'node:module';
 import pg from 'pg';
 if(!process.env.DATABASE_URL)throw new Error('A local PostgreSQL DATABASE_URL is required; database tests are not simulated.');
 const url=new URL(process.env.DATABASE_URL);if(!['127.0.0.1','localhost'].includes(url.hostname)||!/^\/new_game_staging$/.test(url.pathname))throw new Error('Tests only run against local development databases.');
@@ -22,7 +24,7 @@ let player,playerAuth,peerAuth;
 async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},admin);assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
 async function wallet(id){const r=await call('admin/accounts',undefined,admin);return r.data.find(a=>a.id===id).wallet;}
 async function adjust(id,direction,amount,key=randomUUID(),expectedVersion){const w=await wallet(id);return call('admin/credit-adjustments',{targetId:id,direction,amount,reason:'Explicit manual test adjustment',requestKey:key,expectedVersion:expectedVersion??w.version},admin);}
-const {stagingMultiplier,reefFlight}=await import('../../packages/game-math/src/index.ts');
+const {stagingMultiplier,reefFlight,reefTarget,reefLeadAngle,reefTierProfile}=await import('../../packages/game-math/src/index.ts');
 const sleep=()=>new Promise(resolve=>setTimeout(resolve,275));
 const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2',...extra});
 test('isolated staging accounting and outcomes',async t=>{
@@ -101,7 +103,7 @@ test('isolated staging accounting and outcomes',async t=>{
  });
  await t.test('fish reject stale or distant aim and settle valid targets only once',async()=>{
   const room=(await call('practice/reef/join',{},playerAuth)).data;await sleep();
-  const aim=()=>{const firedAt=Date.now()-1600;for(let angle=-3;angle<0;angle+=.1){const f=reefFlight(room.seat,angle,(firedAt-new Date(room.startedAt).getTime())/1000,Array.from({length:80},(_,i)=>i+1));if(f.targetId!==null)return body({roomId:room.id,targetId:f.targetId,aimX:f.x,aimY:f.y,observedAt:Math.round(firedAt+f.time*1000),firedAt,angle});}throw new Error('No trajectory');};
+  const aim=()=>{const firedAt=Date.now()-1600;for(let angle=-3;angle<0;angle+=.1){const f=reefFlight(room.seat,angle,(firedAt-new Date(room.startedAt).getTime())/1000,Array.from({length:80},(_,i)=>i+1));if(f.targetId!==null)return body({profileId:'reef-tiers-v1',roomId:room.id,targetId:f.targetId,aimX:f.x,aimY:f.y,observedAt:Math.round(firedAt+f.time*1000),firedAt,angle});}throw new Error('No trajectory');};
   const before=(await wallet(player)).settled;
   assert.equal((await call('staging/reef-party/rounds',aim(),peerAuth)).status,409);
   assert.equal((await call('staging/reef-party/rounds',{...aim(),observedAt:Date.now()-5000},playerAuth)).status,409);
@@ -110,7 +112,7 @@ test('isolated staging accounting and outcomes',async t=>{
   const teleport=aim();delete teleport.firedAt;delete teleport.angle;assert.equal((await call('staging/reef-party/rounds',teleport,playerAuth)).status,400);
   assert.equal((await wallet(player)).settled,before);
   let captured=false,last;
-  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v2');assert.equal(r.data.award,captured?'75':'0');assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
+  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v3');assert.equal(r.data.ruleVersion,'reef-tiers-v1');assert.equal(r.data.award,(25n*BigInt(stagingMultiplier(r.data))).toString());assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
   assert.equal(captured,true);await sleep();assert.equal((await call('staging/reef-party/rounds',{...last,requestKey:randomUUID()},playerAuth)).status,409);
   // A durable v5 receipt is replayable after the trajectory-proof upgrade.
   const legacy={...last,profileId:'stage-paying30-v1',requestKey:randomUUID()};delete legacy.firedAt;delete legacy.angle;
@@ -120,6 +122,26 @@ test('isolated staging accounting and outcomes',async t=>{
   await control.query('UPDATE practice_targets SET captured_by=$1,captured_at=now() WHERE room_id=$2',[player,room.id]);
   const replacement=(await call('practice/reef/join',{},playerAuth)).data;
   assert.notEqual(replacement.id,room.id);assert.equal(replacement.targets.length,80);assert.ok(replacement.targets.every(t=>!t.captured));
+ });
+ await t.test('every fish tier debits valid hits and credits its own award exactly once',async()=>{
+  const random=crypto.randomInt;
+  try{
+   for(const id of [27,28,33,25]){
+    const room=(await call('practice/reef/join',{newTable:true},playerAuth)).data,p=reefTarget(id,0),rule=reefTierProfile.tiers[p.tier];
+    for(const ticket of [9999,0]){
+     await sleep();let data;
+     for(let age=10;age<p.duration-5&&!data;age+=2){const time=p.spawnAt+age,angle=reefLeadAngle(room.seat,id,time),flight=reefFlight(room.seat,angle,time,Array.from({length:80},(_,i)=>i+1));
+      if(flight.targetId===id){const firedAt=Date.now()-1700,epoch=firedAt-time*1000;await control.query('UPDATE practice_rooms SET created_at=$1 WHERE id=$2',[new Date(epoch),room.id]);data=body({profileId:reefTierProfile.id,roomId:room.id,targetId:id,aimX:flight.x,aimY:flight.y,firedAt,observedAt:Math.round(firedAt+flight.time*1000),angle});}
+     }
+     assert.ok(data,`No clear trajectory for ${p.tier}`);const before=BigInt((await wallet(player)).available);
+     crypto.randomInt=()=>ticket;syncBuiltinESMExports();
+     const r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));
+     const award=ticket===0?25n*BigInt(rule.multiplier):0n;assert.equal(r.data.award,award.toString());assert.equal(r.data.fish.tier,p.tier);
+     assert.equal(BigInt((await wallet(player)).available),before-25n+award);
+     const replay=await call('staging/reef-party/rounds',data,playerAuth);assert.deepEqual(replay.data,r.data);assert.equal(BigInt((await wallet(player)).available),before-25n+award);
+    }
+   }
+  }finally{crypto.randomInt=random;syncBuiltinESMExports();}
  });
  await t.test('daily wheel enforces positive available balance, roles, cooldown, durable replay and balanced awards',async()=>{
   assert.equal((await call('daily-wheel')).status,401);

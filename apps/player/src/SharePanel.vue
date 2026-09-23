@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted,ref} from 'vue';
 import QRCode from 'qrcode';
-const link='https://new-game-tonyk006789.netlify.app/';
+const link=import.meta.env.VITE_PUBLIC_ARCADE_URL || (location.hostname==='localhost'||location.hostname==='127.0.0.1'?location.origin+'/':new URL('/',location.href).href);
 const qr=ref(''),message=ref('');
 onMounted(async()=>{try{qr.value=await QRCode.toDataURL(link,{width:320,margin:4,errorCorrectionLevel:'M',color:{dark:'#062f2b',light:'#ffffff'}});}catch{message.value='Use the link below to share.';}});
 async function copy(){try{await navigator.clipboard.writeText(link);message.value='Link copied.';}catch{message.value='Select and copy the link below.';}}

@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {stagingOutcome,stagingMultiplier,stagingProfile,storyboardRandom,reefTarget,reefSpecies,type StagingGame} from '@new-game/game-math';
 describe('explicit experimental staging math',()=>{
- for(const game of Object.keys(stagingProfile.rules) as StagingGame[])it(`${game}: independent paying target and visible outcomes agree`,()=>{
+ for(const game of Object.keys(stagingProfile.rules).filter(game=>game!=='reef-party') as StagingGame[])it(`${game}: independent paying target and visible outcomes agree`,()=>{
   const rng=storyboardRandom(923455),count=4000;let paying=0;
   for(let i=0;i<count;i++){
    const result=stagingOutcome(game,String(i),rng,[1,2,3,4,5,6]);const multiplier=stagingMultiplier(result);

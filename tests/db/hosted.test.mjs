@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 import pg from 'pg';
+import {createServer} from 'node:http';
 const localUrl=new URL(process.env.DATABASE_URL||'postgres://invalid/');
 if(!['127.0.0.1','localhost'].includes(localUrl.hostname)||localUrl.pathname!=='/new_game_staging')throw new Error('Hosted-adapter tests require the isolated local staging database.');
 const schema=`test_${randomUUID().replaceAll('-','')}`,control=new pg.Client({connectionString:localUrl.href});
@@ -76,6 +77,18 @@ test('Netlify player transport uses authoritative accounting and four real seats
   assert.equal((await call('/v1/me',undefined,sessions[0])).status,503);
   await control.query('UPDATE hosted_test_environment SET site_id=$1',[site]);
   assert.equal((await call('/v1/health')).status,200);
+ });
+ await t.test('Vercel Node transport preserves sessions and enforces its project binding',async()=>{
+  const {default:handler}=await import('../../dist/server/apps/api/src/vercel-handler.js');
+  const server=createServer(handler);await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+  Object.assign(process.env,{HOSTED_TEST_PLATFORM:'vercel',HOSTED_TEST_PROJECT_ID:'prj_Fixture123',VERCEL_PROJECT_ID:'prj_Fixture123',VERCEL:'1'});
+  try{
+   const base=`http://127.0.0.1:${server.address().port}`;
+   const r=await fetch(base+'/game?__route=me',{headers:{Cookie:sessions[1].cookie}});assert.equal(r.status,200);assert.equal((await r.json()).username,'tester.two');
+   assert.equal((await fetch(base+'/game?__route=admin/accounts',{headers:{Cookie:sessions[1].cookie}})).status,404);
+   assert.equal((await fetch(base+'/game?__route=me&accountId=someone',{headers:{Cookie:sessions[1].cookie}})).status,404);
+   process.env.VERCEL_PROJECT_ID='prj_wrong';assert.equal((await fetch(base+'/game?__route=health')).status,503);
+  }finally{for(const key of ['HOSTED_TEST_PLATFORM','HOSTED_TEST_PROJECT_ID','VERCEL_PROJECT_ID','VERCEL'])delete process.env[key];await new Promise(resolve=>server.close(resolve));}
  });
  await t.test('public environment never returns a sample password',async()=>{
   process.env.STAGING_DEMO_PASSWORD='must-not-leak';const r=await call('/v1/environment');assert.equal(r.status,200);assert.equal(r.data.sampleLogin,null);assert.equal(r.data.productionApproved,false);

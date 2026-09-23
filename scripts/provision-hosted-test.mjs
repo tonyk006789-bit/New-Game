@@ -9,7 +9,7 @@ const siteId=process.env.HOSTED_TEST_SITE_ID;
 if(process.env.CONFIRM_HOSTED_SETUP!==siteId)throw new Error('Explicit setup confirmation must name the dedicated test site ID.');
 const origin=process.env.ALLOWED_ORIGINS;
 if(!origin||new URL(origin).protocol!=='https:')throw new Error('Use the exact HTTPS test site origin.');
-const directory='.local/hosted';await mkdir(directory,{recursive:true});
+const directory=process.env.HOSTED_TEST_PLATFORM==='vercel'?'.local/vercel':'.local/hosted';await mkdir(directory,{recursive:true});
 const credentialsFile=`${directory}/accounts.json`;
 let saved;
 try{saved=JSON.parse(await readFile(credentialsFile,'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;const previous=JSON.parse(await readFile('.local/staging/human-testers.json','utf8'));saved={siteId,origin,root:{id:randomUUID(),branch:randomUUID(),username:'hosted.admin',password:randomBytes(24).toString('base64url'),totpSecret:newTotpSecret()},accounts:previous.accounts.map(({username,password,displayName})=>({username,password,displayName}))};}

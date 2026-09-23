@@ -1,6 +1,6 @@
 import {randomInt,randomUUID} from 'node:crypto';
 import {z} from 'zod';
-import {stagingProfile,stagingOutcome,stagingMultiplier,reefFlight,reefBallistics,validStake,type StagingGame} from '@new-game/game-math';
+import {stagingProfile,stagingOutcome,stagingMultiplier,reefOutcome,reefTierProfile,reefFlight,reefBallistics,validStake,type StagingGame} from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import {actorFor,parse,type Request} from './auth.js';
 import {transaction,fail,idempotent} from './store.js';
@@ -18,8 +18,10 @@ export async function stagingRound(req:Request,id:string,body:unknown){
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);if(actor.role!=='PLAYER')fail(403,'PLAYER_REQUIRED');
   const result=await idempotent<Record<string,unknown>>(db,actor,'ROUND',data.requestKey,{game,...data},async()=>{
-   // Replays retain their original grid, award and profile. Only new requests use v2.
-   if(data.profileId!==stagingProfile.id)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
+   // Accepted historical receipts replay before checking the profile for new plays.
+   const profileId=game==='reef-party'?reefTierProfile.id:stagingProfile.id;
+   const roundProfileHash=game==='reef-party'?digest(canonical({profile:reefTierProfile,ballistics:reefBallistics.version})):profileHash;
+   if(data.profileId!==profileId)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
  if(game==='reef-party'&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v===undefined))fail(400,'TARGET_REQUIRED');
    const [wallet]=await lockWallets(db,[actor.id]);
    if(BigInt(wallet.settled_units)-BigInt(wallet.reserved_units)<BigInt(data.stake))fail(409,'INSUFFICIENT_AVAILABLE','Insufficient available play credits.');
@@ -35,15 +37,15 @@ export async function stagingRound(req:Request,id:string,body:unknown){
     const target=(await db.query('SELECT * FROM practice_targets WHERE room_id=$1 AND target_id=$2 FOR UPDATE',[data.roomId,data.targetId])).rows[0];
     if(!target||target.captured_by)fail(409,'TARGET_UNAVAILABLE','This fish is already caught. No credits charged.');
    }
-   const visual=stagingOutcome(game,randomUUID(),randomInt,data.picks),multiplier=stagingMultiplier(visual),award=BigInt(data.stake)*BigInt(multiplier);
-   const stakeTx=await beginLedger(db,actor,actor,'GAME_STAKE',`Staging ${game} / ${stagingProfile.id}`,data.requestKey);
+   const visual=game==='reef-party'?reefOutcome(randomUUID(),data.targetId!,randomInt):stagingOutcome(game,randomUUID(),randomInt,data.picks),multiplier=stagingMultiplier(visual),award=BigInt(data.stake)*BigInt(multiplier);
+   const stakeTx=await beginLedger(db,actor,actor,'GAME_STAKE',`Staging ${game} / ${profileId}`,data.requestKey);
    const debit=await posting(db,stakeTx,wallet,-BigInt(data.stake));
    await db.query("INSERT INTO ledger_postings(transaction_id,system_account,units) VALUES($1,'GAME_CLEARING',$2)",[stakeTx,data.stake]);
    let awardTx:string|null=null,after=debit.after;
-   if(award>0n){awardTx=await beginLedger(db,actor,actor,'GAME_PAYOUT',`Staging award ${game} / ${stagingProfile.id}`,data.requestKey,stakeTx);after=(await posting(db,awardTx,{...wallet,settled_units:after.settled,version:after.version},award)).after;await db.query("INSERT INTO ledger_postings(transaction_id,system_account,units) VALUES($1,'GAME_CLEARING',$2)",[awardTx,(-award).toString()]);}
+   if(award>0n){awardTx=await beginLedger(db,actor,actor,'GAME_PAYOUT',`Staging award ${game} / ${profileId}`,data.requestKey,stakeTx);after=(await posting(db,awardTx,{...wallet,settled_units:after.settled,version:after.version},award)).after;await db.query("INSERT INTO ledger_postings(transaction_id,system_account,units) VALUES($1,'GAME_CLEARING',$2)",[awardTx,(-award).toString()]);}
    if(game==='reef-party'&&visual.captured)await db.query('UPDATE practice_targets SET captured_by=$1,captured_at=now() WHERE room_id=$2 AND target_id=$3',[actor.id,data.roomId,data.targetId]);
-   const result={...visual,mode:'STAGING',ruleVersion:stagingProfile.id,profileHash,creditsChanged:true,stake:data.stake,award:award.toString(),multiplier,net:(award-BigInt(data.stake)).toString(),before:debit.before,after,roomId:data.roomId,targetId:data.targetId,...(game==='reef-party'?{flight:{version:reefBallistics.version,firedAt:data.firedAt,impactAt:data.observedAt,angle:data.angle,x:data.aimX,y:data.aimY}}:{}),description:`${visual.description} Return ${(Number(award)/100).toFixed(2)} credits.`};
-   await db.query('INSERT INTO staging_rounds(id,account_id,game_id,profile_id,profile_hash,stake_units,award_units,stake_transaction,award_transaction,result) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[visual.id,actor.id,game,stagingProfile.id,profileHash,data.stake,award.toString(),stakeTx,awardTx,JSON.stringify(result)]);
+   const result={...visual,mode:'STAGING',ruleVersion:profileId,profileHash:roundProfileHash,creditsChanged:true,stake:data.stake,award:award.toString(),multiplier,net:(award-BigInt(data.stake)).toString(),before:debit.before,after,roomId:data.roomId,targetId:data.targetId,...(game==='reef-party'?{flight:{version:reefBallistics.version,firedAt:data.firedAt,impactAt:data.observedAt,angle:data.angle,x:data.aimX,y:data.aimY}}:{}),description:`${visual.description} Return ${(Number(award)/100).toFixed(2)} credits.`};
+   await db.query('INSERT INTO staging_rounds(id,account_id,game_id,profile_id,profile_hash,stake_units,award_units,stake_transaction,award_transaction,result) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',[visual.id,actor.id,game,profileId,roundProfileHash,data.stake,award.toString(),stakeTx,awardTx,JSON.stringify(result)]);
    return result;
   });
   if(result.cancelled)fail(409,'ROUND_CANCELLED','This interrupted request was not played.');

@@ -1,5 +1,13 @@
 # Owner steering — 17 September 2026
 
+## 23 September 2026 sparse fish tiers and separate Vercel test
+
+- Owner requested fewer fish, slower spawns, clearly different sizes, smaller rewards for small fish and larger/harder catches for large creatures.
+- Explicitly approved `reef-tiers-v1`: small 1× shot stake / 30% capture per valid hit; medium 3× / 20%; large 8× / 10%; boss 20× / 4%. Independent server draws imply averages of 3.33, 5, 10 and 25 hits; no guaranteed kill count, hidden accumulated health or progressive jackpot is introduced. Expected gross return per accepted hit is respectively 30%, 60%, 80%, 80%. This supersedes the earlier uniform fish 30% / 3× test, only for new fish rounds. Other games and null production approvals remain unchanged.
+- `reef-ballistics-v3`: scheduled arrivals six seconds apart, at most nine active targets and one boss; sizes span radii 8–100. Captured target IDs never respawn. Uncaught targets can return after the 480-second migration cycle.
+- Owner selected **a separate Vercel test environment**, not a migration of the existing Netlify wallets. The five-player test setup uses its own database identity, accounts and one-time authenticated manual funding. Existing Netlify balances/history are preserved. No paid infrastructure or public admin console is authorized.
+- Owner explicitly approved GitHub sign-in to Vercel. Provider prompts that require human security/legal choices remain human steps.
+
 ## 23 September 2026 daily wheel, account controls and aquatic refinement
 
 - Owner clarified that the balance changes too early: display the committed win first, then release the displayed balance. Server accounting must still commit immediately.

@@ -175,6 +175,20 @@ export function cabinetPractice(game: CabinetGameId, id: string, random: RandomI
 }
 
 export const stakeLimits={min:25,max:2000,step:25} as const;
+export const reefTierProfile={id:'reef-tiers-v1',tiers:{
+ small:{label:'Small',multiplier:1,captureTickets:3000},
+ medium:{label:'Medium',multiplier:3,captureTickets:2000},
+ large:{label:'Large',multiplier:8,captureTickets:1000},
+ boss:{label:'Boss',multiplier:20,captureTickets:400}
+}} as const;
+export function reefTier(species:number){
+ if(!Number.isInteger(species)||species<0||species>15)throw new Error('Invalid reef species');
+ return [7,8,9].includes(species)?'boss':[3,5,10,11].includes(species)?'large':[2,4,6,13].includes(species)?'medium':'small';
+}
+export function reefOutcome(id:string,targetId:number,random:RandomIndex):StagingVisual{
+ const {species}=reefTarget(targetId,0),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
+ return {id,game:'reef-party',captured,fish:{species,tier,profileId:reefTierProfile.id},description:captured?`${reefSpecies[species]} caught! ${rule.multiplier}× shot stake returned.`:`${reefSpecies[species]} resisted the hit.`};
+}
 export function validStake(value:string):boolean{return /^[1-9]\d{1,3}$/.test(value)&&Number(value)>=stakeLimits.min&&Number(value)<=stakeLimits.max&&Number(value)%stakeLimits.step===0;}
 // Explicit local experiment. This is not registered in the production approval registry.
 export const stagingProfile = {
@@ -188,11 +202,11 @@ export const stagingProfile = {
   'aurora-vault':'8 or more locked crystals pays (collected minus 7)×. Fewer pays zero.',
   'ember-relics':'12 or more cleared relics pays floor(cleared / 12)×. Fewer pays zero. Six cascades maximum.',
   'orchard-numbers':'Pick 4–10. Draw 20 of 80. With 4–6 picks, 2+ hits pays (hits minus 1)×; with 7–10 picks, 3+ hits pays (hits minus 2)×.',
-  'reef-party':'Separate experimental fish model: each valid targeted shot independently has 30% capture probability and pays 3× stake on capture. All species use the same odds and award. Missed/expired/already caught targets are rejected without a charge.'
+  'reef-party':'reef-tiers-v1: small 1× at 30%, medium 3× at 20%, large 8× at 10%, boss 20× at 4% per valid hit. Larger creatures take more shots on average, not a guaranteed number. Missed/expired/already caught targets are rejected without a charge.'
  }
 } as const;
 export type StagingGame=keyof typeof stagingProfile.rules;
-export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean};
+export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
  if(game==='neon-sevens')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({cherry:1,bell:2,bar:2,gem:3,seven:5}[m.symbol]||0)*({3:1,4:2,5:4}[m.count]||0),0);
@@ -202,11 +216,11 @@ export function stagingMultiplier(outcome:StagingVisual):number {
  if(game==='aurora-vault')return Math.max(0,(outcome.sequence as VaultSequence).frames.at(-1)!.cells.filter(Boolean).length-7);
  if(game==='ember-relics')return Math.floor((outcome.sequence as CascadeSequence).frames.reduce((sum,frame)=>sum+frame.removed.length,0)/12);
  if(game==='orchard-numbers')return Math.max(0,outcome.picks!.filter(n=>outcome.drawn!.includes(n)).length-(outcome.picks!.length<=6?1:2));
- return outcome.captured?3:0;
+ return outcome.captured?(outcome.fish?reefTierProfile.tiers[reefTier(outcome.fish.species)].multiplier:3):0;
 }
 export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[]):StagingVisual {
+ if(game==='reef-party')throw new Error('A server-validated fish target is required. Use reefOutcome.');
  const paying=random(10000)<3000;
- if(game==='reef-party')return {id,game,captured:paying,description:paying?'Captured! 3× shot stake returned.':'Fish escaped. Shot settled.'};
  // Rejection sampling conditions the visible outcome distribution, never a player's history.
  for(let attempt=0;attempt<10000;attempt++){
   let outcome:StagingVisual;
@@ -227,7 +241,7 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
 }
 
 export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish'] as const;
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v2'} as const;
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v3'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
 export function reefLeadAngle(seat:number,targetId:number,time:number){
@@ -250,6 +264,7 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
   const current={x:origin.x+vx*time,y:origin.y+vy*time};let hit:{targetId:number;time:number;x:number;y:number}|null=null;
   for(const id of targetIds){
    const before=reefTarget(id,roomTime+time-reefBallistics.step),after=reefTarget(id,roomTime+time);
+   if(!before.active||!after.active)continue;
    if(Math.abs(after.x-before.x)>600)continue; // A fish wrapping offscreen never sweeps across the table.
    const contact=sweptCircle(previous.x-before.x,previous.y-before.y,current.x-after.x,current.y-after.y,after.radius+reefBallistics.radius);
    if(contact!==null){const t=time-reefBallistics.step+contact*reefBallistics.step;if(!hit||t<hit.time)hit={targetId:id,time:t,x:origin.x+vx*t,y:origin.y+vy*t};}
@@ -261,10 +276,16 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
  return {targetId:null,time:reefBallistics.lifetime,x:previous.x,y:previous.y,origin,vx,vy,angle};
 }
 export function reefTarget(id:number,time:number){
- const species=id%40===0?8:id%20===0?9:id%23===0?7:id%17===0?10:id%19===0?13:id%11===0?11:id%13===0?12:id%7===0?3:id%9===0?4:id%8===0?0:id%6===0?6:id%5===0?5:id%4===0?2:id%3===0?1:id%2===0?15:14;
- const direction=id%3===0?-1:1,speed=[32,40,28,39,19,24,14,29,27,24,18,24,21,26,49,42][species];
- // A long shared migration lane keeps most of the 80 targets offscreen, not stacked in the water.
- const x=((id*197+time*speed*direction)%4800+4800)%4800-1800;
- const y=100+(id*37%390)+Math.sin(time*.65+id*.8)*(species>=8&&species<=10?12:20);
- return {x,y,direction,species,radius:[15,18,20,42,25,35,24,48,62,52,34,39,22,29,9,12][species]};
+ if(!Number.isInteger(id)||id<1||id>80||!Number.isFinite(time))throw new Error('Invalid reef target');
+ // One scheduled arrival every six seconds; at most nine on stage and one boss.
+ // Uncaught targets may return on the next 480-second migration. Captured IDs never respawn.
+ const pattern=[14,15,0,2,8,1,4,12,3,14,6,15,0,13,1,5,9,14,2,15,10,12,6,11];
+ const slot=(id-1)%24,species=id%20===5?[8,9,7,8][Math.floor(id/20)]:[7,8,9].includes(pattern[slot])?14:pattern[slot];
+ const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10][species];
+ const duration={small:32,medium:38,large:44,boss:50}[tier],spawnAt=(id-1)*6-42;
+ const age=((time-spawnAt)%480+480)%480,active=time>=spawnAt&&age<duration;
+ const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
+ const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;
+ const y=125+((id*83)%340)+Math.sin(age*.32+id)*({small:15,medium:20,large:12,boss:8}[tier]);
+ return {x,y,direction,species,tier,radius,active,spawnAt,duration};
 }
