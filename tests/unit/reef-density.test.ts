@@ -1,13 +1,13 @@
 import {describe,it,expect} from 'vitest';
 import {reefTarget,reefSpecies,reefOutcome,reefTier,reefTierProfile,stagingMultiplier,reefFlight} from '@new-game/game-math';
 describe('sparse reef migrations and tiered catches',()=>{
- it('never exceeds nine targets or one boss and spaces arrivals six seconds apart',()=>{
+ it('never exceeds fourteen targets or one boss and spaces arrivals three seconds apart',()=>{
   const species=new Set<number>();let smallest=100,largest=0;
   for(let t=0;t<960;t+=.5){const visible=Array.from({length:80},(_,i)=>reefTarget(i+1,t)).filter(p=>p.active);
-   expect(visible.length).toBeLessThanOrEqual(9);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
+   expect(visible.length).toBeLessThanOrEqual(14);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
    for(const p of visible){species.add(p.species);smallest=Math.min(smallest,p.radius);largest=Math.max(largest,p.radius);expect(p.y).toBeGreaterThan(70);expect(p.y).toBeLessThan(510);}
   }
-  for(let id=2;id<=80;id++)expect(reefTarget(id,0).spawnAt-reefTarget(id-1,0).spawnAt).toBe(6);
+  for(let id=2;id<=80;id++)expect(reefTarget(id,0).spawnAt-reefTarget(id-1,0).spawnAt).toBe(3);
   expect(largest/smallest).toBeGreaterThanOrEqual(10);expect(species.size).toBe(reefSpecies.length);
  });
  it('cannot collide with a creature before its spawn window',()=>{

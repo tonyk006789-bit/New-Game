@@ -5,6 +5,7 @@ import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import Icon from '@new-game/ui/Icon.vue';
 import { catalog, type GameId } from '@new-game/contracts';
 import GamePreview from './GamePreview.vue';
+import GameRules from './GameRules.vue';
 import FeatureGame from './FeatureGame.vue';
 import CabinetGame from './CabinetGame.vue';
 import ArcadeLobby from './ArcadeLobby.vue';
@@ -21,7 +22,7 @@ const onGesture=(event:Event)=>{void unlockAudio();if((event.target as Element)?
 function passwordChanged(){clearAccount();loginNotice.value='Password changed. Sign in with your new password.';}
 import { api, session, refreshAccount, expiredSession, loadEnvironment, recoverRound, type Account } from './api';
 import { formatCredits } from '@new-game/domain';
-import {stage,restorePending} from './staging-state';
+import {stage,restorePending,restoreFishPending} from './staging-state';
 const FishScene = defineAsyncComponent(() => import('./FishScene.vue'));
 type Page = 'lobby' | 'history' | 'wallet' | 'settings';
 const entered = ref(false);
@@ -30,17 +31,18 @@ const accountError = ref('');
 const creditHistory = ref<{id:string;kind:string;units:string;reason:string;created_at:string}[]>([]);
 const practiceHistory = ref<{result:{id:string;game:string;description:string};created_at:string}[]>([]);
 const credits = computed(() => formatCredits(creditPresentation.accountId===account.value?.id&&creditPresentation.held!==null?creditPresentation.held:account.value?.wallet.available || '0'));
-async function authenticated(){account.value=session.current;if(account.value)restorePending(account.value.id);entered.value=true;navigate('lobby');await loadHistory();}
+async function authenticated(){account.value=session.current;if(account.value){restorePending(account.value.id);restoreFishPending(account.value.id);}entered.value=true;navigate('lobby');await loadHistory();}
 async function loadHistory(){if(!account.value)return;try{[creditHistory.value,practiceHistory.value]=await Promise.all([api<typeof creditHistory.value>('history'),api<typeof practiceHistory.value>('practice/history')]);}catch(error){accountError.value=(error as Error).message;}}
 async function syncAccount(){if(!account.value||!ready.value)return;try{account.value=await refreshAccount();accountError.value='';}catch(error){accountError.value=(error as Error).message;if(expiredSession(error))clearAccount();}}
-function clearAccount(){revealCredits();session.current=null;stage.pending=null;stage.needsRecovery=false;stage.last=null;account.value=null;entered.value=false;activeGame.value=null;selectedTable.value=null;atFishTable.value=false;modal.value=null;creditHistory.value=[];practiceHistory.value=[];}
+function clearAccount(){revealCredits();session.current=null;stage.pending=null;stage.fishPending=[];stage.needsRecovery=false;stage.last=null;account.value=null;entered.value=false;activeGame.value=null;selectedTable.value=null;atFishTable.value=false;modal.value=null;creditHistory.value=[];practiceHistory.value=[];}
 let syncTimer:ReturnType<typeof setInterval>|undefined,recoveryTimer:ReturnType<typeof setInterval>|undefined,nextRecoveryAt=0;
-async function reconcileRound(){if(!ready.value||!account.value||!stage.needsRecovery||stage.busy||Date.now()<nextRecoveryAt)return;nextRecoveryAt=Date.now()+3000;try{await recoverRound();}catch(error){if(expiredSession(error))clearAccount();}}
+async function reconcileRound(){if(!ready.value||!account.value||!recovering.value||stage.busy||Date.now()<nextRecoveryAt)return;nextRecoveryAt=Date.now()+3000;try{await recoverRound();}catch(error){if(expiredSession(error))clearAccount();}}
+const recovering=computed(()=>stage.needsRecovery||stage.fishPending.some(p=>p.recover));
 const page = ref<Page>('lobby');
 const category = ref('All games');
 const query = ref('');
 const activeGame = ref<GameId | null>(null);
-const modal = ref<'about' | 'support' | 'share' | 'wheel' | null>(null);
+const modal = ref<'about' | 'support' | 'share' | 'wheel' | 'rules' | null>(null);
 const selectedTable=ref<ReefRoom|null>(null),atFishTable=ref(false),fishLeaving=ref(false);
 function joinTable(room:ReefRoom|null){selectedTable.value=room;atFishTable.value=true;}
 async function leaveTable(){if(!atFishTable.value||fishLeaving.value)return;fishLeaving.value=true;try{if(selectedTable.value&&account.value&&online.value)await api('practice/reef/leave',{roomId:selectedTable.value.id});}catch{/* A disconnected seat expires on the server. */}finally{selectedTable.value=null;atFishTable.value=false;fishLeaving.value=false;}}
@@ -79,8 +81,8 @@ function trapFocus(event: KeyboardEvent) {
   if (!event.shiftKey && event.target === items.at(-1)) { event.preventDefault(); items[0]?.focus(); }
 }
 const nativeListeners: PluginListenerHandle[] = [];
-watch(()=>stage.revision,()=>void syncAccount());
-watch(()=>[stage.needsRecovery,stage.busy,ready.value,account.value?.id],()=>void reconcileRound());
+watch(()=>stage.revision,()=>{if(session.current?.id===account.value?.id&&session.current)account.value={...session.current};else void syncAccount();});
+watch(()=>[recovering.value,stage.busy,ready.value,account.value?.id],()=>void reconcileRound());
 onMounted(async () => {
   setAudioActive(ready.value);
   try{await loadEnvironment();}catch{/* Unavailable config keeps staking closed. */}
@@ -135,13 +137,13 @@ watch(page,()=>{void syncAccount();void loadHistory();});
         <div class="header-controls"><button class="credit-meter" :aria-label="`My credits, ${credits}`" @click="navigate('wallet')"><span class="coin-token">N</span><span><small>PLAY CREDITS</small><strong>{{ credits }}</strong></span><Icon name="chevron" :size="14" /></button><button class="round-control" aria-label="Settings" @click="navigate('settings')"><Icon name="settings" /></button><button class="round-control exit-control" aria-label="Return to login" @click="leavePreview"><Icon name="close" /></button></div>
       </header>
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Preview actions are paused until you reconnect.</div>
-      <span v-if="stage.needsRecovery && stage.pending" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
+      <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
       <main v-if="currentGame" class="immersive-game">
-        <div class="game-topline"><button class="round-control" :aria-label="activeGame==='reef-party'&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{activeGame==='reef-party'&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="activeGame==='reef-party'&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span></div>
+        <div class="game-topline"><button class="round-control" :aria-label="activeGame==='reef-party'&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{activeGame==='reef-party'&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="activeGame==='reef-party'&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="activeGame==='reef-party'"><FishScene v-if="atFishTable" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
-        <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <CabinetGame v-else-if="activeGame === 'neon-sevens' || activeGame === 'jade-fortune' || activeGame === 'coin-carnival'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <CabinetGame v-else-if="activeGame === 'neon-sevens' || activeGame === 'jade-fortune' || activeGame === 'coin-carnival'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
 
       </main>
       <template v-else-if="page === 'lobby'">
@@ -166,8 +168,8 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       <footer v-if="!currentGame" class="arcade-bottom"><button :class="{ active: page === 'lobby' }" @click="navigate('lobby')"><Icon name="grid" :size="18" />LOBBY</button><button :class="{ active: page === 'history' }" @click="navigate('history')"><Icon name="clock" :size="18" />HISTORY</button><span class="footer-motto">PRIVATE GROUP <i>✦</i> JUST FOR FUN</span><button @click="modal = 'support'"><Icon name="help" :size="18" />SUPPORT</button><button @click="modal = 'about'"><Icon name="shield" :size="18" />ABOUT</button></footer>
     </template>
     <div v-if="modal" class="player-modal-backdrop" @click.self="modal=null"><section class="player-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" @keydown="trapFocus">
-      <header><h2 id="modal-title">{{modal==='support'?'NEED A HAND?':modal==='share'?'SHARE NEW GAME':modal==='wheel'?'DAILY SPIN':'WELCOME TO NEW GAME'}}</h2><button class="round-control" aria-label="Close dialog" @click="modal=null"><Icon name="close"/></button></header>
-      <SharePanel v-if="modal==='share'"/><DailyWheel v-else-if="modal==='wheel'" :authenticated="!!account" :ready="ready" :reduced-motion="reducedMotion" @settled="syncAccount"/><template v-else-if="modal==='support'"><p>For your player ID, an invitation, a password reset, or help with credits, contact your group’s Main Admin through your usual contact method.</p><p>Sign in with the player ID and password provided by your administrator. Guest previews are also available.</p></template>
+      <header><h2 id="modal-title">{{modal==='support'?'NEED A HAND?':modal==='share'?'SHARE NEW GAME':modal==='wheel'?'DAILY SPIN':modal==='rules'?`${currentGame?.name} · RULES`:'WELCOME TO NEW GAME'}}</h2><button class="round-control" aria-label="Close dialog" @click="modal=null"><Icon name="close"/></button></header>
+      <GameRules v-if="modal==='rules' && activeGame" :game="activeGame" :staked="stage.enabled && !!account"/><SharePanel v-else-if="modal==='share'"/><DailyWheel v-else-if="modal==='wheel'" :authenticated="!!account" :ready="ready" :reduced-motion="reducedMotion" @settled="syncAccount"/><template v-else-if="modal==='support'"><p>For your player ID, an invitation, a password reset, or help with credits, contact your group’s Main Admin through your usual contact method.</p><p>Sign in with the player ID and password provided by your administrator. Guest previews are also available.</p></template>
       <template v-else><p>An invitation-only arcade for your circle. Play credits cannot be purchased, cashed out, or redeemed for prizes of value.</p><p>Your administrator manages your play credits.</p></template>
       <button v-if="modal==='support'||modal==='about'" class="gold-button" @click="modal=null">GOT IT <Icon name="check" :size="17"/></button>
     </section></div>

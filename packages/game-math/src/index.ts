@@ -241,7 +241,7 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
 }
 
 export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish'] as const;
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v3'} as const;
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v4'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
 export function reefLeadAngle(seat:number,targetId:number,time:number){
@@ -277,13 +277,13 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
 }
 export function reefTarget(id:number,time:number){
  if(!Number.isInteger(id)||id<1||id>80||!Number.isFinite(time))throw new Error('Invalid reef target');
- // One scheduled arrival every six seconds; at most nine on stage and one boss.
- // Uncaught targets may return on the next 480-second migration. Captured IDs never respawn.
+ // One scheduled arrival every three seconds; at most fourteen on stage and one boss.
+ // Uncaught targets may return on the next 240-second migration. Captured IDs never respawn.
  const pattern=[14,15,0,2,8,1,4,12,3,14,6,15,0,13,1,5,9,14,2,15,10,12,6,11];
  const slot=(id-1)%24,species=id%20===5?[8,9,7,8][Math.floor(id/20)]:[7,8,9].includes(pattern[slot])?14:pattern[slot];
  const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10][species];
- const duration={small:32,medium:38,large:44,boss:50}[tier],spawnAt=(id-1)*6-42;
- const age=((time-spawnAt)%480+480)%480,active=time>=spawnAt&&age<duration;
+ const duration={small:32,medium:38,large:44,boss:50}[tier],spawnAt=(id-1)*3-36;
+ const age=((time-spawnAt)%240+240)%240,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
  const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;
  const y=125+((id*83)%340)+Math.sin(age*.32+id)*({small:15,medium:20,large:12,boss:8}[tier]);

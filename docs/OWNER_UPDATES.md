@@ -104,3 +104,11 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 - The resulting player refinement enlarges the five-reel cabinets, reduces surrounding prose, adds metallic controls and a committed-return count-up, adjusts reel take-up/braking/landing, expands feature-board space, and replaces simple fish-lounge symbols with original painted creatures and four cannon stations.
 - This is a presentation change. It does not change the experimental profile, stake increments, hosted tester credentials, manual funding rules or production approval status. Six explicit local sample-account test rounds used 0.25 credits each; hosted tester accounts were not used for round testing in this iteration.
 - Research coverage and limits: `JUWA_AUTHENTICATED_REFERENCE.md`. Acceptance: `../reports/REFINEMENT_V9_VERIFICATION.md`.
+
+## 25 September 2026 responsive cannons and game rules
+
+- Owner requested cannon firing that follows click speed, more creatures, and rules in every game. This explicitly supersedes the earlier removal of the game-information section for rules; the statistics panel and manual recovery button remain removed.
+- Manual clicks launch independent overlapping projectiles, without waiting for another hit, network receipt or catch animation. Normal/fast auto cadence is 250/125 ms. Each paid impact keeps its own durable request ID and stake snapshot; interrupted impacts reconcile individually without starting a new stake.
+- Arrivals are three seconds apart, with at most fourteen active targets and one boss. The sixteen species and 8–100 radius range are retained. Shared client/server trajectories use `reef-ballistics-v4`; approved `reef-tiers-v1` capture chances and returns are unchanged.
+- Each of the eight games has an on-demand Rules dialog with its controls, feature mechanics and current return rules; line games also show payline diagrams. No win-rate banner was restored.
+- Updates continue on the authorized Vercel five-person test environment. No account provisioning, refills, password resets, paid services or Netlify deployment is part of this change. See `../reports/REEF_V12_RAPID_FIRE.md`.

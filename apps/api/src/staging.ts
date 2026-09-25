@@ -25,12 +25,15 @@ export async function stagingRound(req:Request,id:string,body:unknown){
  if(game==='reef-party'&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v===undefined))fail(400,'TARGET_REQUIRED');
    const [wallet]=await lockWallets(db,[actor.id]);
    if(BigInt(wallet.settled_units)-BigInt(wallet.reserved_units)<BigInt(data.stake))fail(409,'INSUFFICIENT_AVAILABLE','Insufficient available play credits.');
-   if((await db.query("SELECT id FROM staging_rounds WHERE account_id=$1 AND created_at>clock_timestamp()-interval '250 milliseconds'",[actor.id])).rowCount)fail(429,'SLOW_DOWN');
+   if(game==='reef-party'){
+    // Burst allowance for manual clicks; the wallet lock still serializes debits.
+    if(Number((await db.query("SELECT count(*) n FROM staging_rounds WHERE account_id=$1 AND game_id='reef-party' AND created_at>clock_timestamp()-interval '1 second'",[actor.id])).rows[0].n)>=20)fail(429,'SLOW_DOWN','Too many shots arriving. Please pause briefly.');
+   }else if((await db.query("SELECT id FROM staging_rounds WHERE account_id=$1 AND created_at>clock_timestamp()-interval '250 milliseconds'",[actor.id])).rowCount)fail(429,'SLOW_DOWN');
    if(game==='reef-party'){
     const room=(await db.query("SELECT r.*,s.seat FROM practice_rooms r JOIN practice_seats s ON s.room_id=r.id WHERE r.id=$1 AND r.branch_id=$2 AND s.account_id=$3 AND s.heartbeat_at>now()-interval '20 seconds' AND r.expires_at>now()",[data.roomId,actor.branch_id,actor.id])).rows[0];
     if(!room)fail(409,'JOIN_REQUIRED');
     const now=Date.now();
-    if(data.firedAt!>now+100||now-data.firedAt!>4000||data.observedAt!>now+120||now-data.observedAt!>2000)fail(409,'STALE_AIM','Shot expired; no credits charged.');
+    if(data.firedAt!>now+100||now-data.firedAt!>12000||data.observedAt!>now+120||now-data.observedAt!>10000)fail(409,'STALE_AIM','Shot expired; no credits charged.');
     const targets=(await db.query('SELECT target_id FROM practice_targets WHERE room_id=$1 AND captured_by IS NULL',[data.roomId])).rows.map(row=>Number(row.target_id));
     const flight=reefFlight(room.seat,data.angle!,(data.firedAt!-new Date(room.created_at).getTime())/1000,targets);
     if(flight.targetId!==data.targetId||Math.abs(data.observedAt!-data.firedAt!-flight.time*1000)>30||Math.hypot(flight.x-data.aimX!,flight.y-data.aimY!)>2)fail(409,'AIM_MISSED','The cannon trajectory missed this fish. No credits charged.');
