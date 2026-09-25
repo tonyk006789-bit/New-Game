@@ -30,3 +30,12 @@ Target: existing **https://new-game-test-topaz.vercel.app/**. Publication status
 No database migration is needed. Roll back the Vercel code deployment only; do not restore old balances or erase receipts. Previously accepted outcomes replay unchanged. Refresh an already-open browser after updating because the client and server must use the same trajectory schedule.
 
 Physical Android/iPhone rendering, lifecycle and performance remain unverified; the owner deferred device testing. Browser emulation is not native acceptance. Fish-room synchronization still uses polling. The hosted experiment does not approve production mathematics.
+
+### Published and verified
+
+- Code commit: `602da3d`, pushed to `origin/main` in the owner's New-Game repository.
+- Vercel deployment: `dpl_7zfHqhB15QSidfiJbhicVphGofqB`, READY. Immutable URL: https://new-game-test-kn8hi2dei-tonyk006789-7532.vercel.app. Stable alias: https://new-game-test-topaz.vercel.app/.
+- Command: `node .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config .local/vercel-cli --scope tonyk006789-7532 --no-color`.
+- Publication scan: 258 source/build text files checked against 14 private credential values, zero findings. `git diff --cached --check` passed.
+- `node .local/vercel/verify-v12.mjs`: exact tested JS/CSS hashes served; healthy restricted API; public environment has no sample password; admin endpoint denied; all five existing ordinary logins succeeded with Secure/HttpOnly cookies. No hosted rounds, daily claims, funding or password edits were performed. Private evidence: `.local/vercel/verification-v12.json`.
+- Deployed browser verification: existing Player 1 session restored, rules dialog loaded, reef rendered with the additional mixed-size creatures and all four cannons. No console errors. Balance remained 1,005.30 throughout this read-only game inspection. The temporary verification seat was released. Screenshots: ignored `screenshots/reef-v12/vercel-fish-rules.png` and `vercel-reef.png`.

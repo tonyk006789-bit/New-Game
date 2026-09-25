@@ -33,4 +33,5 @@ The runtime checks both the Vercel project ID and the database's separate UUID m
 
 Redeploy the previous Vercel code if necessary while preserving accepted awards and ledger history. New fish requests use `reef-tiers-v1`; old accepted requests replay their immutable receipts. No schema change is required for the new fish profile. Existing Netlify deployment/accounts stay intact; commits for this move use `[skip netlify]` to avoid updating that deployment.
 
-Implementation follows [Vercel Build Output primitives](https://vercel.com/docs/build-output-api/primitives) and [Build Output routing](https://vercel.com/docs/build-output-api/configuration). Deployment status and exact test evidence are in `../reports/REEF_V11_VERCEL.md`.
+Implementation follows [Vercel Build Output primitives](https://vercel.com/docs/build-output-api/primitives) and [Build Output routing](https://vercel.com/docs/build-output-api/configuration). Deployment status and exact test evidence are in `../reports/REEF_V12_RAPID_FIRE.md` (current update) and `../reports/REEF_V11_VERCEL.md` (initial provisioning).
+
