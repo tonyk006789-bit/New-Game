@@ -19,6 +19,11 @@ export async function actorFor(db: PoolClient, req: Request, mutation=false): Pr
  return actor;
 }
 export function privileged(actor: Actor) { if(actor.role!=='MAIN_ADMIN')fail(403,'MAIN_ADMIN_REQUIRED');if(!actor.verified_at || Date.now()-actor.verified_at.getTime()>300000)fail(403,'VERIFICATION_REQUIRED','Verify your password and authenticator code to continue.'); }
+export function verifiedStaff(actor: Actor) {
+ if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
+ if(actor.role==='MAIN_ADMIN')return privileged(actor);
+ if(!actor.verified_at || Date.now()-actor.verified_at.getTime()>300000)fail(403,'VERIFICATION_REQUIRED','Verify your password to continue.');
+}
 export function parse<T>(schema: z.ZodType<T>, body: unknown): T { const result=schema.safeParse(body);if(!result.success)return fail(400,'INVALID_REQUEST',result.error.issues.map(issue=>`${issue.path.join('.')}: ${issue.message}`).join('; '));return result.data; }
 const credentials=z.object({username:z.string().min(3).max(64).transform(v=>v.toLowerCase()),password:z.string().min(1).max(256),code:z.string().max(6).optional()}).strict();
 export async function login(req: Request,res: Response,body: unknown) {
@@ -29,11 +34,11 @@ export async function login(req: Request,res: Response,body: unknown) {
   const attempt=(await db.query('SELECT * FROM login_attempts WHERE key_hash=$1 FOR UPDATE',[key])).rows[0];
   if(Date.now()-new Date(attempt.window_start).getTime()>900000)await db.query('UPDATE login_attempts SET failures=0,window_start=now() WHERE key_hash=$1',[key]);
   else if(attempt.failures>=8)return {error:'RATE_LIMITED'};
-  const account=(await db.query('SELECT * FROM accounts WHERE username=$1',[data.username])).rows[0];
+  const account=(await db.query('SELECT * FROM accounts WHERE username=$1 FOR SHARE',[data.username])).rows[0];
   const passwordOk=await passwordMatches(data.password,account?.password_hash);
   if(!account?.active || !passwordOk || (account.role==='MAIN_ADMIN' && !validTotp(account.totp_secret,data.code||''))){await db.query('UPDATE login_attempts SET failures=failures+1 WHERE key_hash=$1',[key]);return {error:'INVALID_CREDENTIALS'};}
   const raw=token(),csrf=token();
-  await db.query('INSERT INTO sessions(token_hash,account_id,csrf_token,expires_at,verified_at) VALUES($1,$2,$3,now()+interval \'12 hours\',$4)',[digest(raw),account.id,csrf,account.role==='MAIN_ADMIN'?new Date():null]);
+  await db.query('INSERT INTO sessions(token_hash,account_id,csrf_token,expires_at,verified_at) VALUES($1,$2,$3,now()+interval \'12 hours\',$4)',[digest(raw),account.id,csrf,account.role!=='PLAYER'?new Date():null]);
   await db.query('UPDATE login_attempts SET failures=0 WHERE key_hash=$1',[key]);
   await audit(db,account,'LOGIN',{});
   return {raw,csrf};
@@ -42,15 +47,20 @@ export async function login(req: Request,res: Response,body: unknown) {
  res.setHeader('Set-Cookie',sessionCookie(result.raw!));return {csrf:result.csrf};
 }
 export async function verify(req:Request,body:unknown){
- const data=parse(z.object({password:z.string().min(1).max(256),code:z.string().length(6)}).strict(),body);
+ const data=parse(z.object({password:z.string().min(1).max(256),code:z.string().max(6).optional()}).strict(),body);
  const result=await transaction(async db=>{
-  const actor=await actorFor(db,req,true);if(actor.role!=='MAIN_ADMIN')fail(403,'MAIN_ADMIN_REQUIRED');
+  const candidate=(await db.query('SELECT account_id FROM sessions WHERE token_hash=$1',[digest(readToken(req))])).rows[0];
+  if(!candidate)fail(401,'AUTH_REQUIRED');
+  // Same account-before-session order as password changes. Concurrent verification
+  // must not upgrade two shared session locks while holding the rate-limit lock.
+  await db.query('SELECT id FROM accounts WHERE id=$1 FOR UPDATE',[candidate.account_id]);
+  const actor=await actorFor(db,req,true);if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
   const key=digest(`verify:${actor.id}`);await db.query('INSERT INTO login_attempts(key_hash) VALUES($1) ON CONFLICT DO NOTHING',[key]);
   const attempt=(await db.query('SELECT * FROM login_attempts WHERE key_hash=$1 FOR UPDATE',[key])).rows[0];
   if(Date.now()-new Date(attempt.window_start).getTime()>900000)await db.query('UPDATE login_attempts SET failures=0,window_start=now() WHERE key_hash=$1',[key]);
   else if(attempt.failures>=8)return false;
   const account=(await db.query('SELECT password_hash,totp_secret FROM accounts WHERE id=$1',[actor.id])).rows[0];
-  if(!await passwordMatches(data.password,account.password_hash)||!validTotp(account.totp_secret,data.code)){await db.query('UPDATE login_attempts SET failures=failures+1 WHERE key_hash=$1',[key]);return false;}
+  if(!await passwordMatches(data.password,account.password_hash)||(actor.role==='MAIN_ADMIN'&&!validTotp(account.totp_secret,data.code||''))){await db.query('UPDATE login_attempts SET failures=failures+1 WHERE key_hash=$1',[key]);return false;}
   await db.query('UPDATE sessions SET verified_at=now() WHERE token_hash=$1',[actor.token_hash]);await audit(db,actor,'PRIVILEGED_VERIFICATION',{});return true;
  });
  if(!result)fail(403,'VERIFICATION_FAILED','Verification failed or too many attempts.');return {verified:true};

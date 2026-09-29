@@ -47,7 +47,7 @@ For a fresh machine: install Node 24.19/pnpm 11.19 and PostgreSQL 17, create a l
 | Agent | Own wallet | Active assigned player | Never |
 | Player | None | None | Never |
 
-Sibling, upward, cross-branch and arbitrary-source transfers fail on the server. Only Main Admin creates or changes account access. Organization moves and lower-role account management are not implemented or implicitly authorized.
+29 September owner approval adds a separate **Agent redeem** action: assigned PLAYER available wallet → that same AGENT wallet, with recent password verification, two version checks and a balanced immutable receipt. Agents may create zero-balance players under themselves and edit/reset/suspend/reactivate those players. Other upward, sibling, cross-branch and arbitrary-source transfers remain denied. Organization moves and sub-distributor account-management powers remain outside this approval. See [AGENT_CONSOLE.md](AGENT_CONSOLE.md).
 
 ## What is still required for the complete product
 

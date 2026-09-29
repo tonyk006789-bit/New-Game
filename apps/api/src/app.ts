@@ -6,10 +6,11 @@ import { mathStatus } from '@new-game/game-math';
 import { type Request, type Response, actorFor, login, verify, sessionCookie } from './auth.js';
 import { transaction, fail } from './store.js';
 import { accounts, createAccount, history, me, report, auditHistory, manageAccount } from './accounts.js';
-import { adjust, transfer, reverse } from './ledger.js';
+import { adjust, transfer, reverse, redeem } from './ledger.js';
 import { practiceHistory, practiceRound, reefRoom, reefShot, reefTables, reefLeave } from './practice.js';
 import { environment, stagingRound, stagingHistory, stagingStats, recoverStagingRound } from './staging.js';
 import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
+import {operatorDashboard,operatorAccounts,operatorRecords,operatorReceipt,operatorSettings} from './operator.js';
 import {changePassword} from './password.js';
 @Catch()
 class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost){
@@ -34,6 +35,12 @@ class ArcadeController {
  @Post('auth/logout') async logout(@Req() req:Request,@Res({passthrough:true}) res:Response){await transaction(async db=>{const actor=await actorFor(db,req,true);await db.query('UPDATE sessions SET revoked_at=now() WHERE token_hash=$1',[actor.token_hash]);});res.setHeader('Set-Cookie',sessionCookie('',0));return {loggedOut:true};}
  @Get('me') me(@Req() req:Request){return me(req);}
  @Get('history') history(@Req() req:Request,@Query('accountId') id?:string){return history(req,id);}
+ @Get('operator/dashboard') dashboard(@Req() req:Request){return operatorDashboard(req);}
+ @Get('operator/accounts') operatorAccounts(@Req() req:Request,@Query() query:unknown){return operatorAccounts(req,query);}
+ @Get('operator/records') records(@Req() req:Request,@Query() query:unknown){return operatorRecords(req,query);}
+ @Get('operator/receipts/:id') receipt(@Req() req:Request,@Param('id') id:string){return operatorReceipt(req,id);}
+ @Get('operator/settings') settings(@Req() req:Request){return operatorSettings(req);}
+ @Post('operator/redeems') redeem(@Req() req:Request,@Body() body:unknown){return redeem(req,body);}
  @Get('admin/accounts') accounts(@Req() req:Request){return accounts(req);}
  @Post('admin/accounts') create(@Req() req:Request,@Body() body:unknown){return createAccount(req,body);}
  @Get('admin/report') report(@Req() req:Request){return report(req);}

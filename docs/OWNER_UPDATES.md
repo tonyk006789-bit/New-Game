@@ -112,3 +112,14 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 - Arrivals are three seconds apart, with at most fourteen active targets and one boss. The sixteen species and 8–100 radius range are retained. Shared client/server trajectories use `reef-ballistics-v4`; approved `reef-tiers-v1` capture chances and returns are unchanged.
 - Each of the eight games has an on-demand Rules dialog with its controls, feature mechanics and current return rules; line games also show payline diagrams. No win-rate banner was restored.
 - Updates continue on the authorized Vercel five-person test environment. No account provisioning, refills, password resets, paid services or Netlify deployment is part of this change. See `../reports/REEF_V12_RAPID_FIRE.md`.
+
+
+## 29 September 2026 agent console and approved redemption
+
+- Owner requested a working agent backend using their authenticated JUWA agent portal and screenshots as workflow references: dashboard, player creation/edit/reset, recharge/redeem, records and settings. The reference portal was inspected read-only after owner sign-in. No external players, passwords or credits were changed; no provider code, private customer export or provider credentials were imported.
+- Owner explicitly approved: **“Yes—allow transfers back to the agent.”** A dedicated REDEEM operation moves only available play credits from an assigned player into that same agent's wallet. Agents do not gain issuance/removal or arbitrary upward transfer authority.
+- Agent player creation is restricted to the actor's own branch and the PLAYER role; new wallets start at zero. Edits, password reset and suspend/reactivate are restricted to assigned players. Main Admin retains its existing hierarchy and manual adjustment authority. Sub-distributor powers are unchanged.
+- Password reset and status changes revoke player sessions, preserve credits and retain accepted game history. Sensitive agent management and redemption require verification within five minutes; Main Admin still requires TOTP.
+- Console includes scoped dashboard metrics, database pagination/search/sort, recharge/redeem/daily-wheel/game/adjustment records, scoped printable receipts and own-account settings/password change. All counts, records and receipts use branch authorization. Display-name edits do not move accounts between branches.
+- Separate local demo accounts are in `.local/operator-demo/LOGINS.md`. The demo agent was funded once with 100.00 credits using the authenticated Main Admin ADD workflow. Browser acceptance recharged 10.00 and redeemed 2.00, leaving the demo agent at 92.00 and demo player at 8.00. Existing human tester accounts were unchanged.
+- Remote publication of the privileged console and admitting agent-created players to the hosted test game were requested separately for owner approval. Until that approval, the existing hosted five-player gateway remains unchanged.

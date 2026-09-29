@@ -10,7 +10,7 @@ export async function changePassword(req:Request,res:Response,body:unknown){
   if(!candidate)fail(401,'AUTH_REQUIRED');
   // Lock before actorFor's shared locks, so concurrent password changes cannot deadlock upgrades.
   await db.query('SELECT id FROM accounts WHERE id=$1 FOR UPDATE',[candidate.account_id]);
-  const actor=await actorFor(db,req,true);if(actor.role!=='PLAYER')fail(403,'PLAYER_REQUIRED');
+  const actor=await actorFor(db,req,true);
   const key=digest(`password:${actor.id}`);await db.query('INSERT INTO login_attempts(key_hash) VALUES($1) ON CONFLICT DO NOTHING',[key]);
   const attempt=(await db.query('SELECT * FROM login_attempts WHERE key_hash=$1 FOR UPDATE',[key])).rows[0];
   if(Date.now()-new Date(attempt.window_start).getTime()>900000)await db.query('UPDATE login_attempts SET failures=0,window_start=now() WHERE key_hash=$1',[key]);

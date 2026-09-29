@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { type PoolClient } from 'pg';
-import { actorFor, parse, privileged, type Request } from './auth.js';
+import { actorFor, parse, privileged, verifiedStaff, type Request } from './auth.js';
 import { type Actor, type Wallet, audit, fail, idempotent, inScope, transaction, walletView } from './store.js';
 const units=z.string().regex(/^[1-9]\d{0,14}$/);
 const version=z.string().regex(/^(0|[1-9]\d{0,18})$/);
@@ -72,6 +72,25 @@ export async function reverse(req:Request,body:unknown){
    const delta=-BigInt(original.units);const id=await beginLedger(db,actor,target,'REVERSAL',data.reason,data.requestKey,original.id);
    const balance=await posting(db,id,wallet,delta);await db.query('INSERT INTO ledger_postings(transaction_id,system_account,units) VALUES($1,$2,$3)',[id,delta>0?'ISSUANCE':'RETIREMENT',(-delta).toString()]);
    const receipt={id,kind:'REVERSAL',relatedId:original.id,targetId:target.id,reason:data.reason,...balance};await audit(db,actor,'REVERSAL',receipt);return receipt;
+  });
+ });
+}
+export async function redeem(req:Request,body:unknown){
+ const data=parse(transferSchema,body);
+ return transaction(async db=>{
+  const actor=await actorFor(db,req,true);
+  if(actor.role!=='AGENT')fail(403,'AGENT_REQUIRED');
+  verifiedStaff(actor);
+  const player=await inScope(db,actor,data.targetId);
+  if(player.role!=='PLAYER'||player.branch_id!==actor.branch_id)fail(403,'REDEEM_FORBIDDEN');
+  return idempotent(db,actor,'REDEEM',data.requestKey,data,async()=>{
+   const wallets=await lockWallets(db,[actor.id,player.id]);
+   const source=wallets.find(w=>w.account_id===player.id)!,destination=wallets.find(w=>w.account_id===actor.id)!;
+   fresh(destination,data.expectedVersion);fresh(source,data.targetVersion);
+   const id=await beginLedger(db,actor,player,'REDEEM',data.reason,data.requestKey);
+   const from=await posting(db,id,source,-BigInt(data.amount)),to=await posting(db,id,destination,BigInt(data.amount));
+   const receipt={id,kind:'REDEEM',sourceId:player.id,targetId:actor.id,amount:data.amount,reason:data.reason,from,to};
+   await audit(db,actor,'REDEEM',receipt);return receipt;
   });
  });
 }

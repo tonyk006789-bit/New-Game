@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { type Request, actorFor, parse, privileged } from './auth.js';
-import { type Wallet, audit, fail, inScope, transaction, walletView } from './store.js';
+import { type Request, actorFor, parse, privileged, verifiedStaff } from './auth.js';
+import { type Wallet, audit, fail, idempotent, inScope, transaction, walletView } from './store.js';
 import { passwordHash } from './security.js';
 export async function me(req:Request){return transaction(async db=>{
  const actor=await actorFor(db,req);const wallet=(await db.query<Wallet>('SELECT * FROM wallets WHERE account_id=$1',[actor.id])).rows[0];
@@ -13,11 +13,16 @@ export async function accounts(req:Request){return transaction(async db=>{
  JOIN branches b ON b.id=a.branch_id JOIN branch_ancestors c ON c.branch_id=a.branch_id JOIN wallets w ON w.account_id=a.id WHERE c.ancestor_id=$1 ORDER BY a.created_at DESC LIMIT 500`,[actor.branch_id]);
  return rows.map(row=>({id:row.id,username:row.username,displayName:row.display_name,role:row.role,active:row.active,branch:row.branch,wallet:walletView(row as Wallet)}));
 });}
-const createSchema=z.object({parentId:z.uuid(),username:z.string().regex(/^[a-z0-9][a-z0-9._-]{2,63}$/),displayName:z.string().trim().min(1).max(100),password:z.string().min(12).max(256)}).strict();
+const createSchema=z.object({parentId:z.uuid(),username:z.string().regex(/^[a-z0-9][a-z0-9._-]{2,63}$/),displayName:z.string().trim().min(1).max(100),password:z.string().min(12).max(256),requestKey:z.string().min(8).max(128).optional()}).strict();
 export async function createAccount(req:Request,body:unknown){
- const data=parse(createSchema,body);const hash=await passwordHash(data.password);
+ const data=parse(createSchema,body);
  return transaction(async db=>{
-  const actor=await actorFor(db,req,true);privileged(actor);const parent=await inScope(db,actor,data.parentId);
+  const actor=await actorFor(db,req,true);
+  if(actor.role==='MAIN_ADMIN')privileged(actor);else if(actor.role==='AGENT'&&data.parentId===actor.id)verifiedStaff(actor);else fail(403,'ACCOUNT_CREATE_FORBIDDEN');
+  const parent=await inScope(db,actor,data.parentId);
+  if(!parent.active)fail(409,'PARENT_INACTIVE');
+  return idempotent(db,actor,'ACCOUNT_CREATE',data.requestKey||`create:${data.username}`,data,async()=>{
+  const hash=await passwordHash(data.password);
   const next={MAIN_ADMIN:'SUB_DISTRIBUTOR',SUB_DISTRIBUTOR:'AGENT',AGENT:'PLAYER',PLAYER:null};const role=next[parent.role];if(!role)fail(400,'PLAYER_CANNOT_PARENT');
   await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`username:${data.username}`]);
   if((await db.query('SELECT id FROM accounts WHERE username=$1',[data.username])).rowCount)fail(409,'USERNAME_EXISTS');
@@ -30,6 +35,7 @@ export async function createAccount(req:Request,body:unknown){
   await db.query('INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash) VALUES($1,$2,$3,$4,true,$5,$6)',[id,branch,role,data.displayName,data.username,hash]);
   await db.query('INSERT INTO wallets(id,account_id) VALUES($1,$2)',[randomUUID(),id]);
   await audit(db,actor,'ACCOUNT_CREATED',{id,parentId:parent.id,role,username:data.username});return {id,role,username:data.username};
+  });
  });
 }
 export async function history(req:Request,targetId?:string){return transaction(async db=>{
@@ -46,17 +52,25 @@ export async function report(req:Request){return transaction(async db=>{
 });}
 export async function auditHistory(req:Request){return transaction(async db=>{const actor=await actorFor(db,req);if(actor.role!=='MAIN_ADMIN')fail(403,'MAIN_ADMIN_REQUIRED');return (await db.query('SELECT e.id,e.event_type,e.details,e.created_at,a.display_name actor FROM audit_events e JOIN accounts a ON a.id=e.actor_id JOIN branch_ancestors c ON c.branch_id=e.branch_id_at_event WHERE c.ancestor_id=$1 ORDER BY e.created_at DESC LIMIT 100',[actor.branch_id])).rows;});}
 const manageSchema=z.discriminatedUnion('action',[
- z.object({action:z.literal('RESET_PASSWORD'),password:z.string().min(12).max(256),reason:z.string().trim().min(5).max(500)}).strict(),
- z.object({action:z.literal('SET_ACTIVE'),active:z.boolean(),reason:z.string().trim().min(5).max(500)}).strict()
+ z.object({action:z.literal('RESET_PASSWORD'),password:z.string().min(12).max(256),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict(),
+ z.object({action:z.literal('SET_ACTIVE'),active:z.boolean(),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict(),
+ z.object({action:z.literal('EDIT_PROFILE'),displayName:z.string().trim().min(1).max(100),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict()
 ]);
 export async function manageAccount(req:Request,id:string,body:unknown){
  const targetId=parse(z.uuid(),id),data=parse(manageSchema,body);
- const hash=data.action==='RESET_PASSWORD'?await passwordHash(data.password):null;
- return transaction(async db=>{const actor=await actorFor(db,req,true);privileged(actor);const target=await inScope(db,actor,targetId);
+ return transaction(async db=>{const actor=await actorFor(db,req,true);
+  if(!['MAIN_ADMIN','AGENT'].includes(actor.role))fail(403,'ACCOUNT_MANAGE_FORBIDDEN');
+  verifiedStaff(actor);const target=await inScope(db,actor,targetId);
+  if(actor.role==='AGENT'&&(target.role!=='PLAYER'||target.branch_id!==actor.branch_id))fail(403,'ACCOUNT_MANAGE_FORBIDDEN');
+  const apply=async()=>{
+  const hash=data.action==='RESET_PASSWORD'?await passwordHash(data.password):null;
   if(target.role==='MAIN_ADMIN')fail(403,'ROOT_RECOVERY_SEPARATE','Main Admin recovery requires the local operator recovery procedure.');
   if(data.action==='RESET_PASSWORD')await db.query('UPDATE accounts SET password_hash=$1 WHERE id=$2',[hash,target.id]);
-  else await db.query('UPDATE accounts SET active=$1 WHERE id=$2',[data.active,target.id]);
-  await db.query('UPDATE sessions SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL',[target.id]);
-  await audit(db,actor,data.action,{targetId:target.id,reason:data.reason,...(data.action==='SET_ACTIVE'?{active:data.active}:{})});return {updated:true,sessionsRevoked:true};
+  else if(data.action==='SET_ACTIVE')await db.query('UPDATE accounts SET active=$1 WHERE id=$2',[data.active,target.id]);
+  else await db.query('UPDATE accounts SET display_name=$1 WHERE id=$2',[data.displayName,target.id]);
+  if(data.action!=='EDIT_PROFILE')await db.query('UPDATE sessions SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL',[target.id]);
+  await audit(db,actor,data.action,{targetId:target.id,reason:data.reason,...(data.action==='SET_ACTIVE'?{active:data.active}:data.action==='EDIT_PROFILE'?{displayName:data.displayName}:{}),requestKey:data.requestKey});return {updated:true,sessionsRevoked:data.action!=='EDIT_PROFILE'};
+  };
+  return data.requestKey?idempotent(db,actor,'ACCOUNT_MANAGE',data.requestKey,{targetId,...data},apply):apply();
  });
 }

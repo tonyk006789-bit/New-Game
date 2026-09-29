@@ -45,6 +45,8 @@ test('Netlify player transport uses authoritative accounting and four real seats
   assert.equal((await call('/v1/me',undefined,sessions[0])).data.wallet.available,'100000');
   for(const username of ['fixture.admin','outside.player'])assert.equal((await call('/v1/auth/login',{username,password})).status,401);
   assert.equal((await call('/v1/admin/accounts')).status,404);
+  for(const route of ['dashboard','accounts','records','settings','receipts/'+randomUUID()])assert.equal((await call('/v1/operator/'+route,undefined,sessions[0])).status,404);
+  assert.equal((await call('/v1/operator/redeems',{},sessions[0])).status,404);
   assert.equal((await call('/v1/history?accountId=someone',undefined,sessions[0])).status,404);
   assert.equal((await call('/v1/me',undefined,{cookie:admin.headers.cookie,csrf:admin.headers['x-csrf-token']})).status,403);
  });
