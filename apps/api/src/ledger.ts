@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { type PoolClient } from 'pg';
 import { actorFor, parse, privileged, verifiedStaff, type Request } from './auth.js';
-import { type Actor, type Wallet, audit, fail, idempotent, inScope, transaction, walletView } from './store.js';
+import { type Actor, type Wallet, audit, branchEnabled, directChild, fail, idempotent, inScope, transaction, walletView } from './store.js';
 const units=z.string().regex(/^[1-9]\d{0,14}$/);
 const version=z.string().regex(/^(0|[1-9]\d{0,18})$/);
 const base={targetId:z.uuid(),amount:units,reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128),expectedVersion:version};
@@ -49,7 +49,7 @@ export async function transfer(req:Request,body:unknown){
   const actor=await actorFor(db,req,true);if(!['SUB_DISTRIBUTOR','AGENT','MAIN_ADMIN'].includes(actor.role))fail(403,'TRANSFER_FORBIDDEN');
   const target=await inScope(db,actor,data.targetId);
   const rank={MAIN_ADMIN:0,SUB_DISTRIBUTOR:1,AGENT:2,PLAYER:3};
-  if(!target.active||rank[target.role]<=rank[actor.role])fail(403,'TRANSFER_FORBIDDEN','Transfer only your own existing credits to a lower role in your branch.');
+  if(!target.active||target.archived_at||!await branchEnabled(db,target.branch_id)||rank[target.role]<=rank[actor.role])fail(403,'TRANSFER_FORBIDDEN','Transfer only your own existing credits to a lower role in your branch.');
   return idempotent(db,actor,'TRANSFER',data.requestKey,data,async()=>{
    const wallets=await lockWallets(db,[actor.id,target.id]);const source=wallets.find(w=>w.account_id===actor.id)!;const destination=wallets.find(w=>w.account_id===target.id)!;
    fresh(source,data.expectedVersion);fresh(destination,data.targetVersion);
@@ -79,10 +79,10 @@ export async function redeem(req:Request,body:unknown){
  const data=parse(transferSchema,body);
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);
-  if(actor.role!=='AGENT')fail(403,'AGENT_REQUIRED');
+  if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
   verifiedStaff(actor);
   const player=await inScope(db,actor,data.targetId);
-  if(player.role!=='PLAYER'||player.branch_id!==actor.branch_id)fail(403,'REDEEM_FORBIDDEN');
+  if(!directChild(actor,player))fail(403,'REDEEM_FORBIDDEN');
   return idempotent(db,actor,'REDEEM',data.requestKey,data,async()=>{
    const wallets=await lockWallets(db,[actor.id,player.id]);
    const source=wallets.find(w=>w.account_id===player.id)!,destination=wallets.find(w=>w.account_id===actor.id)!;

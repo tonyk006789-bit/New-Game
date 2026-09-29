@@ -6,11 +6,14 @@ import { hostedTest, validateHostedTest } from './environment.js';
 export const fail = (status: number, code: string, message: string = code): never => { throw new HttpException({ code, message }, status); };
 export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: hostedTest()?3:12, connectionTimeoutMillis:10000, idleTimeoutMillis:30000 });
 pool.on('error',()=>console.error('An idle database connection closed.'));
-export async function transaction<T>(run: (db: PoolClient) => Promise<T>) {
+export async function transaction<T>(run: (db: PoolClient) => Promise<T>, exclusiveAccess=false) {
  if (!process.env.DATABASE_URL) fail(503, 'DATABASE_UNAVAILABLE', 'The account service is not configured.');
  const db = await pool.connect();
  try {
   await db.query('BEGIN');
+  // Shared for ordinary requests, exclusive for account access changes. Taking
+  // this first ensures suspension cannot race a login, stake or branch transfer.
+  await db.query(`SELECT ${exclusiveAccess?'pg_advisory_xact_lock':'pg_advisory_xact_lock_shared'}(10440721)`);
   if(hostedTest()){
    validateHostedTest();
    const marker=await db.query('SELECT site_id FROM hosted_test_environment WHERE singleton=true');
@@ -24,7 +27,7 @@ export interface Actor extends QueryResultRow { id: string; branch_id: string; r
 export interface Wallet extends QueryResultRow { id: string; account_id: string; settled_units: string; reserved_units: string; version: string }
 export function walletView(wallet: Wallet) { return { settled: wallet.settled_units, reserved: wallet.reserved_units, available: (BigInt(wallet.settled_units)-BigInt(wallet.reserved_units)).toString(), version: wallet.version }; }
 export async function inScope(db: PoolClient, actor: Actor, target: string) {
- const {rows} = await db.query('SELECT a.* FROM accounts a JOIN branch_ancestors b ON b.branch_id=a.branch_id WHERE a.id=$1 AND b.ancestor_id=$2', [target,actor.branch_id]);
+ const {rows} = await db.query('SELECT a.*,br.parent_id FROM accounts a JOIN branches br ON br.id=a.branch_id JOIN branch_ancestors b ON b.branch_id=a.branch_id WHERE a.id=$1 AND b.ancestor_id=$2', [target,actor.branch_id]);
  if (!rows.length || (actor.role === 'PLAYER' && target !== actor.id)) fail(404,'ACCOUNT_NOT_FOUND');
  return rows[0] as Actor;
 }
@@ -39,4 +42,13 @@ export async function idempotent<T>(db: PoolClient, actor: Actor, operation: str
  const result=await run();
  await db.query('INSERT INTO idempotency_records(actor_id,operation,request_key,request_hash,response) VALUES($1,$2,$3,$4,$5)',[actor.id,operation,key,hash,JSON.stringify(result)]);
  return result;
+}
+
+export function directChild(actor:Actor,target:Actor|{role:string;branch_id:string;parent_id:string|null}) {
+ const next={MAIN_ADMIN:'SUB_DISTRIBUTOR',SUB_DISTRIBUTOR:'AGENT',AGENT:'PLAYER',PLAYER:null};
+ return target.role===next[actor.role]&&(target.role==='PLAYER'?target.branch_id===actor.branch_id:target.parent_id===actor.branch_id);
+}
+export async function branchEnabled(db:PoolClient,branchId:string) {
+ return !(await db.query(`SELECT 1 FROM accounts a JOIN branch_ancestors c ON c.ancestor_id=a.branch_id
+ WHERE c.branch_id=$1 AND a.role<>'PLAYER' AND (NOT a.active OR a.archived_at IS NOT NULL) LIMIT 1`,[branchId])).rowCount;
 }

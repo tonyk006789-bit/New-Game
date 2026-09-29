@@ -39,7 +39,8 @@
     "assets:manifest": "node scripts/asset-manifest.mjs",
     "test:operator": "pnpm build:server && node --env-file=.local/staging/runtime.env --test tests/db/operator.test.mjs",
     "test:ledger": "pnpm build:server && node --env-file-if-exists=.local/runtime.env --test tests/db/backend.test.mjs",
-    "local:bootstrap": "pnpm build:server && node --env-file=.local/runtime.env scripts/bootstrap-admin.mjs"
+    "local:bootstrap": "pnpm build:server && node --env-file=.local/runtime.env scripts/bootstrap-admin.mjs",
+    "build:vercel-operator": "pnpm build:admin && node scripts/vercel-operator-build.mjs"
   },
   "dependencies": {
     "@capacitor/app": "8.1.1",

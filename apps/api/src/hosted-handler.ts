@@ -41,10 +41,10 @@ export async function hostedHandler(request:Request, context:{ip?:string}={}){
   if(path==='/v1/health'){await transaction(db=>db.query('SELECT 1'));return json({status:'ok',mode:'private-test'});}
   if(path==='/v1/games')return json(catalog);
   if(path==='/v1/auth/login'){
-   if(typeof body?.username!=='string'||!testAudience.has(body.username.toLowerCase()))return json({code:'INVALID_CREDENTIALS',message:'Player ID or password is incorrect.'},401);
-   return json(await login(req,res,body),201,headers);
+   if(typeof body?.username!=='string'||(process.env.HOSTED_PLAYER_ADMISSION!=='managed'&&!testAudience.has(body.username.toLowerCase())))return json({code:'INVALID_CREDENTIALS',message:'Player ID or password is incorrect.'},401);
+   return json(await login(req,res,body,'player'),201,headers);
   }
-  await transaction(async db=>{const actor=await actorFor(db,req,request.method==='POST');if(actor.role!=='PLAYER'||!testAudience.has(actor.username))fail(403,'TEST_ACCOUNT_REQUIRED');});
+  await transaction(async db=>{const actor=await actorFor(db,req,request.method==='POST');if(actor.role!=='PLAYER'||(process.env.HOSTED_PLAYER_ADMISSION!=='managed'&&!testAudience.has(actor.username)))fail(403,'TEST_ACCOUNT_REQUIRED');});
   let result:unknown;
   if(path==='/v1/me')result=await me(req);
   else if(path==='/v1/daily-wheel')result=await dailyWheelStatus(req);

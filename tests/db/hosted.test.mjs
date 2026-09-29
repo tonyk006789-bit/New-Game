@@ -50,6 +50,14 @@ test('Netlify player transport uses authoritative accounting and four real seats
   assert.equal((await call('/v1/history?accountId=someone',undefined,sessions[0])).status,404);
   assert.equal((await call('/v1/me',undefined,{cookie:admin.headers.cookie,csrf:admin.headers['x-csrf-token']})).status,403);
  });
+ await t.test('managed player admission permits created players but never staff',async()=>{
+  process.env.HOSTED_PLAYER_ADMISSION='managed';
+  try{
+   const r=await call('/v1/auth/login',{username:'outside.player',password});assert.equal(r.status,201);
+   const session={cookie:r.cookie.split(';')[0],csrf:r.data.csrf};assert.equal((await call('/v1/me',undefined,session)).status,200);
+   for(const username of ['fixture.admin','fixture.agent','fixture.circle'])assert.equal((await call('/v1/auth/login',{username,password})).status,401);
+  }finally{delete process.env.HOSTED_PLAYER_ADMISSION;}
+ });
  await t.test('wrong origin, CSRF and oversized bodies are rejected',async()=>{
   assert.equal((await call('/v1/auth/logout',{},sessions[0],{Origin:'https://other.example'})).status,403);
   assert.equal((await call('/v1/auth/logout',{},sessions[0],{'X-CSRF-Token':'forged'})).status,403);

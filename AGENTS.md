@@ -36,3 +36,7 @@ Commands available now:
 - `node math-reference/report.mjs`
 Sprint 0 must create, execute and document actual workspace commands for install, lint, typecheck, unit/integration tests, web builds, Android build and iOS build. Report unavailable macOS/signing/device steps as blocked, not passed.
 Each change: changed files, acceptance evidence, exact commands/results, remaining issues, migrations/rollback notes and screenshots/device recordings for UI changes. Do not report reference tests as proof of production accounting, real-device performance or store approval.
+
+
+## Owner amendment — 29 September 2026 operator hierarchy
+The latest direct owner request and confirmation supersede earlier TOTP and lower-tier management restrictions for this implementation. Operator sign-in and recent verification use passwords without an authenticator. SUB_DISTRIBUTOR is displayed as Sub-contractor and may create/manage its direct AGENT accounts; AGENT may create/manage its PLAYER accounts. REDEEM is authorized only from a direct child in the hierarchy into the parent actor's wallet, including MAIN_ADMIN ← SUB_DISTRIBUTOR and SUB_DISTRIBUTOR ← AGENT. This never grants issuance/removal authority to lower roles. Removal archives accounts and blocks descendant access while retaining all accounting history. See docs/OWNER_UPDATES.md for the explicit owner confirmation and Vercel publication request.
