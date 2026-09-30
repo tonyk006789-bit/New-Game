@@ -64,4 +64,12 @@ After a classic three-reel round is accepted, preserve `stage-classic3-v1`, its 
 
 ## Publication
 
-Pending final deployment verification. Stable target: https://new-game-test-topaz.vercel.app/.
+Published and verified: **https://new-game-test-topaz.vercel.app/**.
+
+- Source commit: `6f3a51cb597d7a7956b93a00096b09f290043441`, pushed to the owner's GitHub main branch.
+- Vercel deployment: `dpl_HjKRTKb4KpApysoqZfjuFLNMPMWx`, READY.
+- Immutable build: https://new-game-test-70wadtakg-tonyk006789-7532.vercel.app/.
+- Command: `node .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config .local/vercel-cli --scope tonyk006789-7532 --no-color`.
+- Public health is `ok` in `private-test` mode; environment lists `stage-classic3-v1` alongside unchanged base/expansion profiles and keeps production approval false.
+- The existing Player 1 session restored, showing 984.55. The new lobby format labels, Ruby's preserved five-reel historical receipt and Sapphire's upright layout loaded on the public URL. No hosted round was played. Screenshot: ignored `reports/screenshots-v16/live-sapphire-portrait.png`.
+- Netlify and the operator site were not redeployed. No schema, account, password or hosted credit-funding changes were made.
