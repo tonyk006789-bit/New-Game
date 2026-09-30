@@ -58,4 +58,12 @@ After any new-cabinet round is accepted, keep its route/profile/recovery support
 
 ## Publication
 
-Pending final publication verification. Stable target: https://new-game-test-topaz.vercel.app/. Operator and Netlify deployments are outside this change.
+Published and verified: **https://new-game-test-topaz.vercel.app/**.
+
+- Source commit: `98e8c0a1e2bbcd0e7d05cd4dfe73c84db25a25d3`, pushed to the owner's GitHub `main` branch.
+- Vercel deployment: `dpl_Mb8FJxQpkUnLzCLTa2cCP5ZfTzxc`, READY.
+- Immutable build: https://new-game-test-p2xyfkicw-tonyk006789-7532.vercel.app/.
+- Command: `node .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config .local/vercel-cli --scope tonyk006789-7532 --no-color`.
+- Public health is `ok`; environment reports the unchanged base profile and `stage-cabinets-v1`; catalog returns eleven games including all three additions. An operator API path on the player site returns 404.
+- The existing Player 1 browser session restored after refresh, showing 983.80 before and after deployment. New lobby and Ruby Rush controls loaded on the public URL. No hosted round was played. Console warnings/errors: none. Screenshot: ignored `reports/screenshots-v15/live-lobby.png`.
+- Operator and Netlify were not deployed. No schema, accounts, passwords or hosted credit funding were changed.

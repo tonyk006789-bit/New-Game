@@ -33,5 +33,7 @@ The runtime checks both the Vercel project ID and the database's separate UUID m
 
 Redeploy the previous Vercel code if necessary while preserving accepted awards and ledger history. New fish requests use `reef-tiers-v1`; old accepted requests replay their immutable receipts. No schema change is required for the new fish profile. Existing Netlify deployment/accounts stay intact; commits for this move use `[skip netlify]` to avoid updating that deployment.
 
-Implementation follows [Vercel Build Output primitives](https://vercel.com/docs/build-output-api/primitives) and [Build Output routing](https://vercel.com/docs/build-output-api/configuration). Deployment status and exact test evidence are in `../reports/REEF_V12_RAPID_FIRE.md` (current update) and `../reports/REEF_V11_VERCEL.md` (initial provisioning).
+Implementation follows [Vercel Build Output primitives](https://vercel.com/docs/build-output-api/primitives) and [Build Output routing](https://vercel.com/docs/build-output-api/configuration). Current deployment and exact test evidence: `../reports/REFINEMENT_V15.md`. Earlier fish refinement: `../reports/REEF_V12_RAPID_FIRE.md`; initial provisioning: `../reports/REEF_V11_VERCEL.md`.
+
+The three additional V15 cabinets use `stage-cabinets-v1` while the original eight retain their profiles. No new environment secret or migration is needed. Once a new-cabinet round exists, any presentation rollback must keep its API/recovery support so accepted receipts remain accessible.
 
