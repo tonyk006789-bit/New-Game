@@ -9,6 +9,8 @@ import GameRules from './GameRules.vue';
 import FeatureGame from './FeatureGame.vue';
 import CabinetGame from './CabinetGame.vue';
 import ArcadeLobby from './ArcadeLobby.vue';
+import GameShelf from './GameShelf.vue';
+import {isCabinetGame} from '@new-game/game-math';
 import FishingLobby from './FishingLobby.vue';
 import type {ReefRoom} from './reef-room';
 import LoginScreen from './LoginScreen.vue';
@@ -40,6 +42,7 @@ async function reconcileRound(){if(!ready.value||!account.value||!recovering.val
 const recovering=computed(()=>stage.needsRecovery||stage.fishPending.some(p=>p.recover));
 const page = ref<Page>('lobby');
 const category = ref('All games');
+const lobbyView=ref<'shelf'|'floor'>('shelf');
 const query = ref('');
 const activeGame = ref<GameId | null>(null);
 const modal = ref<'about' | 'support' | 'share' | 'wheel' | 'rules' | null>(null);
@@ -142,18 +145,20 @@ watch(page,()=>{void syncAccount();void loadHistory();});
         <div class="game-topline"><button class="round-control" :aria-label="activeGame==='reef-party'&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{activeGame==='reef-party'&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="activeGame==='reef-party'&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="activeGame==='reef-party'"><FishScene v-if="atFishTable" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
         <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <CabinetGame v-else-if="activeGame === 'neon-sevens' || activeGame === 'jade-fortune' || activeGame === 'coin-carnival'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
 
       </main>
       <template v-else-if="page === 'lobby'">
         <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
         <main class="arcade-lobby">
-          <div class="lobby-heading"><span class="heading-rule"></span><div><span>EIGHT ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : `${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
+          <div class="lobby-heading"><span class="heading-rule"></span><div><span>{{catalog.length}} ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : `${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
           <section class="collection-cabinet" aria-label="Game collection">
             <div class="neon-bar top"></div><div class="neon-bar bottom"></div>
             <div class="shelf-toolbar"><span><span class="live-spark">✦</span> NEW GAME ORIGINALS <small>{{ visibleGames.length }} / {{ catalog.length }}</small></span><label class="search-games"><Icon name="search" :size="15" /><input v-model="query" aria-label="Search games" placeholder="Find a game"></label></div>
-            <ArcadeLobby :games="visibleGames" :favorites="favorites" :running="ready && !modal" :reduced-motion="reducedMotion" :player-name="account?.displayName || 'YOU'" @open="openGame" @favorite="toggleFavorite" />
+            <div class="lobby-view-switch" role="group" aria-label="Lobby view"><button :aria-pressed="lobbyView==='shelf'" @click="lobbyView='shelf'">GAME SHELF</button><button :aria-pressed="lobbyView==='floor'" @click="lobbyView='floor'">WALK THE FLOOR</button></div>
+            <GameShelf v-if="lobbyView==='shelf'" :games="visibleGames" :favorites="favorites" :running="ready && !modal" @open="openGame" @favorite="toggleFavorite"/>
+            <ArcadeLobby v-else :games="visibleGames" :favorites="favorites" :running="ready && !modal" :reduced-motion="reducedMotion" :player-name="account?.displayName || 'YOU'" @open="openGame" @favorite="toggleFavorite" />
             <div class="shelf-bottom"><i></i><span>SLOTS • KENO • FISHING</span><i></i></div>
           </section>
           <div class="lobby-extras"><button class="daily-wheel-entry" @click="modal='wheel'"><span aria-hidden="true">✺</span><b>DAILY SPIN</b><small>A little luck, every day</small></button><button class="share-entry" @click="modal='share'"><span aria-hidden="true">▦</span><b>SHARE ARCADE</b><small>Invite your friends</small></button></div><div class="credit-note"><Icon name="info" :size="15" /><p>{{ credits === '0.00' ? 'No credits available. Contact your administrator.' : stage.enabled ? 'Choose your game. Make your next play.' : 'Your current play-credit balance.' }}</p><button @click="modal = 'about'">How credits work <Icon name="chevron" :size="13" /></button></div>

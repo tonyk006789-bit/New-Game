@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { actorFor, type Request, parse } from './auth.js';
 import { canonical, digest } from './security.js';
 import { fail, transaction } from './store.js';
-import { featurePractice, cabinetPractice } from '@new-game/game-math';
+import { featurePractice, cabinetPractice, isCabinetGame } from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import type {PoolClient} from 'pg';
 const schema=z.object({requestKey:z.string().min(8).max(128),picks:z.array(z.number().int().min(1).max(80)).max(10).optional()}).strict();
 export async function practiceRound(req:Request,game:string,body:unknown){
- if(!['temple-lights','orchard-numbers','aurora-vault','ember-relics','neon-sevens','jade-fortune','coin-carnival'].includes(game))fail(404,'GAME_NOT_FOUND');const data=parse(schema,body);
+ if(!isCabinetGame(game)&&!['temple-lights','orchard-numbers','aurora-vault','ember-relics'].includes(game))fail(404,'GAME_NOT_FOUND');const data=parse(schema,body);
  if(game!=='orchard-numbers'&&data.picks)fail(400,'PICKS_ONLY_FOR_KENO');
  if(game==='orchard-numbers'&&(!data.picks||data.picks.length<4||new Set(data.picks).size!==data.picks.length))fail(400,'CHOOSE_4_TO_10_UNIQUE');
  return transaction(async db=>{
@@ -18,7 +18,7 @@ export async function practiceRound(req:Request,game:string,body:unknown){
   if(prior){if(prior.request_hash!==hash)fail(409,'IDEMPOTENCY_CONFLICT');return prior.result;}
   if((await db.query("SELECT id FROM practice_rounds WHERE account_id=$1 AND created_at>now()-interval '500 milliseconds'",[actor.id])).rowCount)fail(429,'SLOW_DOWN');
   const id=randomUUID();let result:unknown;
-  if(game==='neon-sevens'||game==='jade-fortune'||game==='coin-carnival'){
+  if(isCabinetGame(game)){
    result=cabinetPractice(game,id,randomInt);
   }else if(game==='aurora-vault'||game==='ember-relics'){
    result=featurePractice(game,id,randomInt);

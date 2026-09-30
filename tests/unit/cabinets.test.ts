@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cabinetGames, cabinetMatches, cabinetPractice, storyboardRandom, type CabinetGameId } from '@new-game/game-math';
+import { cabinetGames, cabinetBase, cabinetMatches, cabinetPractice, storyboardRandom, type CabinetGameId } from '@new-game/game-math';
 describe('original nonpayable cabinet mechanics', () => {
   it('checks straight and diagonal lines independently, without counting partial triples', () => {
     const grid = [['seven','bar','bell','bar','seven'],['bar','seven','bar','seven','bell'],['bell','bar','seven','bell','bar']];
@@ -29,7 +29,7 @@ describe('original nonpayable cabinet mechanics', () => {
       const result = cabinetPractice(game,'test',storyboardRandom(seed));
       expect(result.mode).toBe('PRACTICE');expect(result.creditsChanged).toBe(false);
       expect(result).not.toHaveProperty('award');expect(result).not.toHaveProperty('stake');
-      expect(result.frames.length).toBeLessThanOrEqual(game==='coin-carnival'?4:1);
+      expect(result.frames.length).toBeLessThanOrEqual(cabinetBase(game)==='coin-carnival'?4:1);
       for (let n=1;n<result.frames.length;n++) {
         const before=result.frames[n-1], after=result.frames[n];
         for(const col of before.locked){expect(after.locked).toContain(col);expect(after.grid.map(row=>row[col])).toEqual(before.grid.map(row=>row[col]));}
@@ -37,7 +37,7 @@ describe('original nonpayable cabinet mechanics', () => {
       }
       const end=result.frames.at(-1)!;
       expect(result.matches).toEqual(cabinetMatches(game,end.grid));
-      if(game==='coin-carnival') {
+      if(cabinetBase(game)==='coin-carnival') {
         expect(result.collected).toBe(end.grid[1].filter(symbol=>symbol==='coin').length);
         expect(result.collected===5 || end.remaining===0).toBe(true);
       }

@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import {reefTierProfile} from '@new-game/game-math';
+import {reefTierProfile,stagingGameProfileId} from '@new-game/game-math';
 import {stage,savePending,clearPending,restorePending,restoreFishPending,saveFishPending,clearFishPending,type Pending,type FishPending} from './staging-state';
 import {holdCredits,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
@@ -20,7 +20,7 @@ export async function api<T>(path:string,body?:unknown):Promise<T>{
    if(stage.fishPending.length)throw new Error('Your cannon shots are still settling.');
    const target=path==='practice/reef/shots'?'staging/reef-party/rounds':path.replace('practice/','staging/');
    if(stage.pending)throw new Error('Your connection is being restored. Please wait.');
-   if(!stage.pending)savePending({accountId:session.current.id,path:target,body:{...(body as Record<string,unknown>),stake:stage.stake,profileId:target==='staging/reef-party/rounds'?reefTierProfile.id:stage.profile.id}});
+   if(!stage.pending)savePending({accountId:session.current.id,path:target,body:{...(body as Record<string,unknown>),stake:stage.stake,profileId:stagingGameProfileId(target.split('/')[1])}});
    return settle<T>();
   }
  }

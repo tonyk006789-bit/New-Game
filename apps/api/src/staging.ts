@@ -1,17 +1,17 @@
 import {randomInt,randomUUID} from 'node:crypto';
 import {z} from 'zod';
-import {stagingProfile,stagingOutcome,stagingMultiplier,reefOutcome,reefTierProfile,reefFlight,reefBallistics,validStake,type StagingGame} from '@new-game/game-math';
+import {stagingProfile,stagingRules,cabinetExpansionProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,reefOutcome,reefTierProfile,reefFlight,reefBallistics,validStake,type StagingGame} from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import {actorFor,parse,type Request} from './auth.js';
 import {transaction,fail,idempotent} from './store.js';
 import {lockWallets,posting,beginLedger} from './ledger.js';
 import {canonical,digest} from './security.js';
 export const profileHash=digest(canonical(stagingProfile));
-export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null};}
+export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null,additionalProfiles:stagingEnabled()?[{...cabinetExpansionProfile,hash:digest(canonical(cabinetExpansionProfile))}]:[]};}
 function gate(){if(!stagingEnabled())fail(404,'STAGING_DISABLED');}
 const schema=z.object({requestKey:z.string().min(8).max(128),stake:z.string().refine(validStake),profileId:z.string().min(1).max(80),picks:z.array(z.number().int().min(1).max(80)).min(4).max(10).optional(),roomId:z.uuid().optional(),targetId:z.number().int().min(1).max(80).optional(),aimX:z.number().min(0).max(1200).optional(),aimY:z.number().min(0).max(600).optional(),observedAt:z.number().int().optional(),firedAt:z.number().int().optional(),angle:z.number().min(-Math.PI).max(Math.PI).optional()}).strict();
 export async function stagingRound(req:Request,id:string,body:unknown){
- gate();if(!Object.hasOwn(stagingProfile.rules,id))fail(404,'GAME_NOT_FOUND');const game=id as StagingGame,data=parse(schema,body);
+ gate();if(!Object.hasOwn(stagingRules,id))fail(404,'GAME_NOT_FOUND');const game=id as StagingGame,data=parse(schema,body);
  if(game==='orchard-numbers'){if(!data.picks||new Set(data.picks).size!==data.picks.length)fail(400,'CHOOSE_4_TO_10_UNIQUE');}else if(data.picks)fail(400,'PICKS_ONLY_FOR_KENO');
  if(game!=='reef-party'&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v!==undefined))fail(400,'FISH_FIELDS_ONLY');
 
@@ -19,8 +19,8 @@ export async function stagingRound(req:Request,id:string,body:unknown){
   const actor=await actorFor(db,req,true);if(actor.role!=='PLAYER')fail(403,'PLAYER_REQUIRED');
   const result=await idempotent<Record<string,unknown>>(db,actor,'ROUND',data.requestKey,{game,...data},async()=>{
    // Accepted historical receipts replay before checking the profile for new plays.
-   const profileId=game==='reef-party'?reefTierProfile.id:stagingProfile.id;
-   const roundProfileHash=game==='reef-party'?digest(canonical({profile:reefTierProfile,ballistics:reefBallistics.version})):profileHash;
+   const profileId=stagingGameProfileId(game);
+   const roundProfileHash=game==='reef-party'?digest(canonical({profile:reefTierProfile,ballistics:reefBallistics.version})):profileId===cabinetExpansionProfile.id?digest(canonical(cabinetExpansionProfile)):profileHash;
    if(data.profileId!==profileId)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
  if(game==='reef-party'&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v===undefined))fail(400,'TARGET_REQUIRED');
    const [wallet]=await lockWallets(db,[actor.id]);
@@ -59,7 +59,7 @@ export async function stagingRound(req:Request,id:string,body:unknown){
 // request lock serializes this with an in-flight round. A missing round receives
 // a tombstone so a delayed original HTTP request cannot charge after recovery.
 export async function recoverStagingRound(req:Request,body:unknown){
- gate();const {game,...data}=parse(schema.extend({game:z.string().refine(id=>Object.hasOwn(stagingProfile.rules,id))}),body);
+ gate();const {game,...data}=parse(schema.extend({game:z.string().refine(id=>Object.hasOwn(stagingRules,id))}),body);
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);if(actor.role!=='PLAYER')fail(403,'PLAYER_REQUIRED');
   const result=await idempotent<Record<string,unknown>>(db,actor,'ROUND',data.requestKey,{game,...data},async()=>({cancelled:true,creditsChanged:false}));

@@ -1,0 +1,17 @@
+{
+  "created": "2026-09-30",
+  "generator": "Built-in ImageGen",
+  "referenceAssetsShipped": false,
+  "assets": [
+    {
+      "path": "apps/player/public/art/cabinet-symbols-v15.png",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. Asset type: original casino slot game symbol atlas, runtime sprites, not a screenshot. Create a square 1536 by 1536 image as an exact 4-column by 4-row evenly spaced sprite sheet on a fully transparent background. Each of 16 isolated objects centered in its own square cell with 15 percent clear padding, no contact between cells, no gridlines, no text labels. Premium illustrated slot-machine art, glossy sculpted surfaces, bold gold bevels, jewel highlights, strong silhouette, saturated colors, richly painted arcade style rather than photorealistic. Row 1 left to right: ruby-red faceted numeral 7, two juicy cherries with gold stems, golden bell, single gold-framed black BAR symbol. Row 2: large radiant red diamond, royal sapphire-and-gold crown, round engraved golden sun coin, lotus of luminous blue crystal. Row 3: royal sapphire scepter, velvet blue treasure pouch tied with gold, golden phoenix with spread wings, purple amethyst jewel. Row 4: golden solar medallion, red-orange planet encircled by a gold ring, blue crescent moon, turquoise five-point star. The upper row belongs to Ruby Rush, sapphire royal objects to Sapphire Crown, celestial objects to Solar Fortune. Consistent clear perspective and dramatic top-left lighting. Entire cell background transparent. Only object shadows within cell. No known provider logos, characters, or borrowed artwork. This is original art for an existing independent game project."
+    },
+    {
+      "path": "apps/player/public/art/cabinet-posters-v15.png",
+      "transparent": false,
+      "prompt": "Use case: stylized-concept. Asset type: original illustrated casino game poster triptych for an independent mobile arcade. Create one landscape 1536 by 1024 illustration split into exactly three equal-width vertical panels, with crisp vertical divisions at one-third and two-thirds. No borders, no text, no typography, no logos, no UI. Each panel is an independent portrait game key-art image. Left panel RUBY theme: an enormous faceted crimson ruby in golden ornamental claws, smaller ruby-red seven, cherries and coins orbiting, deep scarlet velvet and warm gold rays, arcade luxury. Center SAPPHIRE theme: imposing blue velvet royal crown with sapphire jewels and gold filigree, two crossed royal scepters, icy royal blue palace arches behind, moonlit glitter, premium slot machine illustration. Right SOLAR theme: a majestic original golden phoenix holding a radiant circular sun medallion, surrounded by amber planets and turquoise stars, deep purple cosmos, warm orange sunburst. Each main subject occupies upper 70 percent, bottom 25 percent is dark colored gradient with only subtle decoration for game titles to be rendered later in code. Dramatic sculpted gold, saturated richly painted 2.5D arcade graphics, sharp silhouettes readable as small casino tiles; polished illustration, not photography. Do not imitate any existing provider artwork or characters. All three panels fully opaque."
+    }
+  ]
+}

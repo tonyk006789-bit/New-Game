@@ -81,6 +81,21 @@ test('isolated staging accounting and outcomes',async t=>{
   }
   assert.ok(wins>0,'Positive awards must exercise the two-update wallet reconciliation');
  });
+ await t.test('new cabinets settle exact awards, use their own profile, and replay without double charging',async()=>{
+  for(const game of ['ruby-rush','sapphire-crown','solar-fortune']){
+   await sleep();const before=await wallet(player),data=body({profileId:'stage-cabinets-v1',stake:'75'});
+   assert.equal((await call(`staging/${game}/rounds`,{...data,profileId:'stage-paying30-v2'},playerAuth)).status,400);
+   assert.deepEqual(await wallet(player),before);
+   const round=await call(`staging/${game}/rounds`,data,playerAuth);assert.equal(round.status,201,JSON.stringify(round.data));
+   assert.equal(round.data.game,game);assert.equal(round.data.ruleVersion,'stage-cabinets-v1');
+   assert.equal(round.data.award,(75n*BigInt(stagingMultiplier(round.data))).toString());
+   assert.equal(BigInt((await wallet(player)).settled),BigInt(before.settled)-75n+BigInt(round.data.award));
+   const settled=await wallet(player);
+   assert.deepEqual((await call(`staging/${game}/rounds`,data,playerAuth)).data,round.data);
+   assert.deepEqual((await call('staging/recover',{game,...data},playerAuth)).data.result,round.data);
+   assert.deepEqual(await wallet(player),settled);
+  }
+ });
  await t.test('expanded stakes enforce quarter steps through twenty credits and preserve old-profile receipts',async()=>{
   for(const stake of ['100','275','1975','2000']){await sleep();const r=await call('staging/neon-sevens/rounds',body({stake}),playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.stake,stake);assert.ok(r.data.frames.every(f=>f.grid.every(row=>row.length===5)));}
   for(const stake of ['0','24','26','2025','2500','025','25.0','2e3'])assert.equal((await call('staging/neon-sevens/rounds',body({stake}),playerAuth)).status,400);

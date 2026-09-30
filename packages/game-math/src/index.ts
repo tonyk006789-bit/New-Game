@@ -1,4 +1,7 @@
 export const mathStatus = Object.freeze({
+  'ruby-rush': { approved: false, profileId: null, mathHash: null },
+  'sapphire-crown': { approved: false, profileId: null, mathHash: null },
+  'solar-fortune': { approved: false, profileId: null, mathHash: null },
   'neon-sevens': { approved: false, profileId: null, mathHash: null },
   'jade-fortune': { approved: false, profileId: null, mathHash: null },
   'coin-carnival': { approved: false, profileId: null, mathHash: null },
@@ -131,12 +134,20 @@ export function storyboardRandom(seed: number): RandomIndex {
 }
 
 // Original cabinet practice rules. Counts describe matches/collectibles, never payable units.
-export const cabinetGames = {
+const originalCabinetGames = {
   'neon-sevens': { columns: 5, symbols: ['seven', 'cherry', 'bell', 'bar', 'gem'], lines: [[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2]], wild: false },
   'jade-fortune': { columns: 5, symbols: ['dragon', 'coin', 'lotus', 'gem', 'bell', 'leaf', 'seven'], lines: [[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1]], wild: true },
   'coin-carnival': { columns: 5, symbols: ['coin', 'cherry', 'bell', 'bar', 'seven'], lines: [], wild: false }
 } as const;
+export const cabinetAliases = {'ruby-rush':'neon-sevens','sapphire-crown':'jade-fortune','solar-fortune':'coin-carnival'} as const;
+export const cabinetGames = {...originalCabinetGames,
+ 'ruby-rush':originalCabinetGames['neon-sevens'],
+ 'sapphire-crown':originalCabinetGames['jade-fortune'],
+ 'solar-fortune':originalCabinetGames['coin-carnival']
+} as const;
 export type CabinetGameId = keyof typeof cabinetGames;
+export function cabinetBase(game:CabinetGameId):keyof typeof originalCabinetGames{return Object.hasOwn(cabinetAliases,game)?cabinetAliases[game as keyof typeof cabinetAliases]:game as keyof typeof originalCabinetGames;}
+export function isCabinetGame(game:string):game is CabinetGameId{return Object.hasOwn(cabinetGames,game);}
 export type CabinetMatch = { line: number; rows: number[]; symbol: string; count: number };
 export type CabinetFrame = { grid: string[][]; locked: number[]; remaining: number };
 export type CabinetResult = {
@@ -158,10 +169,11 @@ export function cabinetMatches(game: CabinetGameId, grid: string[][]): CabinetMa
 }
 export function cabinetPractice(game: CabinetGameId, id: string, random: RandomIndex): CabinetResult {
   const profile = cabinetGames[game];
+  const coinGame = cabinetBase(game) === 'coin-carnival';
   const draw = () => profile.symbols[random(profile.symbols.length)];
   let grid = Array.from({ length: 3 }, () => Array.from({ length: profile.columns }, draw));
-  let locked: number[] = [], remaining = game === 'coin-carnival' ? 3 : 0;
-  if (game === 'coin-carnival') locked = grid[1].flatMap((symbol, col) => symbol === 'coin' ? [col] : []);
+  let locked: number[] = [], remaining = coinGame ? 3 : 0;
+  if (coinGame) locked = grid[1].flatMap((symbol, col) => symbol === 'coin' ? [col] : []);
   const frames: CabinetFrame[] = [{ grid, locked: [...locked], remaining }];
   while (remaining > 0 && locked.length < profile.columns) {
     grid = grid.map(row => row.map((symbol, col) => locked.includes(col) ? symbol : draw()));
@@ -170,7 +182,7 @@ export function cabinetPractice(game: CabinetGameId, id: string, random: RandomI
     frames.push({ grid, locked: [...locked], remaining });
   }
   const matches = cabinetMatches(game, grid), collected = locked.length;
-  const description = game === 'coin-carnival' ? `${collected} of ${profile.columns} coin reels locked in ${frames.length - 1} respins.` : matches.length ? `${matches.length} matching line${matches.length === 1 ? '' : 's'}.` : 'No matching lines. Spin again!';
+  const description = coinGame ? `${collected} of ${profile.columns} coin reels locked in ${frames.length - 1} respins.` : matches.length ? `${matches.length} matching line${matches.length === 1 ? '' : 's'}.` : 'No matching lines. Spin again!';
   return { id, game, mode: 'PRACTICE', ruleVersion: 'practice-cabinets-v2', frames, matches, collected, description, creditsChanged: false };
 }
 
@@ -205,10 +217,20 @@ export const stagingProfile = {
   'reef-party':'reef-tiers-v1: small 1× at 30%, medium 3× at 20%, large 8× at 10%, boss 20× at 4% per valid hit. Larger creatures take more shots on average, not a guaranteed number. Missed/expired/already caught targets are rejected without a charge.'
  }
 } as const;
-export type StagingGame=keyof typeof stagingProfile.rules;
+// The original v2 profile stays byte-for-byte stable. New themed cabinets get a
+// separate version that explicitly reuses its distributions and evaluations.
+export const cabinetExpansionProfile={id:'stage-cabinets-v1',baseProfile:stagingProfile.id,payingProbability:stagingProfile.payingProbability,aliases:cabinetAliases,rules:{
+ 'ruby-rush':stagingProfile.rules['neon-sevens'],
+ 'sapphire-crown':stagingProfile.rules['jade-fortune'].replace('Dragon substitutes.','Crown (wild) substitutes.'),
+ 'solar-fortune':stagingProfile.rules['coin-carnival'].replace('center coins','center sun coins')
+}} as const;
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules};
+export type StagingGame=keyof typeof stagingRules;
+export function stagingGameProfileId(game:string){return game==='reef-party'?reefTierProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
+ if(Object.hasOwn(cabinetAliases,game))return stagingMultiplier({...outcome,game:cabinetAliases[game as keyof typeof cabinetAliases]});
  if(game==='neon-sevens')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({cherry:1,bell:2,bar:2,gem:3,seven:5}[m.symbol]||0)*({3:1,4:2,5:4}[m.count]||0),0);
  if(game==='jade-fortune')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({3:2,4:4,5:8}[m.count]||0),0);
  if(game==='coin-carnival'){const row=outcome.frames!.at(-1)!.grid[1];return row.length===5&&row.every(s=>s==='coin')?5:0;}

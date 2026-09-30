@@ -27,10 +27,10 @@ export async function unlockAudio(){
  if(context.state==='suspended')await context.resume();if(audioPreferences.music&&!timer)update();}catch{/* Unsupported audio never blocks play. */}
 }
 export function setAudioActive(value:boolean){active=value;update();if(!value)void context?.suspend();else if(context)void context.resume().then(update).catch(()=>{});}
-export function playSound(kind:'click'|'shot'|'win'|'impact'='click'){
+export function playSound(kind:'click'|'shot'|'win'|'impact'|'reel-start'|'reel-stop'='click'){
  if(!context||!soundGain||!active||!audioPreferences.sound||context.state!=='running')return;
  const now=context.currentTime;
- const notes=kind==='win'?[72,76,79,84]:kind==='shot'?[45,33]:kind==='impact'?[64,52]:[79];
+ const notes=kind==='win'?[72,76,79,84]:kind==='reel-start'?[48,55,60]:kind==='reel-stop'?[62,50]:kind==='shot'?[45,33]:kind==='impact'?[64,52]:[79];
  notes.forEach((note,i)=>tone(note,now+i*(kind==='win'?.1:.025),kind==='win'?.42:.13,soundGain!,.15,kind==='shot'?'triangle':'sine'));
 }
 watch(audioPreferences,()=>{try{localStorage.setItem('ng-audio',JSON.stringify(audioPreferences));}catch{/* Optional preferences. */}update();});

@@ -4,7 +4,7 @@ export const MAX_UNITS = 9223372036854775807n;
 export const Units = z.string().regex(/^(0|[1-9]\d{0,18})$/).pipe(z.string().refine(value => BigInt(value) <= MAX_UNITS, 'Exceeds PostgreSQL bigint'));
 export const PositiveUnits = Units.pipe(z.string().refine(value => BigInt(value) > 0n, 'Amount must be positive'));
 export const Role = z.enum(['MAIN_ADMIN', 'SUB_DISTRIBUTOR', 'AGENT', 'PLAYER']);
-export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival']);
+export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -46,6 +46,9 @@ export const FishCommand = z.object({
 export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SERVICE_NOT_READY', 'FORBIDDEN', 'STALE_WALLET', 'INSUFFICIENT_AVAILABLE', 'IDEMPOTENCY_CONFLICT']);
 
 export const catalog = [
+  { id: 'ruby-rush', name: 'Ruby Rush', category: 'Slots', tagline: 'Classic reels. Radiant rubies.', description: 'Five illuminated reels with ruby sevens, cherries, bells, BARs and red diamonds. Five left-to-right paylines use the Neon Sevens test rules.', detail: '5 reels · 5 lines', color: '#ff4569' },
+  { id: 'sapphire-crown', name: 'Sapphire Crown', category: 'Slots', tagline: 'Every crown holds a possibility.', description: 'A royal blue cabinet with nine paylines and substituting crown wilds. Uses the Jade Fortune test rules.', detail: '5 reels · Crown wilds', color: '#67b8ff' },
+  { id: 'solar-fortune', name: 'Solar Fortune', category: 'Slots', tagline: 'Hold the sun. Complete the constellation.', description: 'Center sun coins hold their entire reel through up to three respins. Uses the Coin Carnival test rules.', detail: '5 reels · Hold & respin', color: '#ffc764' },
   { id: 'neon-sevens', name: 'Neon Sevens', category: 'Slots', tagline: 'The classic lights up.', description: 'Five mechanical reels, cherries, bells, BARs and bright red sevens. Match three or more symbols from the left on any of five marked lines. Free practice with no credit award.', detail: '5 reels · 5 lines', color: '#ff4189' },
   { id: 'jade-fortune', name: 'Jade Fortune', category: 'Slots', tagline: 'Let the dragon lead.', description: 'Five reels and nine paths. Jade dragons substitute for any symbol in a run of three or more from the left. An all-dragon run counts once on each line. Free practice only.', detail: '5 reels · Wild dragons', color: '#54ffc1' },
   { id: 'coin-carnival', name: 'Coin Carnival', category: 'Slots', tagline: 'Catch a coin. Lock a reel.', description: 'Land a coin on the middle row to lock its entire reel. Up to three respins move only unlocked reels. Stop when all five reels lock or respins run out. Coins are practice collectibles, never credits.', detail: '5 reels · Lock & respin', color: '#ffcf3e' },

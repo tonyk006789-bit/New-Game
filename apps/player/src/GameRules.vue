@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import {computed} from 'vue';
-import {cabinetGames,reefTierProfile,stagingProfile,stakeLimits,type StagingGame} from '@new-game/game-math';
+import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefTierProfile,stagingRules,stakeLimits,type StagingGame} from '@new-game/game-math';
+import ArcadeSymbol from './ArcadeSymbol.vue';
 const props=defineProps<{game:StagingGame;staked:boolean}>();
 const instructions:Record<StagingGame,string[]>={
+ 'ruby-rush':['Choose your stake and press SPIN. All five paylines are active.','Match three or more of the same symbol from the leftmost reel. Red diamonds use the gem award. The line review highlights each winning path in turn.'],
+ 'sapphire-crown':['Choose your stake and press SPIN. All nine paylines are active.','The crown is WILD. It substitutes in left-to-right runs of three or more; an all-crown run pays once on each line.'],
+ 'solar-fortune':['Choose your stake and press SPIN. A sun coin in the center row locks its entire reel.','Only unlocked reels respin, up to three times, with no additional stake. New locks do not reset the counter. Collect all five sun coins to win.'],
  'neon-sevens':['Choose your stake, then press SPIN. All five paylines are active on every spin.','Matches start on the leftmost reel and continue across adjacent reels. Use LINES to see the five paths.'],
  'jade-fortune':['Choose your stake, then press SPIN. All nine paylines are active.','The dragon is wild and substitutes for any matching symbol. Matches run from the leftmost reel across adjacent reels.'],
  'coin-carnival':['Choose your stake and start a spin. A coin in the middle row locks its whole reel.','The unlocked reels respin up to three times at no additional stake. Collect coins on all five reels to win.'],
@@ -12,7 +16,12 @@ const instructions:Record<StagingGame,string[]>={
  'orchard-numbers':['Select 4–10 different numbers from 1–80, then press DRAW. Twenty different numbers are drawn.','QUICK PICK selects six numbers you can change. CLEAR removes your selection. A hit is one of your selected numbers appearing in the draw.'],
  'reef-party':['Choose a table and one of four player seats. Aim and click or tap for each shot. Several shots can travel at once; each valid hit uses the cannon stake selected when it was fired.','AUTO keeps firing in your aim direction. LOCK tracks a creature; tap another creature to change targets. FAST doubles the automatic firing cadence. Turning it on does not change capture chances or rewards.','Only a server-validated hit spends credits. Shots that miss, expire, or reach an already-caught creature cost nothing. A resisted hit still spends its stake.','Each valid hit has an independent capture chance. Larger creatures pay more and usually need more hits, but there is no fixed health bar or guaranteed number of shots.','Auto fire stops when you pause, leave the table, change stake, lose connection, or have insufficient credits. Catch celebrations show the existing award; there is no separate progressive jackpot.']
 };
-const lines=computed(()=>props.game==='neon-sevens'||props.game==='jade-fortune'?cabinetGames[props.game].lines:props.game==='temple-lights'?[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]:[]);
+const lines=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game].lines:props.game==='temple-lights'?[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]:[]);
+const cabinet=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game]:null);
+const baseGame=computed(()=>isCabinetGame(props.game)?cabinetBase(props.game):null);
+const themed=computed(()=>Object.hasOwn(cabinetExpansionProfile.rules,props.game));
+function symbolName(symbol:string){if(props.game==='sapphire-crown')return ({dragon:'Crown · WILD',coin:'Sun coin',lotus:'Crystal lotus',gem:'Amethyst',bell:'Scepter',leaf:'Treasure pouch',seven:'Star'} as Record<string,string>)[symbol];if(props.game==='solar-fortune')return ({coin:'Sun coin · HOLD',cherry:'Planet',bell:'Moon',bar:'Star',seven:'Phoenix'} as Record<string,string>)[symbol];return symbol==='gem'&&themed.value?'Ruby':symbol.toUpperCase();}
+function returns(symbol:string,count:number){return baseGame.value==='neon-sevens'?({cherry:1,bell:2,bar:2,gem:3,seven:5}[symbol]||0)*({3:1,4:2,5:4}[count]||0):({3:2,4:4,5:8}[count]||0);}
 const tiers=Object.values(reefTierProfile.tiers);
 </script>
 <template>
@@ -25,9 +34,10 @@ const tiers=Object.values(reefTierProfile.tiers);
     <table><thead><tr><th>Size</th><th>Return</th><th>Capture / hit</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td></tr></tbody></table>
     <p>At a 0.25 stake, a successful small, medium, large or boss catch returns 0.25, 0.75, 2.00 or 5.00 credits respectively. Open SPECIES at the table to see each creature’s size tier.</p>
    </template>
-   <p v-else>{{stagingProfile.rules[game]}}</p>
+   <p v-else>{{stagingRules[game]}}</p>
    <p>Multipliers apply to the total selected stake. Returns include any returned stake; they are not extra profit on top of it. An unsuccessful paid play returns zero.</p>
   </section>
+  <table v-if="cabinet && baseGame!=='coin-carnival'" class="symbol-paytable"><thead><tr><th>Symbol</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody><tr v-for="symbol in cabinet.symbols" :key="symbol"><th><ArcadeSymbol :symbol="symbol" :theme="game"/><span>{{symbolName(symbol)}}</span></th><td v-for="count in [3,4,5]" :key="count">{{returns(symbol,count)}}×</td></tr></tbody></table>
   <div v-if="lines.length" class="rules-lines" aria-label="Active payline paths"><figure v-for="(line,index) in lines" :key="index"><svg viewBox="0 0 100 60" role="img" :aria-label="`Line ${index+1}: rows ${line.map(row=>row+1).join(', ')}`"><path d="M0 20H100M0 40H100M20 0V60M40 0V60M60 0V60M80 0V60" stroke="#ffffff25" fill="none"/><polyline :points="line.map((row,col)=>`${col*20+10},${row*20+10}`).join(' ')" fill="none" stroke="#ffd76c" stroke-width="3"/></svg><figcaption>LINE {{index+1}}</figcaption></figure></div>
   <h3>STAKE & CONTROLS</h3>
   <p>Use −, +, the stake menu or MAX to choose {{(stakeLimits.min/100).toFixed(2)}}–{{(stakeLimits.max/100).toFixed(2)}} credits in {{(stakeLimits.step/100).toFixed(2)}} steps. {{game==='reef-party'?'The stake is per valid hit.':'One stake pays for the complete spin, draw or feature sequence. Fast animation and Show result do not alter the outcome.'}}</p>
