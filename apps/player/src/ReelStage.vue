@@ -6,12 +6,13 @@ import { previewGrid, symbols } from '@new-game/game-math';
 const props = defineProps<{ reducedMotion: boolean; initialGrid?: string[][]; stripSymbols?: readonly string[]; highlighted?: number[]; locked?: number[]; theme?:string }>();
 const root = ref<HTMLElement>();
 const initial = props.initialGrid || previewGrid(0);
+const rows=ref(initial.length);
 const columns = ref(Array.from({ length: initial[0].length }, (_, column) => initial.map(row => row[column] as string)));
 const rolling = ref(false), landed = ref<number[]>([]), lines = ref<{ row: number; count: number }[]>([]);
 let animations: Animation[] = [], generation = 0, target = initial as string[][];
 function settle(grid = target, matches: { row: number; count: number }[] = []) {
   generation++; animations.forEach(animation => animation.cancel()); animations = [];
-  target = grid; columns.value = Array.from({ length: grid[0].length }, (_, column) => grid.map(row => row[column]));
+  target = grid;rows.value=grid.length; columns.value = Array.from({ length: grid[0].length }, (_, column) => grid.map(row => row[column]));
   rolling.value = false; lines.value = matches; landed.value = props.reducedMotion ? [] : columns.value.map((_,index)=>index);
 }
 async function play(grid: string[][], matches: { row: number; count: number }[], fast = false, held: number[] = []) {
@@ -20,13 +21,18 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
   const token = generation; rolling.value = true; lines.value = []; landed.value = [];
   playSound('reel-start');
   const stripSymbols = props.stripSymbols || symbols;
-  columns.value = columns.value.map((column, index) => held.includes(index) ? grid.map(row => row[index]) : [...column, ...Array.from({ length: 20 + index * 3 }, (_, n) => stripSymbols[(n * 2 + index) % stripSymbols.length]), ...grid.map(row => row[index])]);
+  const previousColumns = columns.value;
+  rows.value = grid.length;
+  columns.value = Array.from({ length: grid[0].length }, (_, index) => {
+    const column = previousColumns[index] || grid.map(row => row[index]);
+    return held.includes(index) ? grid.map(row => row[index]) : [...column, ...Array.from({ length: 20 + index * 3 }, (_, n) => stripSymbols[(n * 2 + index) % stripSymbols.length]), ...grid.map(row => row[index])];
+  });
   await nextTick();
   if (token !== generation || !root.value) return;
   const strips = root.value.querySelectorAll<HTMLElement>('.reel-strip');
   await Promise.all(Array.from(strips, async (strip, index) => {
     if (held.includes(index)) return;
-    const distance = (columns.value[index].length - 3) * strip.parentElement!.clientHeight / 3;
+    const distance = (columns.value[index].length - rows.value) * strip.parentElement!.clientHeight / rows.value;
     const animation = strip.animate([
       { transform: 'translateY(0)', filter: 'blur(0px)', offset: 0, easing: 'ease-out' },
       { transform: 'translateY(9px)', filter: 'blur(0px)', offset: .045, easing: 'ease-in' },
@@ -43,4 +49,4 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
 defineExpose({ play, settle });
 onBeforeUnmount(() => settle());
 </script>
-<template><div ref="root" class="reel-frame kinetic-reels" :style="{gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`}" :class="{ 'reels-rolling': rolling }" role="img" :aria-label="`${columns.length} reel three row result`"><div v-for="(column, c) in columns" :key="c" class="reel-window" :class="{ 'reel-landed': landed.includes(c), 'reel-locked': locked?.includes(c) }"><div class="reel-strip"><div v-for="(symbol, r) in column" :key="r" class="symbol reel-symbol" :data-symbol="symbol" :class="[symbol, { 'matching-symbol': !rolling && (lines.some(line => line.row === r && c < line.count) || highlighted?.includes(r * columns.length + c)) }]"><ArcadeSymbol :symbol="symbol" :theme="theme" /></div></div><span v-if="locked?.includes(c)" class="reel-lock-label">LOCKED</span></div><div class="reel-glass" aria-hidden="true"></div></div></template>
+<template><div ref="root" class="reel-frame kinetic-reels" :style="{gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, '--visible-rows':rows}" :class="{ 'reels-rolling': rolling }" role="img" :aria-label="`${columns.length} reel ${rows} row result`"><div v-for="(column, c) in columns" :key="c" class="reel-window" :class="{ 'reel-landed': landed.includes(c), 'reel-locked': locked?.includes(c) }"><div class="reel-strip"><div v-for="(symbol, r) in column" :key="r" class="symbol reel-symbol" :data-symbol="symbol" :class="[symbol, { 'matching-symbol': !rolling && (lines.some(line => line.row === r && c < line.count) || highlighted?.includes(r * columns.length + c)) }]"><ArcadeSymbol :symbol="symbol" :theme="theme" /></div></div><span v-if="locked?.includes(c)" class="reel-lock-label">LOCKED</span></div><div class="reel-glass" aria-hidden="true"></div></div></template>

@@ -154,3 +154,12 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 - Added original painted cabinet/symbol art, an eight-card paged shelf with favorite hearts and truthful NEW ribbons, expanded walking-floor pagination, reel sounds, rotating winning-line review, committed-award celebrations and illustrated rules.
 - Cash Frenzy lobby composition was partially visible; its canvas capture then failed. Full catalog, game rules, bonus triggers and live timing could not be verified. No provider source, account data, art or runtime dependency was imported. Coverage and acceptance are recorded in `../reports/REFINEMENT_V15.md`.
 - Publication continues on the already authorized Vercel player test site. No provisioning, grants, refills, hosted tester play or operator funding changes are part of this iteration.
+
+## 30 September 2026 varied reels and portrait cabinets
+
+- Owner requested varied slot formats, including three columns and portrait-only games. This supersedes the earlier requirement that every slot have at least four columns.
+- Owner explicitly approved **“Use those three-reel test rules”** for Neon Sevens and Ruby Rush: a 3 × 3 grid, five paylines, triple rewards of cherry 1×, bell/BAR 2×, gem 3× and seven 5×, retaining the roughly 30% positive-return-round test target. This is not an RTP target or production approval.
+- New rounds for those two games use `stage-classic3-v1`. Existing profile definitions and accepted five-reel receipts stay unchanged; old receipts still replay and evaluate using their original geometry. New requests with obsolete profiles must refresh before playing.
+- Sapphire Crown is an upright five-reel cabinet; Aurora Vault presents its existing fifteen independent cells in three columns and five rows. On phone-sized landscape viewports these games require portrait orientation before accepting a new play. An already accepted result still completes.
+- Solar Fortune presents only its existing scoring row as five individual reel windows. Its persisted sequence and hold/respin award remain unchanged. Other cabinets retain wide five-reel and six-column cascade formats.
+- Publication continues on the existing authorized Vercel player test link. No migration, new account, funding, hosted play, operator deployment or production-math approval is included. Evidence and rollback guidance: `../reports/REFINEMENT_V16.md`.

@@ -11,6 +11,7 @@ import CabinetGame from './CabinetGame.vue';
 import ArcadeLobby from './ArcadeLobby.vue';
 import GameShelf from './GameShelf.vue';
 import {isCabinetGame} from '@new-game/game-math';
+import {isPortraitGame,portraitRotationQuery} from './cabinet-layout';
 import FishingLobby from './FishingLobby.vue';
 import type {ReefRoom} from './reef-room';
 import LoginScreen from './LoginScreen.vue';
@@ -56,6 +57,10 @@ const foreground = ref(!document.hidden);
 const online = ref(navigator.onLine);
 const ready = computed(() => foreground.value && online.value);
 const currentGame = computed(() => catalog.find(game => game.id === activeGame.value));
+const portraitGame=computed(()=>!!activeGame.value&&isPortraitGame(activeGame.value));
+const portraitMedia=window.matchMedia(portraitRotationQuery),rotatePortrait=ref(portraitMedia.matches);
+const onPortraitOrientation=()=>{rotatePortrait.value=portraitMedia.matches;};
+const cabinetReady=computed(()=>ready.value&&!(portraitGame.value&&rotatePortrait.value));
 const visibleGames = computed(() => catalog.filter(game =>
   (category.value === 'All games' || category.value === 'Favorites' || game.category === category.value) &&
   (category.value !== 'Favorites' || favorites.value.includes(game.id)) &&
@@ -87,6 +92,7 @@ const nativeListeners: PluginListenerHandle[] = [];
 watch(()=>stage.revision,()=>{if(session.current?.id===account.value?.id&&session.current)account.value={...session.current};else void syncAccount();});
 watch(()=>[recovering.value,stage.busy,ready.value,account.value?.id],()=>void reconcileRound());
 onMounted(async () => {
+  portraitMedia.addEventListener('change',onPortraitOrientation);
   setAudioActive(ready.value);
   try{await loadEnvironment();}catch{/* Unavailable config keeps staking closed. */}
   try{const restored=await refreshAccount();if(restored.role==='PLAYER')await authenticated();}catch{/* No authenticated session yet. */}
@@ -120,6 +126,7 @@ watch(modal, async value => {
   else focusBeforeModal?.focus();
 });
 onBeforeUnmount(() => {
+  portraitMedia.removeEventListener('change',onPortraitOrientation);
   clearInterval(syncTimer);
   clearInterval(recoveryTimer);
   document.removeEventListener('visibilitychange', onVisibility);
@@ -141,12 +148,13 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </header>
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Preview actions are paused until you reconnect.</div>
       <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
-      <main v-if="currentGame" class="immersive-game">
+      <main v-if="currentGame" class="immersive-game" :class="{'portrait-cabinet':portraitGame,'portrait-blocked':portraitGame&&rotatePortrait}" :data-layout="portraitGame?'portrait':'wide'">
         <div class="game-topline"><button class="round-control" :aria-label="activeGame==='reef-party'&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{activeGame==='reef-party'&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="activeGame==='reef-party'&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="activeGame==='reef-party'"><FishScene v-if="atFishTable" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
-        <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <section v-if="portraitGame&&rotatePortrait" class="portrait-rotation" role="status"><i aria-hidden="true"></i><h2>Turn to portrait</h2><p>{{currentGame.name}} plays in an upright cabinet.</p><button @click="backFromGame">BACK TO LOBBY</button></section>
 
       </main>
       <template v-else-if="page === 'lobby'">

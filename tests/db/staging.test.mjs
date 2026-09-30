@@ -24,9 +24,9 @@ let player,playerAuth,peerAuth;
 async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},admin);assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
 async function wallet(id){const r=await call('admin/accounts',undefined,admin);return r.data.find(a=>a.id===id).wallet;}
 async function adjust(id,direction,amount,key=randomUUID(),expectedVersion){const w=await wallet(id);return call('admin/credit-adjustments',{targetId:id,direction,amount,reason:'Explicit manual test adjustment',requestKey:key,expectedVersion:expectedVersion??w.version},admin);}
-const {stagingMultiplier,reefFlight,reefTarget,reefLeadAngle,reefTierProfile}=await import('../../packages/game-math/src/index.ts');
+const {stagingMultiplier,stagingGameProfileId,reefFlight,reefTarget,reefLeadAngle,reefTierProfile}=await import('../../packages/game-math/src/index.ts');
 const sleep=()=>new Promise(resolve=>setTimeout(resolve,275));
-const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2',...extra});
+const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1',...extra});
 test('isolated staging accounting and outcomes',async t=>{
  await t.test('zero-start hierarchy and environment separation',async()=>{
   const north=await create(adminId,'stage.north'),agent=await create(north,'stage.agent');player=await create(agent,'stage.player');await create(agent,'stage.peer');playerAuth=await signin('stage.player');peerAuth=await signin('stage.peer');
@@ -73,7 +73,7 @@ test('isolated staging accounting and outcomes',async t=>{
  await t.test('all seven round games persist visible outcomes with exact evaluated awards',async()=>{
   let wins=0;
   for(let i=0;i<28;i++){
-   await sleep();const game=['neon-sevens','jade-fortune','coin-carnival','temple-lights','aurora-vault','ember-relics','orchard-numbers'][i%7];const data=body({stake:['25','50','75'][i%3],...(game==='orchard-numbers'?{picks:[1,2,3,4,5,6]}:{})});
+   await sleep();const game=['neon-sevens','jade-fortune','coin-carnival','temple-lights','aurora-vault','ember-relics','orchard-numbers'][i%7];const data=body({profileId:stagingGameProfileId(game),stake:['25','50','75'][i%3],...(game==='orchard-numbers'?{picks:[1,2,3,4,5,6]}:{})});
    const before=await wallet(player),r=await call(`staging/${game}/rounds`,data,playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));
    assert.equal(r.data.award,(BigInt(data.stake)*BigInt(stagingMultiplier(r.data))).toString());
    assert.equal(BigInt((await wallet(player)).settled),BigInt(before.settled)-BigInt(data.stake)+BigInt(r.data.award));wins+=Number(BigInt(r.data.award)>0n);
@@ -83,11 +83,11 @@ test('isolated staging accounting and outcomes',async t=>{
  });
  await t.test('new cabinets settle exact awards, use their own profile, and replay without double charging',async()=>{
   for(const game of ['ruby-rush','sapphire-crown','solar-fortune']){
-   await sleep();const before=await wallet(player),data=body({profileId:'stage-cabinets-v1',stake:'75'});
+   await sleep();const before=await wallet(player),data=body({profileId:stagingGameProfileId(game),stake:'75'});
    assert.equal((await call(`staging/${game}/rounds`,{...data,profileId:'stage-paying30-v2'},playerAuth)).status,400);
    assert.deepEqual(await wallet(player),before);
    const round=await call(`staging/${game}/rounds`,data,playerAuth);assert.equal(round.status,201,JSON.stringify(round.data));
-   assert.equal(round.data.game,game);assert.equal(round.data.ruleVersion,'stage-cabinets-v1');
+   assert.equal(round.data.game,game);assert.equal(round.data.ruleVersion,stagingGameProfileId(game));
    assert.equal(round.data.award,(75n*BigInt(stagingMultiplier(round.data))).toString());
    assert.equal(BigInt((await wallet(player)).settled),BigInt(before.settled)-75n+BigInt(round.data.award));
    const settled=await wallet(player);
@@ -96,8 +96,20 @@ test('isolated staging accounting and outcomes',async t=>{
    assert.deepEqual(await wallet(player),settled);
   }
  });
+ await t.test('historical five-reel receipts replay after the switch to three reels without new postings',async()=>{
+  for(const game of ['neon-sevens','ruby-rush']){
+   const profileId=game==='ruby-rush'?'stage-cabinets-v1':'stage-paying30-v2';
+   const old=body({profileId}),receipt={id:randomUUID(),game,ruleVersion:profileId,stake:'25',award:'2500',frames:[{grid:Array.from({length:3},()=>Array(5).fill('seven')),locked:[],remaining:0}]};
+   await control.query("INSERT INTO idempotency_records(actor_id,operation,request_key,request_hash,response) VALUES($1,'ROUND',$2,$3,$4)",[player,old.requestKey,digest(canonical({game,...old})),JSON.stringify(receipt)]);
+   const before=await wallet(player);
+   assert.deepEqual((await call(`staging/${game}/rounds`,old,playerAuth)).data,receipt);
+   assert.deepEqual((await call('staging/recover',{game,...old},playerAuth)).data.result,receipt);
+   assert.equal((await call(`staging/${game}/rounds`,{...old,requestKey:randomUUID()},playerAuth)).status,400);
+   assert.deepEqual(await wallet(player),before);
+  }
+ });
  await t.test('expanded stakes enforce quarter steps through twenty credits and preserve old-profile receipts',async()=>{
-  for(const stake of ['100','275','1975','2000']){await sleep();const r=await call('staging/neon-sevens/rounds',body({stake}),playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.stake,stake);assert.ok(r.data.frames.every(f=>f.grid.every(row=>row.length===5)));}
+  for(const stake of ['100','275','1975','2000']){await sleep();const r=await call('staging/neon-sevens/rounds',body({stake}),playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.stake,stake);assert.ok(r.data.frames.every(f=>f.grid.every(row=>row.length===3)));}
   for(const stake of ['0','24','26','2025','2500','025','25.0','2e3'])assert.equal((await call('staging/neon-sevens/rounds',body({stake}),playerAuth)).status,400);
   const legacy=body({profileId:'stage-paying30-v1'}),receipt={id:randomUUID(),game:'neon-sevens',ruleVersion:'stage-paying30-v1',stake:'25',award:'75',frames:[{grid:[['seven','bell','bar'],['gem','gem','gem'],['bar','bell','cherry']],locked:[],remaining:0}]};
   await control.query("INSERT INTO idempotency_records(actor_id,operation,request_key,request_hash,response) VALUES($1,'ROUND',$2,$3,$4)",[player,legacy.requestKey,digest(canonical({game:'neon-sevens',...legacy})),JSON.stringify(receipt)]);

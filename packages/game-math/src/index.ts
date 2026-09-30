@@ -140,11 +140,13 @@ const originalCabinetGames = {
   'coin-carnival': { columns: 5, symbols: ['coin', 'cherry', 'bell', 'bar', 'seven'], lines: [], wild: false }
 } as const;
 export const cabinetAliases = {'ruby-rush':'neon-sevens','sapphire-crown':'jade-fortune','solar-fortune':'coin-carnival'} as const;
-export const cabinetGames = {...originalCabinetGames,
+export const legacyCabinetGames = {...originalCabinetGames,
  'ruby-rush':originalCabinetGames['neon-sevens'],
  'sapphire-crown':originalCabinetGames['jade-fortune'],
  'solar-fortune':originalCabinetGames['coin-carnival']
 } as const;
+const classicCabinet={...originalCabinetGames['neon-sevens'],columns:3,lines:[[1,1,1],[0,0,0],[2,2,2],[0,1,2],[2,1,0]]} as const;
+export const cabinetGames={...legacyCabinetGames,'neon-sevens':classicCabinet,'ruby-rush':classicCabinet} as const;
 export type CabinetGameId = keyof typeof cabinetGames;
 export function cabinetBase(game:CabinetGameId):keyof typeof originalCabinetGames{return Object.hasOwn(cabinetAliases,game)?cabinetAliases[game as keyof typeof cabinetAliases]:game as keyof typeof originalCabinetGames;}
 export function isCabinetGame(game:string):game is CabinetGameId{return Object.hasOwn(cabinetGames,game);}
@@ -155,7 +157,9 @@ export type CabinetResult = {
   frames: CabinetFrame[]; matches: CabinetMatch[]; collected: number; description: string; creditsChanged: boolean;
 };
 export function cabinetMatches(game: CabinetGameId, grid: string[][]): CabinetMatch[] {
-  const profile = cabinetGames[game];
+  // Five-column historical receipts keep their original evaluation after the
+  // approved switch to three reels. New outcomes only use cabinetGames below.
+  const profile = grid[0]?.length===5?legacyCabinetGames[game]:cabinetGames[game];
   if (grid.length !== 3 || grid.some(row => row.length !== profile.columns || row.some(symbol => !(profile.symbols as readonly string[]).includes(symbol)))) throw new Error('Invalid cabinet grid');
   const matches: CabinetMatch[] = [];
   profile.lines.forEach((rows, line) => {
@@ -183,7 +187,7 @@ export function cabinetPractice(game: CabinetGameId, id: string, random: RandomI
   }
   const matches = cabinetMatches(game, grid), collected = locked.length;
   const description = coinGame ? `${collected} of ${profile.columns} coin reels locked in ${frames.length - 1} respins.` : matches.length ? `${matches.length} matching line${matches.length === 1 ? '' : 's'}.` : 'No matching lines. Spin again!';
-  return { id, game, mode: 'PRACTICE', ruleVersion: 'practice-cabinets-v2', frames, matches, collected, description, creditsChanged: false };
+  return { id, game, mode: 'PRACTICE', ruleVersion: profile.columns===3?'practice-classic3-v1':'practice-cabinets-v2', frames, matches, collected, description, creditsChanged: false };
 }
 
 export const stakeLimits={min:25,max:2000,step:25} as const;
@@ -224,9 +228,14 @@ export const cabinetExpansionProfile={id:'stage-cabinets-v1',baseProfile:staging
  'sapphire-crown':stagingProfile.rules['jade-fortune'].replace('Dragon substitutes.','Crown (wild) substitutes.'),
  'solar-fortune':stagingProfile.rules['coin-carnival'].replace('center coins','center sun coins')
 }} as const;
-export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules};
+export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagingProfile.payingProbability,columns:3,rows:3,lines:classicCabinet.lines,
+ rewards:{cherry:1,bell:2,bar:2,gem:3,seven:5},
+ rules:{'neon-sevens':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add all five lines.',
+ 'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
+} as const;
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules};
 export type StagingGame=keyof typeof stagingRules;
-export function stagingGameProfileId(game:string){return game==='reef-party'?reefTierProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export function stagingGameProfileId(game:string){return game==='reef-party'?reefTierProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;

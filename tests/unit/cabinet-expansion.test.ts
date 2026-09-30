@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {cabinetAliases,cabinetPractice,cabinetExpansionProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,stagingProfile,storyboardRandom,type CabinetGameId} from '@new-game/game-math';
+import {cabinetAliases,cabinetPractice,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,stagingProfile,storyboardRandom,type CabinetGameId} from '@new-game/game-math';
 import {catalog,GameId} from '@new-game/contracts';
 describe('approved themed cabinets preserve their base rules',()=>{
  for(const [game,base] of Object.entries(cabinetAliases) as [keyof typeof cabinetAliases,CabinetGameId][]){
@@ -12,13 +12,13 @@ describe('approved themed cabinets preserve their base rules',()=>{
     expect(stagingMultiplier(paying)).toBe(stagingMultiplier(original));
    }
    expect(GameId.safeParse(game).success).toBe(true);expect(catalog.some(entry=>entry.id===game)).toBe(true);
-   expect(stagingGameProfileId(game)).toBe(cabinetExpansionProfile.id);
+   expect(stagingGameProfileId(game)).toBe(game==='ruby-rush'?classicReelsProfile.id:cabinetExpansionProfile.id);
   });
  }
  it('keeps old profile version and rule set intact',()=>{
   expect(stagingProfile.id).toBe('stage-paying30-v2');expect(Object.keys(stagingProfile.rules)).toHaveLength(8);
   expect(cabinetExpansionProfile.baseProfile).toBe(stagingProfile.id);
-  expect(stagingGameProfileId('neon-sevens')).toBe(stagingProfile.id);
+  expect(stagingGameProfileId('neon-sevens')).toBe(classicReelsProfile.id);
   expect(stagingGameProfileId('reef-party')).toBe('reef-tiers-v1');
  });
 });

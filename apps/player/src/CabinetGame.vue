@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { cabinetGames, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
+import { cabinetGames, legacyCabinetGames, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
 import { catalog } from '@new-game/contracts';
 import ReelStage from './ReelStage.vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
@@ -9,26 +9,31 @@ import BetControls from './BetControls.vue';
 import {stage} from './staging-state';
 import {creditPresentation} from './credit-presentation';
 import {formatCredits} from '@new-game/domain';
+import {displayedReelGrid} from './cabinet-layout';
 
 const staked=computed(()=>stage.enabled&&props.authenticated);
 const props = defineProps<{ game: CabinetGameId; running: boolean; reducedMotion: boolean; authenticated: boolean; balance: string }>();
 const profile = cabinetGames[props.game], game = catalog.find(item => item.id === props.game)!;
 const baseGame=cabinetBase(props.game),coinGame = baseGame === 'coin-carnival';
 const crownGame=props.game==='sapphire-crown';
+const singleRow=props.game==='solar-fortune';
+const reelGrid=(grid:string[][])=>displayedReelGrid(props.game,grid);
 const initialGrid = Array.from({length:3}, (_, r) => Array.from({length:profile.columns}, (_, c) => profile.symbols[(r + c) % profile.symbols.length]));
 const reels = ref<InstanceType<typeof ReelStage>>();
 const result = ref<CabinetResult | null>(null), frame = ref(0), active = ref(false), saving = ref(false), loading = ref(props.authenticated);
+const renderProfile=computed(()=>result.value?.frames[0]?.grid[0]?.length===5?legacyCabinetGames[props.game]:profile);
+const legacyReceipt=computed(()=>renderProfile.value.columns!==profile.columns);
 const fast = ref(false), showLines = ref(false), phase = ref('ready');
 const lineIndex=ref(0),freshResult=ref(false);
 const returnAmount=computed(()=>staked.value&&stage.last?.game===props.game?stage.last.award:'0');
 const celebrating=computed(()=>freshResult.value&&phase.value==='complete'&&BigInt(returnAmount.value)>0n);
 const currentMatches=computed(()=>{const matches=result.value?.matches||[];return showLines.value?matches:matches.length?[matches[lineIndex.value%matches.length]]:[];});
-const notice = ref(coinGame ? 'Middle-row coins lock their reel. Collect all five!' : 'Line up the symbols. Light up the cabinet!');
+const notice = ref(coinGame ? singleRow?'Sun coins lock their reel. Collect all five!':'Middle-row coins lock their reel. Collect all five!' : 'Line up the symbols. Light up the cabinet!');
 const pendingKey = ref<string | null>(null);
 const locked = computed(() => result.value?.frames[frame.value]?.locked || []);
 const remaining = computed(() => result.value?.frames[frame.value]?.remaining ?? 3);
-const highlighted = computed(() => phase.value === 'complete' ? currentMatches.value.flatMap(match => match.rows.slice(0, match.count).map((row,col) => row * profile.columns + col)) : []);
-const visibleLines = computed(() => showLines.value ? profile.lines.map((rows,line) => ({rows, line:line+1,count:profile.columns})) : phase.value === 'complete' ? currentMatches.value : []);
+const highlighted = computed(() => phase.value === 'complete' ? currentMatches.value.flatMap(match => match.rows.slice(0, match.count).map((row,col) => row * renderProfile.value.columns + col)) : []);
+const visibleLines = computed(() => showLines.value ? renderProfile.value.lines.map((rows,line) => ({rows, line:line+1,count:renderProfile.value.columns})) : phase.value === 'complete' ? currentMatches.value : []);
 const lineColors = ['#ff2d69','#00a8ff','#5ecf26','#c957ff','#ff9517','#06c9aa','#ed48bf','#417eff','#edbd16'];
 let generation = 0, disposed = false, demo = 0, timer: ReturnType<typeof setTimeout> | undefined, release: (() => void) | undefined;
 let lineTimer:ReturnType<typeof setInterval>|undefined;
@@ -39,7 +44,7 @@ function finish() {
   generation++; cancelDelay();
   if (!result.value) return;
   frame.value = result.value.frames.length - 1;
-  reels.value?.settle(result.value.frames[frame.value].grid);
+  reels.value?.settle(reelGrid(result.value.frames[frame.value].grid));
   active.value = false; phase.value = 'complete';
   notice.value = `${result.value.description} ${staked.value ? '' : 'No credits changed.'}`;
 }
@@ -62,7 +67,7 @@ async function play() {
       if (disposed || generation !== token) return;
       phase.value = 'spinning';
       notice.value = index === 0 ? 'Reels rolling…' : `Respin ${index} of 3 · ${accepted.frames[index - 1].locked.length} reels held`;
-      await reels.value?.play(accepted.frames[index].grid, [], fast.value, index ? accepted.frames[index - 1].locked : []);
+      await reels.value?.play(reelGrid(accepted.frames[index].grid), [], fast.value, index ? accepted.frames[index - 1].locked : []);
       if (disposed || generation !== token) return;
       frame.value = index; phase.value = 'landed';
       if (index < accepted.frames.length - 1) await delay(fast.value ? 250 : 650);
@@ -79,8 +84,8 @@ onMounted(async () => {
   try {
     const history = await api<{result: CabinetResult}[]>('practice/history');
     if (disposed) return;
-    const saved = history.find(item => item.result.game === props.game && item.result.frames?.every(frame => frame.grid.every(row => row.length === profile.columns)))?.result;
-    if (saved) { result.value = saved; await nextTick(); if (disposed) return; finish(); notice.value = `Last saved round: ${saved.description}`; }
+    const saved = history.find(item => item.result.game === props.game && item.result.frames?.every(frame => frame.grid.every(row => row.length === profile.columns || row.length === legacyCabinetGames[props.game].columns)))?.result;
+    if (saved) { result.value = saved; await nextTick(); if (disposed) return; finish(); notice.value = `Last saved ${saved.frames[0].grid[0].length}-reel round: ${saved.description}`; }
   } catch { notice.value = 'History unavailable. Your next spin will check the connection.'; }
   finally { loading.value = false; }
 });
@@ -88,17 +93,19 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
 </script>
 
 <template>
-  <section class="slot-cabinet" :class="[game.id, {'cabinet-active':active, 'stage-paused':!running}]" :data-phase="phase" :style="{'--game-color':game.color}">
+  <section class="slot-cabinet" :class="[game.id, {'cabinet-active':active, 'stage-paused':!running,'classic-three':renderProfile.columns===3,'single-row-cabinet':singleRow}]" :data-phase="phase" :style="{'--game-color':game.color}">
     <div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
-    <header class="slot-marquee"><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span><div><small>NEW GAME ORIGINAL</small><h2>{{ game.name }}</h2><p>{{ game.detail }}</p></div><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span></header>
+    <header class="slot-marquee"><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span><div><small>NEW GAME ORIGINAL</small><h2>{{ game.name }}</h2><p>{{legacyReceipt?'SAVED 5-REEL RESULT':game.detail}}</p></div><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span></header>
+    <p v-if="legacyReceipt" class="legacy-layout-note">Previous five-reel round · New spins use three reels</p>
+    <div v-if="crownGame" class="portrait-crown-feature" aria-hidden="true"><span>THE ROYAL COLLECTION</span><ArcadeSymbol symbol="dragon" :theme="game.id"/><b>CROWN WILD</b></div>
     <div class="cabinet-game-body">
       <aside class="cabinet-side left"><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span><div class="cabinet-readout"><small>{{ coinGame ? 'HELD' : 'MATCHES' }}</small><strong>{{ coinGame ? locked.length : phase === 'complete' ? result?.matches.length || 0 : '—' }}<em v-if="coinGame"> / 5</em></strong></div><b>{{ coinGame ? 'COLLECT' : baseGame === 'jade-fortune' ? 'WILD' : 'SEVENS' }}</b></aside>
       <div class="slot-reel-surround">
-        <div class="reel-banner"><span>{{ coinGame ? 'LOCK A COIN • HOLD THE REEL' : `${profile.lines.length} LINES • LEFT TO RIGHT` }}</span><span>{{ coinGame ? `${remaining} RESPINS LEFT` : (staked ? 'PLAY' : 'FREE PRACTICE') }}</span></div>
+        <div class="reel-banner"><span>{{ coinGame ? singleRow?'SUN COINS • LOCK & COLLECT':'LOCK A COIN • HOLD THE REEL' : `${renderProfile.lines.length} LINES • LEFT TO RIGHT` }}</span><span>{{ coinGame ? `${remaining} RESPINS LEFT` : (staked ? 'PLAY' : 'FREE PRACTICE') }}</span></div>
         <div class="reel-playfield">
           <div v-if="celebrating" class="cabinet-win-flare" aria-hidden="true"><span v-for="n in 12" :key="`${result?.id}-${n}`" :style="{'--spark':n}">✦</span></div>
-          <ReelStage ref="reels" :theme="game.id" :initial-grid="initialGrid" :strip-symbols="profile.symbols" :reduced-motion="reducedMotion" :highlighted="highlighted" :locked="coinGame ? locked : []" />
-          <svg v-if="!coinGame" class="payline-overlay" :viewBox="`0 0 ${profile.columns * 100} 300`" preserveAspectRatio="none" aria-hidden="true"><polyline v-for="line in visibleLines" :key="line.line" :points="line.rows.slice(0,line.count).map((row,col) => `${col*100+50},${row*100+50}`).join(' ')" :stroke="lineColors[(line.line-1)%lineColors.length]" fill="none" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><text v-for="line in visibleLines" :key="`label-${line.line}`" x="10" :y="line.rows[0]*100+43" :fill="lineColors[(line.line-1)%lineColors.length]" stroke="#fff9dc" stroke-width=".7" font-size="18" font-weight="900">{{line.line}}</text></svg>
+          <ReelStage ref="reels" :theme="game.id" :initial-grid="reelGrid(initialGrid)" :strip-symbols="profile.symbols" :reduced-motion="reducedMotion" :highlighted="highlighted" :locked="coinGame ? locked : []" />
+          <svg v-if="!coinGame" class="payline-overlay" :viewBox="`0 0 ${renderProfile.columns * 100} 300`" preserveAspectRatio="none" aria-hidden="true"><polyline v-for="line in visibleLines" :key="line.line" :points="line.rows.slice(0,line.count).map((row,col) => `${col*100+50},${row*100+50}`).join(' ')" :stroke="lineColors[(line.line-1)%lineColors.length]" fill="none" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><text v-for="line in visibleLines" :key="`label-${line.line}`" x="10" :y="line.rows[0]*100+43" :fill="lineColors[(line.line-1)%lineColors.length]" stroke="#fff9dc" stroke-width=".7" font-size="18" font-weight="900">{{line.line}}</text></svg>
         </div>
         <div class="reel-tray"><span v-if="coinGame" class="coin-lamps"><i v-for="n in profile.columns" :key="n" :class="{lit:locked.includes(n-1)}">{{ locked.includes(n-1) ? '★ LOCKED' : '☆ REEL ' + n }}</i></span><span v-else>✦ {{ phase === 'complete' && result?.matches.length ? `LINE ${currentMatches[0]?.line || 1} · ${currentMatches[0]?.count || 3} MATCHES` : 'SPIN • MATCH • LIGHT IT UP' }} ✦</span></div>
       </div>

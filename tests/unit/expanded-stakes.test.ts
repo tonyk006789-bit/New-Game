@@ -12,9 +12,9 @@ describe('quarter-credit stakes and five-reel outcomes',()=>{
    expect(stagingMultiplier({id:'test',game:'neon-sevens',description:'',frames:[{grid,locked:[],remaining:0}]})).toBe(multiplier);
   }
  });
- it('all cabinet frames have five columns, and only a full five-coin collection pays',()=>{
+ it('cabinet frames follow their declared reel count, and only a full five-coin collection pays',()=>{
   for(const game of Object.keys(cabinetGames) as (keyof typeof cabinetGames)[])for(let seed=1;seed<100;seed++){
-   const result=cabinetPractice(game,'test',storyboardRandom(seed));for(const frame of result.frames){expect(frame.grid).toHaveLength(3);for(const row of frame.grid)expect(row).toHaveLength(5);}
+   const result=cabinetPractice(game,'test',storyboardRandom(seed));for(const frame of result.frames){expect(frame.grid).toHaveLength(3);for(const row of frame.grid)expect(row).toHaveLength(cabinetGames[game].columns);}
   }
   const full=cabinetPractice('coin-carnival','test',()=>0);expect(stagingMultiplier(full)).toBe(5);
   full.frames[0].grid[1][4]='bell';expect(stagingMultiplier(full)).toBe(0);

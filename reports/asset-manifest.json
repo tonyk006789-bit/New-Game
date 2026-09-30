@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-30T16:27:58.680Z",
+  "generatedAt": "2026-09-30T17:35:45.562Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -232,6 +232,13 @@
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
       "sha256": "799c0597dea80dce5f36032f8509d0187693f8e6d2882d92dc02a44ead6cb453"
+    },
+    {
+      "path": "apps/player/src/arcade-v16.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "fcd42b1f38f318b3becb5d83686065f3a2636249d3cf034dc55d6fd0cb9584d7"
     }
   ]
 }
