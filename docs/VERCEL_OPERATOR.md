@@ -17,10 +17,24 @@ To allow newly managed players in the Vercel game, set HOSTED_PLAYER_ADMISSION=m
 
 ## Database and recovery
 
-Verify the existing test database marker and save an encrypted/access-controlled private backup before applying migrations 011 and 012. Record existing wallet versions/balances before and after migration; these migrations do not change balances. Provision sample accounts only through authenticated creation, starting at zero. Existing Main Admin/sub-contractor/agent credentials can be reused without password reset.
+Verify the existing test database marker and save an encrypted/access-controlled private backup before applying migrations 011, 012 and 013. Record existing wallet versions/balances before and after migration; these migrations do not change balances. Provision sample accounts only through authenticated creation, starting at zero. Existing Main Admin/sub-contractor/agent credentials can be reused without password reset.
 
-Keep migration 011/012 and all ledger history during rollback. Do not restore an older database snapshot over new accepted activity. An older application lacking archive/ancestor checks is not a safe rollback while staff branches are blocked. Roll back deployment only to an access-compatible version, or pause traffic first.
+Keep migrations 011–013 and all ledger history during rollback. Do not restore an older database snapshot over new accepted activity. An older application lacking archive/ancestor checks is not a safe rollback while staff branches are blocked. Roll back deployment only to an access-compatible version, or pause traffic first.
 
-## Status
+## Status — 30 September 2026
 
-Build, database integration and local responsive checks pass. Vercel project exists. Credential upload requires the explicit database-secret approval requested after automatic approval review rejected the first attempt. No operator deployment is claimed live until health, password login and branch-management checks succeed on its public URL.
+Live operator URL: **https://new-game-operator.vercel.app/**
+Live player URL: **https://new-game-test-topaz.vercel.app/**
+
+Operator deployment: `dpl_5WiGkoeef8qn756Jf5Y67fxKuL9z`.
+Player deployment: `dpl_EoywYHwDjs59jRYhbMBXPKbbDCPL`.
+
+The owner approved the credential transfer; the database connection is stored only in Vercel's server-side encrypted environment. Migration 013 adds numeric display IDs, login device records, IP metadata and hashed API key settings. All eight existing wallets were unchanged by the migrations. A zero-credit `operator.sample` account was subsequently created through the authenticated agent workflow to validate managed player admission.
+
+Live checks passed for health, Main Admin and Agent password login, every report/settings endpoint, zero-start account creation, managed player login, role separation, logout and denial of operator routes on the player deployment. Existing staff credentials are reused without resets. Private owner login reference: `.local/vercel-operator/OPERATOR_LOGINS.md` (not committed).
+
+`Login Device` uses an opaque HttpOnly device cookie; review is off initially. The first password-authenticated device receives review authority. While review is off, a recently password-verified browser can enable it and becomes an approved review device. Turning review on revokes other unapproved sessions. Once enabled, only existing review devices can approve or disable review. Keep an approved review device available. The UI refuses to reject or remove review authority from the current review device. There is no public bypass/reset endpoint.
+
+`API Download` generates a secret shown once and stores only its hash. An empty whitelist denies all requests. Exact source IP restrictions and live account/ancestor checks apply to every request. API credentials are read-only and cannot create sessions or invoke console mutation routes; account/credit operations use console sessions. Password changes/reset revoke API keys. The Vercel adapter uses the platform's client-IP header, documented in [Vercel request headers](https://vercel.com/docs/headers/request-headers#x-vercel-forwarded-for). Local Nest uses the socket IP; no arbitrary forwarded header is trusted there.
+
+Do not roll back to a version that ignores enabled device review, API revocations, or ancestor/archive access rules. Keep migration 013 and revoke/disable new credentials before any access-compatible rollback. No database rollback may erase accepted accounting history.

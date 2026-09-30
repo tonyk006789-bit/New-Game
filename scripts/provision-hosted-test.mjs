@@ -39,7 +39,7 @@ const {adjust}=await import('../dist/server/apps/api/src/ledger.js');
 const {transaction,pool}=await import('../dist/server/apps/api/src/store.js');
 const request={headers:{origin},ip:'manual-hosted-provisioner'};
 try{
- const session=await login(request,{setHeader(name,value){if(name==='Set-Cookie')request.headers.cookie=value.split(';')[0];}},{username:saved.root.username,password:saved.root.password,code:totp(saved.root.totpSecret)});request.headers['x-csrf-token']=session.csrf;
+ const session=await login(request,{setHeader(name,value){if(name==='Set-Cookie')request.headers.cookie=(Array.isArray(value)?value:[value]).map(cookie=>cookie.split(';')[0]).join('; ');}},{username:saved.root.username,password:saved.root.password,code:totp(saved.root.totpSecret)});request.headers['x-csrf-token']=session.csrf;
  async function create(parentId,entry,role){
   const existing=(await accounts(request)).find(account=>account.username===entry.username);
   if(existing){

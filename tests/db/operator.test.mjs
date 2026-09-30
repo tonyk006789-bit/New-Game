@@ -113,6 +113,20 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await control.query('SELECT coalesce(sum(p.units),0)::text n FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id WHERE w.account_id=$1',[player])).rows[0].n,after.settled);
   if(result[0].status===201){const round=(await control.query('SELECT * FROM staging_rounds WHERE account_id=$1',[player])).rows[0];assert.ok(round);const receipt=(await call('operator/receipts/'+round.stake_transaction,undefined,operator)).data;assert.equal(receipt.round_id,round.id);assert.equal(receipt.award_units,round.award_units);}
  });
+ await t.test('reference game and total reports aggregate committed rounds once and preserve branch scope',async()=>{
+  await new Promise(resolve=>setTimeout(resolve,1100));
+  ok(await adjust(player,'1000'));
+  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2'},playerAuth));
+  const expected=(await control.query('SELECT count(*)::text total,sum(stake_units)::text played,sum(award_units)::text won FROM staging_rounds WHERE account_id=$1',[player])).rows[0];
+  const rounds=await call('operator/rounds',undefined,operator);assert.equal(rounds.status,200,JSON.stringify(rounds.data));assert.equal(rounds.data.total,expected.total);assert.equal(rounds.data.played,expected.played);assert.equal(rounds.data.won,expected.won);
+  for(const row of rounds.data.items){assert.equal(BigInt(row.before_units)-BigInt(row.stake_units)+BigInt(row.award_units),BigInt(row.after_units));assert.equal(row.manager,'operator.agent');}
+  const totals=await call('operator/totals',undefined,operator);assert.equal(totals.status,200,JSON.stringify(totals.data));assert.equal(totals.data.total,'1');assert.equal(totals.data.played,expected.played);assert.equal(totals.data.recharged,'4000');assert.ok(totals.data.items.every(row=>row.id===agent));
+  assert.equal((await call('operator/rounds?search=operator.south',undefined,operator)).data.total,'0');assert.equal((await call('operator/totals?search=operator.south',undefined,operator)).data.total,'0');
+  assert.equal((await call('operator/rounds?from=2026-99-99',undefined,operator)).status,400);assert.equal((await call('operator/totals',undefined,playerAuth)).status,403);
+  const member=(await call('operator/accounts?search=operator.player',undefined,operator)).data.items[0];assert.match(member.publicId,/^\d+$/);assert.equal(member.registeredIp,'127.0.0.1');assert.equal(member.lastIp,'127.0.0.1');assert.ok(BigInt(member.loginCount)>0n);assert.match(member.manager,/operator.agent/);
+  const own=(await call('operator/accounts?role=ALL&search='+agent,undefined,operator)).data.items[0];assert.equal(own.manager,null);
+  assert.equal((await call('operator/accounts?search='+member.publicId,undefined,operator)).data.items[0].id,player);
+ });
  await t.test('agent edits/reset/suspension are scoped and preserve the ledger',async()=>{
   const before=await wallet(player);const edit={action:'EDIT_PROFILE',displayName:'Updated player',reason:'Player profile correction',requestKey:randomUUID()};ok(await call(`admin/accounts/${player}/manage`,edit,operator));ok(await call(`admin/accounts/${player}/manage`,edit,operator));
   assert.equal((await call(`admin/accounts/${southPlayer}/manage`,edit,operator)).status,404);assert.equal((await call(`admin/accounts/${agent}/manage`,edit,operator)).status,403);

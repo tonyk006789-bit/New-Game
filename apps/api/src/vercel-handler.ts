@@ -19,6 +19,6 @@ export default async function vercelHandler(req:IncomingMessage,res:ServerRespon
   const body=chunks.length?new Uint8Array(Buffer.concat(chunks)):undefined;
   const request=new Request(url,{method:req.method||'GET',headers,...(body?{body}:{})});
   const response=await hostedHandler(request,{ip:String(req.headers['x-vercel-forwarded-for']||req.socket.remoteAddress||'unknown').split(',')[0]});
-  res.writeHead(response.status,Object.fromEntries(response.headers.entries()));res.end(Buffer.from(await response.arrayBuffer()));
+  const outgoing:Record<string,string|string[]>=Object.fromEntries(response.headers.entries());if(response.headers.getSetCookie().length)outgoing['set-cookie']=response.headers.getSetCookie();res.writeHead(response.status,outgoing);res.end(Buffer.from(await response.arrayBuffer()));
  }catch{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({code:'SERVICE_UNAVAILABLE'}));}
 }

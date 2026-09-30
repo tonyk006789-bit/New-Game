@@ -11,6 +11,9 @@ import { practiceHistory, practiceRound, reefRoom, reefShot, reefTables, reefLea
 import { environment, stagingRound, stagingHistory, stagingStats, recoverStagingRound } from './staging.js';
 import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
 import {operatorDashboard,operatorAccounts,operatorRecords,operatorReceipt,operatorSettings} from './operator.js';
+import {operatorRounds,operatorTotals} from './operator-reports.js';
+import {operatorDevices,manageDevice} from './device.js';
+import {operatorApiSettings,updateOperatorApi,operatorApiDocumentation,operatorIntegration} from './operator-api.js';
 import {changePassword} from './password.js';
 @Catch()
 class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost){
@@ -39,6 +42,14 @@ class ArcadeController {
  @Get('operator/accounts') operatorAccounts(@Req() req:Request,@Query() query:unknown){return operatorAccounts(req,query);}
  @Get('operator/records') records(@Req() req:Request,@Query() query:unknown){return operatorRecords(req,query);}
  @Get('operator/receipts/:id') receipt(@Req() req:Request,@Param('id') id:string){return operatorReceipt(req,id);}
+ @Get('integration/:endpoint') integration(@Req() req:Request,@Param('endpoint') endpoint:string,@Query() query:unknown){return operatorIntegration(req,endpoint,query);}
+ @Get('operator/rounds') gameRecords(@Req() req:Request,@Query() query:unknown){return operatorRounds(req,query);}
+ @Get('operator/totals') totals(@Req() req:Request,@Query() query:unknown){return operatorTotals(req,query);}
+ @Get('operator/devices') devices(@Req() req:Request,@Query() query:unknown){return operatorDevices(req,query);}
+ @Post('operator/devices') device(@Req() req:Request,@Body() body:unknown){return manageDevice(req,body);}
+ @Get('operator/api') apiSettings(@Req() req:Request){return operatorApiSettings(req);}
+ @Post('operator/api') apiConfigure(@Req() req:Request,@Body() body:unknown){return updateOperatorApi(req,body);}
+ @Get('operator/api/documentation') async apiDocumentation(@Req() req:Request){await operatorApiSettings(req);return {text:operatorApiDocumentation,operatorIntegration};}
  @Get('operator/settings') settings(@Req() req:Request){return operatorSettings(req);}
  @Post('operator/redeems') redeem(@Req() req:Request,@Body() body:unknown){return redeem(req,body);}
  @Get('admin/accounts') accounts(@Req() req:Request){return accounts(req);}

@@ -1,44 +1,59 @@
-# Agent console — 29 September 2026
+# Agent console — 30 September 2026
 
-A separate responsive operator web app at **http://127.0.0.1:5184/** uses the same authoritative PostgreSQL accounting functions as local staging games. It is not part of the player or native bundle. The owner has now requested a separate Vercel operator deployment. The staff-only artifact is built separately from the player artifact; deployment status and steps are recorded in `VERCEL_OPERATOR.md`.
+The separate operator application is live at **https://new-game-operator.vercel.app/**. The associated player application is **https://new-game-test-topaz.vercel.app/**. Both use the existing dedicated Vercel test PostgreSQL database. Operator code and routes are not served by the player deployment. See `VERCEL_OPERATOR.md` for build, deployment, credentials and recovery.
 
-## Workflows
+## Reference pages and working behavior
 
-- **Dashboard:** registered/enabled players, sign-ins in the last 24 hours, yesterday's new/recharged/redeemed players, transfer amounts, all-time transfer amounts and available player credits. Yesterday uses UTC and is labeled. Manual issuance and game winnings are separate from recharge totals. Activity means a real sign-in, not invented online occupancy.
-- **Players:** server-side exact-ID/literal-text search, active/suspended/archived filtering, registration/name/available-balance sorting, bounded pagination. Actions are based on server capabilities and checked again on every mutation.
-- **Create:** Main Admin creates the next hierarchy tier under a selected parent; Sub-contractor creates AGENT only under itself; Agent creates PLAYER only under itself. Every account begins at zero. Names can be edited; login IDs and branches remain unchanged.
-- **Recharge:** move the operator's own available credits to an active lower role in its subtree. The existing transfer restrictions remain.
-- **Redeem:** move available credits from a direct child into its parent operator's wallet: Main Admin ← Sub-contractor, Sub-contractor ← Agent, Agent ← Player. Arbitrary or skipped-level recipients, minting, retirement, and reserved-credit removal remain denied. An archived or suspended direct child's balance can still be collected without erasing its records.
-- **Account access:** Main Admin manages its hierarchy; Sub-contractor manages direct Agents; Agent manages assigned Players. Accounts may be edited, reset, suspended, reactivated, archived or restored. All target sessions are revoked for password/status changes, and credits/history are preserved. Display-name changes are audited without signing players out. Root recovery remains separate.
-- **Records:** UTC date/account/receipt filters, database counts/pagination, signed wallet changes and immutable receipts. Game ledger receipts also show the committed round, game, profile, stake and award. A stake and any positive award appear as separate ledger entries. Reward records refer only to the approved daily wheel; no agent commission or promotional bonus was added.
-- **Settings:** own identity, real login count/time, own active sessions and authenticated password change. Tokens, hashes, TOTP secrets and CSRF secrets are never returned by the settings API. Password changes sign out all sessions. No invented device names or IP history.
+The authenticated JUWA STORE account was inspected read-only. Original Vue/CSS now follows its dark header, gray accordion navigation, white compact tables and blue controls. No provider code, credentials or customer data is part of this product.
 
-## Security and correctness
+| Group | Pages | Behavior |
+|---|---|---|
+| Admin Management | Home | Ten real branch metrics, login time/IP/count. Activity means a login within 24 hours. Yesterday is a UTC day. |
+| Admin Management | Total Account | Date-filtered played/won/recharged/redeemed/net-credit totals by agent; each player and committed round is counted once. |
+| Admin Management | Agent Rewards | Rewards, Records and Rules tabs; disabled by explicit owner instruction. No invented rewards or rates. |
+| Admin Management | Sub-contractors, Agents | Owner-requested hierarchy management, shown only to authorized staff. |
+| Game User | User Management | Account/numeric-ID search, registration/account/balance sorting, pagination, editor dropdown and status controls. |
+| Game User | Redeem Record, Recharge Record, Reward Record | Scoped immutable transactions with before/after values, operator, date, IP when known, and printable receipts. Reward Record contains the previously approved daily wheel. |
+| Game User | Game Records | One row per committed round with its actual stake, award and before/after balance. |
+| Game User | Wager Bonus FAQ | Matching bonus page, disabled. No deposit-match credits or wagering restriction. |
+| Setting | Setting | Own account information and current-password-authenticated password change. |
+| Setting | API Download | Generate/copy a once-shown key, edit exact IP whitelist, download original API documentation, and copy this platform's API address. Integration access is read-only. |
+| Setting | Login Device | Real device records, filters, approval/rejection, review-device permission and optional review enforcement. |
 
-Cookie sessions, CSRF and allowed-origin checks are shared with the API. Account management and redemption require recent staff verification; all staff, including Main Admin, verify with their password. The owner explicitly removed the authenticator requirement. Agents may not manage other agents, distributors, root or players in another branch. Sub-contractors may manage their direct agents only; they cannot manage themselves, another branch or players below an agent.
+Removed standalone Audit log, Organization and Adjustments screens and the invented dashboard/quick-start design. Audit records and manual credit authority remain on the server. Higher JUWA roles and undocumented provider APIs were not observable; the owner's approved hierarchy and accounting rules take precedence.
 
-Migration **012_account_archive.sql** adds an account archive timestamp. Staff status/archive mutations revoke descendant sessions and all authenticated requests check ancestor access. A transaction-level shared/exclusive access lock serializes access changes with ordinary requests. Migration **011_agent_console.sql** adds REDEEM and durable account-operation idempotency constraints plus query indexes. No balances, accounts, game outcomes or previous migration files are rewritten. Wallet locks are deterministic; both source and destination versions must match. Balanced append-only postings and wallet reconciliation remain database constraints. Agent credits never subsidize or suppress accepted game awards.
+## Accounts and credits
 
-A credit request keeps its request ID during retries and is saved in session storage before submission. Only the request details are stored there, never credentials. A reload restores an unfinished request for checking/replay. Definite validation/stale-wallet rejection refreshes balances for a new review. Server idempotency remains authoritative.
+Main Admin → Sub-contractor (`SUB_DISTRIBUTOR`) → Agent → Player. Main Admin manages the scoped hierarchy; sub-contractors manage direct agents; agents manage assigned players. Create always starts the next-role wallet at zero. Login IDs/branches are not silently edited or reassigned.
 
-Record reads require both current account scope and the event's historical branch scope. Receipts expose only wallet postings inside the caller's branch; an incoming distributor transfer does not disclose that distributor's outside wallet balance. Dashboard metrics are calculated from one database snapshot. Bigint amounts and wallet versions remain decimal strings through JSON.
+Recharge transfers the operator's own available credits to an active lower role in its branch. Redeem moves available credits from a direct child back to the parent actor. Skipped-level or unrelated redemption is denied. Only Main Admin may issue or retire credits through Add/Remove. Reservations cannot be taken, balances cannot become negative, and accepted winnings remain independent of operator funds.
 
-## Local use
+Editor actions include edit nickname, reset password, recharge, redeem and owner-approved archive/restore. Status changes suspend/reactivate. Staff archive/suspension blocks descendants; restoration does not undo individually suspended child accounts. Password and access changes revoke affected sessions while retaining all balances and history.
 
-1. `pnpm build:server`
-2. `node --env-file=.local/staging/runtime.env scripts/database.mjs migrate`
-3. `./scripts/start-staging.ps1` (the existing local PostgreSQL server must be running on port 55432).
-4. Optional isolated acceptance fixture: `node --env-file=.local/staging/runtime.env scripts/setup-operator-demo.mjs --fund-play-credits`
-5. Open the operator URL above; private local demo credentials are in `.local/operator-demo/LOGINS.md`.
+Record filters, aggregates, pagination and receipts apply both current branch authorization and historical event scope. Incoming transfers never disclose an outside distributor's wallet. Integer credit units and versions stay decimal strings through JSON. A new numeric `public_id` is for display; original UUID identities remain intact. Historic IPs not previously captured show a dash instead of fabricated data.
 
-The fixture creates its own branch and zero-start accounts through authenticated account creation. Its optional 100-credit manual ADD uses recent Main Admin password verification, a saved durable request key and an immutable receipt. Re-running it cannot refill a spent wallet. It never resets existing tester passwords or balances. It rejects remote databases.
+## Authentication and API settings
 
-## Migration / rollback
+Password-only login and five-minute recent-password verification replace authenticator codes, as requested. HttpOnly/Secure cookies, CSRF, exact-origin checks, login rate limits and server-side roles remain. Credit request IDs are saved in session storage before submission so retries recover the same receipt rather than duplicating a transaction; no password or session secret is stored there.
 
-Apply 011 and 012 before starting this API version. Do not roll back to an API that ignores archived/ancestor status while archived or suspended branches exist. Disable traffic first, or deploy a rollback version that retains these access checks. Previous migrations are checksum protected. Roll back application code to disable the new routes while retaining migration 011 and all posted REDEEM/account-operation history. Do **not** narrow ledger/idempotency checks after these records exist, delete ledger rows, or restore an older wallet snapshot over newer accepted transactions. A mistaken credit movement requires a new authorized corrective transaction; it is never removed from history. New indexes can be dropped separately during an operational rollback if necessary.
+Login Device uses a separate opaque HttpOnly cookie, not a fingerprint. Review begins disabled. The first device receives review authority; while review is off, any recently verified signed-in browser can enable it and approve itself. Once enabled, only an approved review device may administer review. Activation revokes other unapproved sessions. Rejecting a device revokes its sessions; the current review device cannot reject itself or remove its own review authority. Device responses never contain cookie/session hashes.
 
-## Reference coverage and limits
+API keys are generated on request, shown once, and stored only as hashes. Empty IP whitelists deny all access. Rotation invalidates old keys; password change/reset revokes them. Integration routes expose only the operator's account, assigned players, records and rounds. They recheck account and ancestor status for each query. They cannot issue sessions, create/manage accounts or move credits. Those actions use the console's session/verification workflow. No live JUWA integration exists.
 
-Authenticated JUWA dashboard, player-management table/filter/sort actions, empty create form and account settings were observed. The owner-provided recharge/redemption screenshots informed record layouts. The reference's external commission rules, production gambling math, player data and integration/API packages were not copied. This console uses original Vue/CSS and this project's own authentication/ledger.
+## Run and verify
 
-Desktop and 390px browser layouts were inspected. Browser emulation is not physical Android/iPhone certification. No native engine or packaging changed in this ticket. Evidence: `reports/AGENT_CONSOLE_VERIFICATION.md`.
+- `pnpm build:server`
+- `node --env-file=.local/staging/runtime.env scripts/database.mjs migrate`
+- `./scripts/start-staging.ps1` with the existing local PostgreSQL server on port 55432.
+- `pnpm build:vercel-operator` for the separate operator artifact.
+- `node --env-file=.local/staging/runtime.env --test tests/db/operator.test.mjs tests/db/operator-hosted.test.mjs`
+
+Local URL remains http://127.0.0.1:5184/ for development. Owner credentials are in ignored `.local/vercel-operator/OPERATOR_LOGINS.md`; none are in source or static assets. The existing five human tester credentials/balances were preserved. The new `operator.sample` player remains at zero.
+
+## Migration and rollback
+
+Apply migrations 011–013 before this API. Migration 013 adds numeric presentation IDs, registration and transaction IP metadata, devices and API-key settings; it makes no accounting changes. An encrypted consistent logical backup was saved before hosted migration because bundled pg_dump 17 cannot back up the hosted PostgreSQL 18 server. All eight preexisting wallet balances/reservations/versions were unchanged.
+
+Retain migrations and immutable history on rollback. Do not restore an old wallet snapshot over accepted activity. Disable new traffic or roll back only to a version that retains ancestor/archive restrictions, API revocations and enabled device-review enforcement. First revoke keys/disable review through an authorized recovery process if a legacy version cannot enforce them. Balance corrections are new authorized ledger transactions, never edits/deletions.
+
+Evidence: `../reports/OPERATOR_REFERENCE_V14.md`. Desktop and 390px browser checks are not physical Android/iPhone certification. Native builds, signing/store acceptance and production payout approval are unchanged and remain separate gates.

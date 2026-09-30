@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { type Request, actorFor, parse, privileged, verifiedStaff } from './auth.js';
 import { type Wallet, audit, branchEnabled, directChild, fail, idempotent, inScope, transaction, walletView } from './store.js';
 import { passwordHash } from './security.js';
+import {clientIp} from './device.js';
 export async function me(req:Request){return transaction(async db=>{
  const actor=await actorFor(db,req);const wallet=(await db.query<Wallet>('SELECT * FROM wallets WHERE account_id=$1',[actor.id])).rows[0];
  return {id:actor.id,displayName:actor.display_name,username:actor.username,role:actor.role,csrf:actor.csrf_token,wallet:walletView(wallet)};
@@ -32,7 +33,7 @@ export async function createAccount(req:Request,body:unknown){
    await db.query('INSERT INTO branch_ancestors(branch_id,ancestor_id,depth) SELECT $1,ancestor_id,depth+1 FROM branch_ancestors WHERE branch_id=$2',[branch,parent.branch_id]);
    await db.query('INSERT INTO branch_ancestors VALUES($1,$1,0)',[branch]);
   }
-  await db.query('INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash) VALUES($1,$2,$3,$4,true,$5,$6)',[id,branch,role,data.displayName,data.username,hash]);
+  await db.query('INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash,registered_ip) VALUES($1,$2,$3,$4,true,$5,$6,$7)',[id,branch,role,data.displayName,data.username,hash,clientIp(req)]);
   await db.query('INSERT INTO wallets(id,account_id) VALUES($1,$2)',[randomUUID(),id]);
   await audit(db,actor,'ACCOUNT_CREATED',{id,parentId:parent.id,role,username:data.username});return {id,role,username:data.username};
   });
@@ -70,6 +71,7 @@ export async function manageAccount(req:Request,id:string,body:unknown){
   else if(data.action==='SET_ACTIVE')await db.query('UPDATE accounts SET active=$1 WHERE id=$2',[data.active,target.id]);
   else if(data.action==='SET_ARCHIVED')await db.query('UPDATE accounts SET archived_at=CASE WHEN $1 THEN now() ELSE NULL END WHERE id=$2',[data.archived,target.id]);
   else await db.query('UPDATE accounts SET display_name=$1 WHERE id=$2',[data.displayName,target.id]);
+  if(data.action==='RESET_PASSWORD')await db.query('UPDATE operator_api_keys SET revoked_at=now() WHERE account_id=$1',[target.id]);
   if(data.action!=='EDIT_PROFILE')await db.query(`UPDATE sessions SET revoked_at=now() WHERE revoked_at IS NULL AND
    (account_id=$1 OR ($3::boolean AND account_id IN (SELECT a.id FROM accounts a JOIN branch_ancestors c ON c.branch_id=a.branch_id WHERE c.ancestor_id=$2)))`,[target.id,target.branch_id,target.role!=='PLAYER'&&(data.action==='SET_ACTIVE'||data.action==='SET_ARCHIVED')]);
   await audit(db,actor,data.action,{targetId:target.id,reason:data.reason,...(data.action==='SET_ARCHIVED'?{archived:data.archived}:data.action==='SET_ACTIVE'?{active:data.active}:data.action==='EDIT_PROFILE'?{displayName:data.displayName}:{}),requestKey:data.requestKey});return {updated:true,sessionsRevoked:data.action!=='EDIT_PROFILE'};

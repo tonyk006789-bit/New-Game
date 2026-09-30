@@ -25,7 +25,7 @@ await control.query('INSERT INTO hosted_test_environment(site_id) VALUES($1)',[s
 await control.query('INSERT INTO branches(id,name) VALUES($1,$2)',[branch,'Hosted adapter test']);await control.query('INSERT INTO branch_ancestors VALUES($1,$1,0)',[branch]);
 await control.query("INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash,totp_secret) VALUES($1,$2,'MAIN_ADMIN','Fixture Admin',true,'fixture.admin',$3,$4)",[root,branch,await passwordHash(password),secret]);await control.query('INSERT INTO wallets(id,account_id) VALUES($1,$2)',[randomUUID(),root]);
 const admin={headers:{origin},ip:'fixture'};
-const auth=await login(admin,{setHeader(name,value){if(name==='Set-Cookie')admin.headers.cookie=value.split(';')[0];}},{username:'fixture.admin',password,code:totp(secret)});admin.headers['x-csrf-token']=auth.csrf;
+const auth=await login(admin,{setHeader(name,value){if(name==='Set-Cookie')admin.headers.cookie=(Array.isArray(value)?value:[value]).map(cookie=>cookie.split(';')[0]).join('; ');}},{username:'fixture.admin',password,code:totp(secret)});admin.headers['x-csrf-token']=auth.csrf;
 const distributor=await createAccount(admin,{parentId:root,username:'fixture.circle',displayName:'Circle',password});
 const agent=await createAccount(admin,{parentId:distributor.id,username:'fixture.agent',displayName:'Agent',password});
 for(const username of ['tester.one','tester.two','tester.three','tester.four','tester.five','outside.player']){

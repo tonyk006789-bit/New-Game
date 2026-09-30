@@ -21,6 +21,7 @@ export async function changePassword(req:Request,res:Response,body:unknown){
   await db.query('UPDATE accounts SET password_hash=$1 WHERE id=$2',[await passwordHash(data.newPassword),actor.id]);
   await db.query('UPDATE sessions SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL',[actor.id]);
   await db.query('UPDATE login_attempts SET failures=0 WHERE key_hash=$1',[key]);
+  await db.query('UPDATE operator_api_keys SET revoked_at=now() WHERE account_id=$1',[actor.id]);
   await audit(db,actor,'PASSWORD_CHANGED',{sessionsRevoked:true});return null;
  });
  if(result)fail(result==='RATE_LIMITED'?429:400,result,result==='RATE_LIMITED'?'Too many attempts. Try again in 15 minutes.':result==='PASSWORD_UNCHANGED'?'Choose a different password.':'Your current password is incorrect.');

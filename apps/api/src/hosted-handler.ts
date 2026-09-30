@@ -14,7 +14,11 @@ const reads = new Set(['/v1/environment','/v1/health','/v1/games','/v1/me','/v1/
 const writes = new Set(['/v1/auth/login','/v1/auth/logout','/v1/auth/password','/v1/daily-wheel/spin','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
 const rounds = /^\/v1\/staging\/(neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party)\/rounds$/;
 export function playerRoute(method:string, path:string){return method==='GET'?reads.has(path):method==='POST'&&(writes.has(path)||rounds.test(path));}
-const json=(body:unknown,status=200,extra:Record<string,string>={})=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY',...extra}});
+const json=(body:unknown,status=200,extra:Record<string,string|string[]>={})=>{
+ const headers=new Headers({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
+ for(const [key,value] of Object.entries(extra))for(const item of Array.isArray(value)?value:[value])headers.append(key,item);
+ return Response.json(body,{status,headers});
+};
 
 async function readBody(request:Request){
  if(!request.headers.get('content-type')?.startsWith('application/json'))fail(415,'JSON_REQUIRED');
@@ -35,8 +39,8 @@ export async function hostedHandler(request:Request, context:{ip?:string}={}){
   const req:ApiRequest={headers:Object.fromEntries(request.headers.entries()),ip:context.ip || 'unknown'};
   if(request.method==='POST'&&!String(process.env.ALLOWED_ORIGINS||'').split(',').includes(String(req.headers.origin||'')))return json({code:'ORIGIN_REJECTED'},403);
   const body=request.method==='POST'?await readBody(request):undefined;
-  const headers:Record<string,string>={};
-  const res={setHeader:(name:string,value:string)=>{headers[name]=value;}};
+  const headers:Record<string,string|string[]>={};
+  const res={setHeader:(name:string,value:string|string[])=>{headers[name]=value;}};
   if(path==='/v1/environment')return json(environment());
   if(path==='/v1/health'){await transaction(db=>db.query('SELECT 1'));return json({status:'ok',mode:'private-test'});}
   if(path==='/v1/games')return json(catalog);

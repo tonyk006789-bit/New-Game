@@ -24,7 +24,7 @@ export async function posting(db:PoolClient,id:string,wallet:Wallet,delta:bigint
 }
 export async function beginLedger(db:PoolClient,actor:Actor,target:Actor,kind:string,reason:string,key:string,related:string|null=null){
  const id=randomUUID();
- await db.query('INSERT INTO ledger_transactions(id,actor_id,target_id,branch_id_at_event,kind,reason,request_id,related_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[id,actor.id,target.id,target.branch_id,kind,reason,key,related]);
+ await db.query('INSERT INTO ledger_transactions(id,actor_id,target_id,branch_id_at_event,kind,reason,request_id,related_id,origin_ip) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',[id,actor.id,target.id,target.branch_id,kind,reason,key,related,actor.client_ip||null]);
  return id;
 }
 function fresh(wallet:Wallet,expected:string){if(wallet.version!==expected)fail(409,'STALE_WALLET','The balance changed. Refresh and review this action again.');}
