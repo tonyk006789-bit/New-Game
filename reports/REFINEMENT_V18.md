@@ -43,6 +43,15 @@ Before publication, a read-only hosted audit found nine wallets and zero account
 
 Target links: https://new-game-test-topaz.vercel.app/ and https://new-game-operator.vercel.app/. Deployment IDs and post-publication checks are recorded below after verification.
 
+Published from source commit `1a34435f6dd3798f0f9bcc60a4d364479cfa60d0` on GitHub main:
+
+- Player: `dpl_n3ov3jWBDP4CdvofRGL2Dftxcs6h`, READY, https://new-game-test-j275dk05t-tonyk006789-7532.vercel.app/; alias https://new-game-test-topaz.vercel.app/.
+- Operator: `dpl_9DrnH4YXgxo58zRkwoNLq1B2LfTB`, READY, https://new-game-operator-lt9nask3j-tonyk006789-7532.vercel.app/; alias https://new-game-operator.vercel.app/.
+- Existing Main Admin, sub-contractor and agent sign-ins passed through the public operator API. Each list contained only its direct child role; totals used the matching rollup. Main/sub individual player lists were empty, game-record access returned 403 and individual player receipts/records returned 404.
+- Existing tester sign-in and both new PNGs passed on the player site. The rendered Abyss table has all four new cannons and the persistent wheel; no console warnings/errors were returned. Landscape content viewport 844 × 390 was inspected and the temporary viewport override reset.
+- `.local/check-v18-wallets.mjs` read-only comparison confirmed **all nine balances, reservations and wallet versions unchanged**, and no invalid parents, after publication and API verification. No hosted shots, claims, adjustments, resets or new accounts were performed.
+- Public verification details remain local in `.local/vercel/v18-live-checks.json`; screenshots in `reports/screenshots-v18/abyss-live.png` and `abyss-landscape.png`. No private credentials or customer exports were committed.
+
 Rollback visuals by reverting the V18 player art/components. Preserve the stricter server permission rules on both deployments; rolling the operator back to V17 would reopen the reported bypass. There is no database rollback. Do not rerun provisioning to refresh tester balances.
 
 Remaining limits: no physical-device certification; jackpot reveals reuse the existing approved test fish awards and do not implement a progressive pool. The PostgreSQL client emits a known query-queue deprecation warning in concurrency fixtures; it does not fail the tests. Hosted database SSL is currently verified under the pinned pg version; its future-major-version warning is unchanged.
