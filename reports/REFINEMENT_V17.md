@@ -61,4 +61,11 @@ Leave additive schema in place when reverting presentation. Once Abyss rounds ex
 
 ## Publication
 
-Pending final GitHub push and Vercel verification in this iteration.
+Published and verified: **https://new-game-test-topaz.vercel.app/**.
+
+- Source commit `e8d57509d0b514b018eb89811753e794d205a934`, pushed to the owner’s GitHub main branch.
+- Vercel deployment `dpl_8RGg98soRLoAnyG8Ws4cr5UH9RaW`, READY. Immutable build: https://new-game-test-68a478grv-tonyk006789-7532.vercel.app/.
+- Command: `node .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config .local/vercel-cli --scope tonyk006789-7532 --no-color`.
+- Public database health returned `ok`, catalog returned twelve games including Abyss Legends, and production approval remained false.
+- Existing Player 1 session restored at 1,431.30 credits. Opened its new Abyss table, verified four cannon positions, distinct scenery/creatures, music control and quarter-credit stakes. No hosted shots/spins were performed; the displayed balance remained 1,431.30. Fresh hosted warning/error log was empty.
+- Public screenshot: ignored `reports/screenshots-v17/abyss-live.png`. The published game tab remains available to the owner. Operator and Netlify were not redeployed.
