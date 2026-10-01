@@ -1,3 +1,4 @@
+import {hierarchyFixture} from './hierarchy-fixture.mjs';
 import { test,after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile,readdir } from 'node:fs/promises';
@@ -20,10 +21,11 @@ const app=await createApi();await app.listen(0,'127.0.0.1');const base=await app
 async function call(path,body,auth,extra={}){const response=await fetch(`${base}/v1/${path}`,{method:body===undefined?'GET':'POST',headers:{Origin:'http://127.0.0.1:5184','Content-Type':'application/json',...(auth?{Cookie:auth.cookie,'X-CSRF-Token':auth.csrf}:{}),...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,data:await response.json(),cookie:response.headers.get('set-cookie')?.split(';')[0]};}
 async function signin(username,password=adminPassword,code){const response=await call('auth/login',{username,password,...(code?{code}:{})});assert.equal(response.status,201,JSON.stringify(response.data));return {cookie:response.cookie,csrf:response.data.csrf};}
 const admin=await signin('test.admin',adminPassword,totp(secret));
+const fixture=hierarchyFixture({db:control,call,signin,rootId:adminId,rootAuth:admin});
 let player,playerAuth,peerAuth;
-async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},admin);assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
-async function wallet(id){const r=await call('admin/accounts',undefined,admin);return r.data.find(a=>a.id===id).wallet;}
-async function adjust(id,direction,amount,key=randomUUID(),expectedVersion){const w=await wallet(id);return call('admin/credit-adjustments',{targetId:id,direction,amount,reason:'Explicit manual test adjustment',requestKey:key,expectedVersion:expectedVersion??w.version},admin);}
+async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},await fixture.auth(parentId));assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
+async function wallet(id){return fixture.wallet(id);}
+async function adjust(id,direction,amount){assert.equal(direction,'ADD');return fixture.fund(id,amount);}
 const {stagingMultiplier,stagingGameProfileId,reefFlight,reefTarget,reefLeadAngle,reefTierProfile}=await import('../../packages/game-math/src/index.ts');
 const sleep=()=>new Promise(resolve=>setTimeout(resolve,275));
 const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1',...(extra.roomId?{trajectoryVersion:'reef-ballistics-v5'}:{}),...extra});

@@ -32,8 +32,8 @@
     "negativePlayerBalances": false,
     "removeReservedCredits": false,
     "lowerTierTransfers": "APPROVED_BRANCH_EXISTING_CREDITS",
-    "transferImplementation": "ENABLED_SELF_TO_LOWER_BRANCH_ROLES",
-    "transferApprovalRef": "Owner reply in workspace task, 2026-09-17"
+    "transferImplementation": "ENABLED_SELF_TO_DIRECT_CHILD",
+    "transferApprovalRef": "Owner correction in workspace task, 2026-10-01"
   },
   "hierarchy": {
     "proposedRoles": [

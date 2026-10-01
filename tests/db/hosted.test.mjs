@@ -19,19 +19,24 @@ const {hostedHandler}=await import('../../dist/server/apps/api/src/hosted-handle
 const {login}=await import('../../dist/server/apps/api/src/auth.js');
 const {passwordHash,newTotpSecret,totp}=await import('../../dist/server/apps/api/src/security.js');
 const {createAccount}=await import('../../dist/server/apps/api/src/accounts.js');
-const {adjust}=await import('../../dist/server/apps/api/src/ledger.js');
+const {adjust,transfer}=await import('../../dist/server/apps/api/src/ledger.js');
 const root=randomUUID(),branch=randomUUID(),password='DisposableLocalFixture-123!',secret=newTotpSecret();
 await control.query('INSERT INTO hosted_test_environment(site_id) VALUES($1)',[site]);
 await control.query('INSERT INTO branches(id,name) VALUES($1,$2)',[branch,'Hosted adapter test']);await control.query('INSERT INTO branch_ancestors VALUES($1,$1,0)',[branch]);
 await control.query("INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash,totp_secret) VALUES($1,$2,'MAIN_ADMIN','Fixture Admin',true,'fixture.admin',$3,$4)",[root,branch,await passwordHash(password),secret]);await control.query('INSERT INTO wallets(id,account_id) VALUES($1,$2)',[randomUUID(),root]);
 const admin={headers:{origin},ip:'fixture'};
 const auth=await login(admin,{setHeader(name,value){if(name==='Set-Cookie')admin.headers.cookie=(Array.isArray(value)?value:[value]).map(cookie=>cookie.split(';')[0]).join('; ');}},{username:'fixture.admin',password,code:totp(secret)});admin.headers['x-csrf-token']=auth.csrf;
-const distributor=await createAccount(admin,{parentId:root,username:'fixture.circle',displayName:'Circle',password});
-const agent=await createAccount(admin,{parentId:distributor.id,username:'fixture.agent',displayName:'Agent',password});
+async function fixtureSession(username){const req={headers:{origin},ip:'fixture'};const account=await login(req,{setHeader(name,value){if(name==='Set-Cookie')req.headers.cookie=(Array.isArray(value)?value:[value]).map(c=>c.split(';')[0]).join('; ');}},{username,password});req.headers['x-csrf-token']=account.csrf;return req;}
+const distributor=await createAccount(admin,{parentId:root,username:'fixture.circle',displayName:'Circle',password}),subSession=await fixtureSession('fixture.circle');
+const agent=await createAccount(subSession,{parentId:distributor.id,username:'fixture.agent',displayName:'Agent',password}),agentSession=await fixtureSession('fixture.agent');
+async function fixtureWallet(id){return (await control.query('SELECT version FROM wallets WHERE account_id=$1',[id])).rows[0];}
+await adjust(admin,{targetId:distributor.id,direction:'ADD',amount:'600000',expectedVersion:'0',requestKey:randomUUID(),reason:'Explicit isolated hosted-adapter fixture'});
+await transfer(subSession,{targetId:agent.id,amount:'600000',expectedVersion:'1',targetVersion:'0',requestKey:randomUUID(),reason:'Fixture distribution to direct agent'});
 for(const username of ['tester.one','tester.two','tester.three','tester.four','tester.five','outside.player']){
- const account=await createAccount(admin,{parentId:agent.id,username,displayName:username,password});
- await adjust(admin,{targetId:account.id,direction:'ADD',amount:'100000',expectedVersion:'0',requestKey:randomUUID(),reason:'Explicit isolated hosted-adapter acceptance fixture'});
+ const account=await createAccount(agentSession,{parentId:agent.id,username,displayName:username,password});
+ await transfer(agentSession,{targetId:account.id,amount:'100000',expectedVersion:(await fixtureWallet(agent.id)).version,targetVersion:'0',requestKey:randomUUID(),reason:'Fixture distribution to assigned player'});
 }
+
 async function call(path,body,auth,extra={}){
  const response=await hostedHandler(new Request(origin+path,{method:body===undefined?'GET':'POST',headers:{Origin:origin,'Content-Type':'application/json',...(auth?{Cookie:auth.cookie,'X-CSRF-Token':auth.csrf}:{}),...extra},...(body===undefined?{}:{body:JSON.stringify(body)})}),{ip:'127.0.0.1'});
  return {status:response.status,data:await response.json(),cookie:response.headers.get('set-cookie'),cache:response.headers.get('cache-control')};
@@ -64,7 +69,7 @@ test('Netlify player transport uses authoritative accounting and four real seats
   assert.equal((await call('/v1/auth/login',{username:'tester.one',password:'x'.repeat(17000)})).status,413);
  });
  await t.test('slot retries settle one round; recovery cannot create a new charge',async()=>{
-  const body={requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2'};
+  const body={requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1'};
   const results=await Promise.all(Array.from({length:6},()=>call('/v1/staging/neon-sevens/rounds',body,sessions[0])));
   for(const result of results){assert.equal(result.status,201,JSON.stringify(result.data));assert.deepEqual(result.data,results[0].data);}
   const player=(await call('/v1/me',undefined,sessions[0])).data;

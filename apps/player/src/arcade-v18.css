@@ -1,0 +1,20 @@
+.reef-preview.reef-deluxe.abyss-legends{background-image:url('/art/abyss-caldera-v18.png')!important;border-color:#c589e9;box-shadow:inset 0 0 30px #160827,0 0 24px #892c7340}
+.arcade-poster.abyss-legends,.fishing-lobby.abyss-legends .table-water{background-image:linear-gradient(#1c073522,#0b052933),url('/art/abyss-caldera-v18.png')}
+.fishing-lobby.abyss-legends{background:radial-gradient(ellipse at 50% 20%,#482150,#0f091a 75%)}
+.abyss-legends .fish-table-card{border-color:#d59aef}.abyss-legends .table-emblem{color:#fce0ff;text-shadow:0 2px 3px #000,0 0 12px #f67ed8}.abyss-legends .table-cannon{width:17%;height:31%}
+.abyss-legends .reef-seat-plaque{background:linear-gradient(110deg,#170c25ee,#3d1641e0);border-color:#c283cd}.abyss-legends .reef-seat-plaque.yours{border-color:#ffe19b;box-shadow:0 0 14px #e5916755}.abyss-legends .reef-console{background:linear-gradient(#2d173e,#100b1c);border-color:#aa71c9}
+.abyss-jackpot{position:absolute;z-index:4;top:1%;left:50%;transform:translateX(-50%);width:clamp(110px,15.2vw,196px);text-align:center;pointer-events:none;filter:drop-shadow(0 4px 8px #060010);color:#ffe4a1}
+.abyss-jackpot h3{position:relative;z-index:2;margin:0 8px -5px;padding:4px 8px;border:1px solid #d998ff;border-radius:7px;background:linear-gradient(#653b80,#261137);font:800 clamp(8px,1.1vw,14px) Georgia;letter-spacing:.1em;box-shadow:0 1px 8px #07020c}.abyss-jackpot h3 b{color:#ffedb9}
+.abyss-wheel-rim{position:relative;aspect-ratio:1;border-radius:50%;padding:8px;border:3px ridge #ffe5a1;background:repeating-conic-gradient(#fff2b0 0deg 3deg,#723c77 3deg 15deg);box-shadow:0 0 15px #c05ff566,inset 0 0 10px #000}
+.abyss-wheel-disc{position:absolute;inset:8px;border:2px solid #ffdd89;border-radius:50%;background:repeating-conic-gradient(from -22.5deg,#922cc5 0deg 44deg,#ffe196 44deg 45deg,#193b70 45deg 89deg,#ffe196 89deg 90deg);box-shadow:inset 0 0 17px #000a}
+.abyss-wheel-disc i{position:absolute;inset:4px;text-align:center;font-style:normal}.abyss-wheel-disc i span{display:inline-block;color:#ffe894;font-size:clamp(10px,1.8vw,21px);text-shadow:0 0 5px #ffefff}
+.abyss-wheel-pointer{position:absolute;z-index:3;left:50%;top:-13px;transform:translateX(-50%);color:#ffaf4b;font-size:26px;text-shadow:0 0 3px #fff}
+.abyss-wheel-hub{position:absolute;inset:28%;z-index:2;border:2px ridge #ffecb8;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(#512b64,#130925);box-shadow:0 0 9px #090010}
+.abyss-wheel-hub small,.abyss-wheel-hub span{font:800 clamp(5px,.57vw,8px) Arial;white-space:nowrap}.abyss-wheel-hub strong{font:900 clamp(15px,2.15vw,29px) Georgia;color:#fff2ac}.wheel-awarded .abyss-wheel-hub strong{font-size:clamp(12px,1.6vw,22px)}
+.abyss-jackpot p{display:inline-block;margin:-3px 0 0;padding:3px 7px;border:1px solid #95608c;border-radius:5px;background:#1c0d29e8;font:700 clamp(6px,.66vw,9px) Arial;letter-spacing:.025em}
+.wheel-spinning{animation:abyss-wheel-turn .75s cubic-bezier(.12,.65,.13,1)}.wheel-awarded .abyss-wheel-hub{animation:abyss-award-reveal .82s ease-out}
+@keyframes abyss-wheel-turn{from{transform:rotate(-1080deg);filter:brightness(1.9)}to{transform:rotate(0);filter:brightness(1)}}
+@keyframes abyss-award-reveal{0%,65%{opacity:.25;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+.wheel-still *{animation:none!important}
+@media(max-width:650px) and (orientation:portrait){.abyss-jackpot{width:105px;top:2%}.abyss-wheel-hub strong{font-size:17px}.wheel-awarded .abyss-wheel-hub strong{font-size:13px}.abyss-jackpot h3{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.abyss-jackpot *{animation:none!important}}

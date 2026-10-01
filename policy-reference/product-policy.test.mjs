@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {MAX_UNITS,newPlayerWallet,availableUnits,planManualAdjustment,assertApprovedSlotDecision} from './product-policy.mjs';
 const decisions=JSON.parse(readFileSync(new URL('../config/product-decisions.json',import.meta.url),'utf8'));
-const request=()=>({principal:{id:'admin-1',role:'MAIN_ADMIN',active:true,stepUpVerified:true},wallet:{id:'player-1',settledUnits:10000n,reservedUnits:2000n,version:7},direction:'ADD',amountUnits:2500n,reason:'Owner-approved manual adjustment',idempotencyKey:'request-0001',expectedWalletVersion:7});
+const request=()=>({principal:{id:'admin-1',role:'MAIN_ADMIN',active:true,stepUpVerified:true},wallet:{id:'sub-contractor-1',settledUnits:10000n,reservedUnits:2000n,version:7},direction:'ADD',amountUnits:2500n,reason:'Owner-approved manual adjustment',idempotencyKey:'request-0001',expectedWalletVersion:7});
 function throwsCode(fn,code){assert.throws(fn,e=>e.code===code);}
 test('new player is zero with no automatic reserve',()=>assert.deepEqual(newPlayerWallet('p'),{id:'p',settledUnits:0n,reservedUnits:0n,version:0}));
 test('all grant/refill flags disabled in v2 decisions',()=>{for(const k of ['automaticGrants','scheduledGrants','welcomeGrants','dailyRewards','automaticRefills','promotionalGrants'])assert.equal(decisions.credits[k],false);assert.equal(decisions.credits.initialPlayerBalanceUnits,'0');});
 test('ordinary game settlement remains permitted, distinct from grants',()=>assert.equal(decisions.credits.gameSettlementCredits,true));
 test('Android and iOS both required',()=>{assert.equal(decisions.platforms.android,true);assert.equal(decisions.platforms.ios,true);});
-test('owner-approved branch transfers have an explicit implemented permission matrix',()=>{assert.equal(decisions.credits.lowerTierTransfers,'APPROVED_BRANCH_EXISTING_CREDITS');assert.equal(decisions.credits.transferImplementation,'ENABLED_SELF_TO_LOWER_BRANCH_ROLES');});
+test('owner-approved branch transfers have an explicit implemented permission matrix',()=>{assert.equal(decisions.credits.lowerTierTransfers,'APPROVED_BRANCH_EXISTING_CREDITS');assert.equal(decisions.credits.transferImplementation,'ENABLED_SELF_TO_DIRECT_CHILD');});
 test('admin ADD proposes balanced exact postings and expected new amount',()=>{const p=planManualAdjustment(request());assert.equal(p.afterUnits,'12500');assert.equal(p.availableAfterUnits,'10500');assert.equal(p.entries.reduce((s,e)=>s+BigInt(e.changeUnits),0n),0n);assert.equal(p.status,'PROPOSED_NOT_COMMITTED');});
 test('admin REMOVE uses available credits without taking a reserve',()=>{const p=planManualAdjustment({...request(),direction:'REMOVE',amountUnits:3000n});assert.equal(p.afterUnits,'7000');assert.equal(p.availableAfterUnits,'5000');assert.equal(p.reservedUnits,'2000');});
 test('remove beyond available is rejected even below settled total',()=>throwsCode(()=>planManualAdjustment({...request(),direction:'REMOVE',amountUnits:9000n}),'INSUFFICIENT_AVAILABLE'));

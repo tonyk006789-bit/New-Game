@@ -1,7 +1,21 @@
 {
-  "generatedAt": "2026-10-01T03:11:49.426Z",
+  "generatedAt": "2026-10-01T04:36:52.460Z",
   "privateReferencesShipped": false,
   "assets": [
+    {
+      "path": "apps/player/public/art/abyss-caldera-v18.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v18.json",
+      "license": "Project original; owner review pending",
+      "sha256": "04e79b5b687513f45c1a5b73c7ee430cd23201a94811f771f782f77c5dac3401"
+    },
+    {
+      "path": "apps/player/public/art/abyss-cannons-v18.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v18.json",
+      "license": "Project original; owner review pending",
+      "sha256": "64e4f590b59a54450cf4ea4a27e24c8e1d387954fa9b66b46d6b115c42191bbe"
+    },
     {
       "path": "apps/player/public/art/abyss-creatures-v17.png",
       "creator": "Original artwork authored for New Game in this workspace",
@@ -196,7 +210,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "976c4e7810667e6db42986f143993ab2633381a4610fcfab308adb0594bea272"
+      "sha256": "5c54f8243e873d3325f6f399b66bb4c0ff946437ba5cbe7eba74d813146dee0c"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -224,7 +238,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "22679b0f73d873c3349615e68d08f0efdafaae7cb7e0965c5b1faea6a14b5140"
+      "sha256": "9c0ebbb2b1c4ca6fff5139b2d302ea663e1ef0de4e32062da6ca6ffb99c27133"
     },
     {
       "path": "apps/player/src/arcade-v8.css",
@@ -274,6 +288,27 @@
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
       "sha256": "980acdd6134f933d345898bb4146ee799c70c6b532bc778890b6716d65f3cb4a"
+    },
+    {
+      "path": "apps/player/src/arcade-v18.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "ffeea9d4e9b141ca597dac2ddcb51e5afad716898ce103f7342818faead92842"
+    },
+    {
+      "path": "apps/player/src/AbyssJackpotWheel.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "712b5711a17c3dcd747f05652682bbfa25f6fd228a8257d73d77e850caaeffaa"
+    },
+    {
+      "path": "apps/player/src/abyss-cannons.ts",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "4ad4a4ba977c55eedadaa475e78263acf693fb899cd1c840fa67d2f8acd3ec71"
     }
   ]
 }

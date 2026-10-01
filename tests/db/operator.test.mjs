@@ -1,3 +1,4 @@
+import {hierarchyFixture} from './hierarchy-fixture.mjs';
 import { test,after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile,readdir } from 'node:fs/promises';
@@ -18,9 +19,10 @@ const app=await createApi();await app.listen(0,'127.0.0.1');const base=await app
 async function call(path,body,auth,extra={}){const response=await fetch(`${base}/v1/${path}`,{method:body===undefined?'GET':'POST',headers:{Origin:'http://127.0.0.1:5184','Content-Type':'application/json',...(auth?{Cookie:auth.cookie,'X-CSRF-Token':auth.csrf}:{}),...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,data:await response.json(),cookie:response.headers.get('set-cookie')?.split(';')[0]};}
 async function signin(username,password=adminPassword,code){const response=await call('auth/login',{username,password,...(code?{code}:{})});assert.equal(response.status,201,JSON.stringify(response.data));return {cookie:response.cookie,csrf:response.data.csrf};}
 const admin=await signin('test.admin',adminPassword,totp(secret));
-async function create(parentId,username,auth=admin){const r=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword,requestKey:randomUUID()},auth);assert.equal(r.status,201,JSON.stringify(r.data));return r.data.id;}
+const fixture=hierarchyFixture({db:control,call,signin,rootId:adminId,rootAuth:admin});
+async function create(parentId,username,auth){auth??=await fixture.auth(parentId);const r=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword,requestKey:randomUUID()},auth);assert.equal(r.status,201,JSON.stringify(r.data));return r.data.id;}
 async function wallet(id){return (await control.query('SELECT settled_units settled,reserved_units reserved,version,(settled_units-reserved_units)::text available FROM wallets WHERE account_id=$1',[id])).rows[0];}
-async function adjust(id,amount){return call('admin/credit-adjustments',{targetId:id,direction:'ADD',amount,reason:'Explicit operator test funding',requestKey:randomUUID(),expectedVersion:(await wallet(id)).version},admin);}
+async function adjust(id,amount){return fixture.fund(id,amount);}
 async function move(path,actorAuth,actorId,playerId,amount,extra={}){return call(path,{targetId:playerId,amount,reason:'Approved operator workflow test',requestKey:randomUUID(),expectedVersion:(await wallet(actorId)).version,targetVersion:(await wallet(playerId)).version,...extra},actorAuth);}
 let north,agent,player,peer,southAgent,southPlayer,operator,playerAuth,subAuth,redeemReceipt;
 const ok=r=>assert.equal(r.status,201,JSON.stringify(r.data));
@@ -40,6 +42,27 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await call('admin/accounts',body,playerAuth)).status,403);
   assert.equal((await call('admin/accounts',body,subAuth)).status,403);
   assert.equal((await call('admin/accounts',body,operator,{'X-CSRF-Token':'invalid'})).status,403);
+ });
+ await t.test('main admin and sub-contractors cannot host or operate individual clients',async()=>{
+  const before=(await control.query('SELECT account_id,settled_units,version FROM wallets WHERE account_id IS NOT NULL ORDER BY account_id')).rows;
+  for(const [auth,actorId,targets] of [[admin,adminId,[agent,player]],[subAuth,north,[player]]]){
+   for(const targetId of targets){
+    assert.equal((await call('admin/accounts',{parentId:targetId,username:'skip.level',displayName:'Denied',password:adminPassword,requestKey:randomUUID()},auth)).status,403);
+    for(const direction of ['ADD','REMOVE'])assert.equal((await call('admin/credit-adjustments',{targetId,direction,amount:'1',reason:'Reject skipped-level adjustment',requestKey:randomUUID(),expectedVersion:(await wallet(targetId)).version},auth)).status,403);
+    assert.equal((await move('credit-transfers',auth,actorId,targetId,'1')).status,403);
+    for(const data of [{action:'EDIT_PROFILE',displayName:'Denied'},{action:'RESET_PASSWORD',password:'DeniedPassword-12345'},{action:'SET_ACTIVE',active:false},{action:'SET_ARCHIVED',archived:true}])
+     assert.equal((await call(`admin/accounts/${targetId}/manage`,{...data,reason:'Reject skipped-level management',requestKey:randomUUID()},auth)).status,403);
+    assert.equal((await call('history?accountId='+targetId,undefined,auth)).status,404);
+    assert.equal((await call('operator/records?accountId='+targetId,undefined,auth)).status,404);
+   }
+   assert.equal((await call('operator/accounts?role=PLAYER',undefined,auth)).data.total,'0');
+   assert.equal((await call('operator/rounds',undefined,auth)).status,403);
+  }
+  assert.deepEqual((await control.query('SELECT account_id,settled_units,version FROM wallets WHERE account_id IS NOT NULL ORDER BY account_id')).rows,before);
+  for(const [auth,role,canAdjust] of [[admin,'SUB_DISTRIBUTOR',true],[subAuth,'AGENT',false],[operator,'PLAYER',false]]){
+   const list=(await call('operator/accounts',undefined,auth)).data;
+   assert.ok(list.items.length>0);assert.ok(list.items.every(row=>row.role===role&&row.canManage&&row.canTransfer&&row.canRedeem&&row.canAdjust===canAdjust));
+  }
  });
  await t.test('server-side search, pagination, ordering and counts are branch scoped',async()=>{
   const first=await call('operator/accounts?pageSize=1&sort=username&order=asc',undefined,operator);assert.equal(first.status,200,JSON.stringify(first.data));assert.equal(first.data.total,'2');assert.equal(first.data.items.length,1);assert.equal(typeof first.data.items[0].wallet.version,'string');
@@ -93,10 +116,11 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await call('operator/records?from=2026-10-01&to=2026-09-01',undefined,operator)).status,400);
   assert.equal((await call('operator/records?from=2001-01-01&to=2001-01-02',undefined,operator)).data.total,'0');
   const dashboard=(await call('operator/dashboard',undefined,operator)).data;assert.equal(dashboard.recharge_total,'4000');assert.equal(dashboard.redeem_total,'2750');
-  const recharge=(await call('operator/records?kind=RECHARGE',undefined,operator)).data;assert.equal(recharge.total,'1');
-  ok(await move('credit-transfers',admin,adminId,agent,'1').then(async r=>{if(r.status===409){ok(await adjust(adminId,'100'));return move('credit-transfers',admin,adminId,agent,'1');}return r;}));
+  const recharge=(await call('operator/records?kind=RECHARGE',undefined,operator)).data;assert.equal(recharge.total,'2');
+  ok(await adjust(agent,'1'));
   const incoming=(await control.query("SELECT id FROM ledger_transactions WHERE target_id=$1 AND kind='TRANSFER'",[agent])).rows[0].id;
   const scopedReceipt=(await call('operator/receipts/'+incoming,undefined,operator)).data;assert.equal(scopedReceipt.postings.length,1);assert.equal(scopedReceipt.postings[0].username,'operator.agent');
+  for(const auth of [admin,subAuth])assert.equal((await call('operator/receipts/'+redeemReceipt,undefined,auth)).status,404);
  });
  await t.test('five-minute staff verification uses passwords without requiring an authenticator',async()=>{
   await control.query("UPDATE sessions SET verified_at=now()-interval '6 minutes' WHERE account_id=$1",[agent]);
@@ -107,7 +131,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  });
  await t.test('game settlement and redemption races reconcile without canceling awards',async()=>{
   const before=await wallet(player),amount=before.available;
-  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
+  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
   assert.ok(result.every(r=>[201,409].includes(r.status)),JSON.stringify(result));assert.ok(result.some(r=>r.status===201));
   const after=await wallet(player);assert.ok(BigInt(after.settled)>=0n);
   assert.equal((await control.query('SELECT coalesce(sum(p.units),0)::text n FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id WHERE w.account_id=$1',[player])).rows[0].n,after.settled);
@@ -116,15 +140,16 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  await t.test('reference game and total reports aggregate committed rounds once and preserve branch scope',async()=>{
   await new Promise(resolve=>setTimeout(resolve,1100));
   ok(await adjust(player,'1000'));
-  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-paying30-v2'},playerAuth));
+  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1'},playerAuth));
   const expected=(await control.query('SELECT count(*)::text total,sum(stake_units)::text played,sum(award_units)::text won FROM staging_rounds WHERE account_id=$1',[player])).rows[0];
   const rounds=await call('operator/rounds',undefined,operator);assert.equal(rounds.status,200,JSON.stringify(rounds.data));assert.equal(rounds.data.total,expected.total);assert.equal(rounds.data.played,expected.played);assert.equal(rounds.data.won,expected.won);
   for(const row of rounds.data.items){assert.equal(BigInt(row.before_units)-BigInt(row.stake_units)+BigInt(row.award_units),BigInt(row.after_units));assert.equal(row.manager,'operator.agent');}
-  const totals=await call('operator/totals',undefined,operator);assert.equal(totals.status,200,JSON.stringify(totals.data));assert.equal(totals.data.total,'1');assert.equal(totals.data.played,expected.played);assert.equal(totals.data.recharged,'4000');assert.ok(totals.data.items.every(row=>row.id===agent));
+  const totals=await call('operator/totals',undefined,operator);assert.equal(totals.status,200,JSON.stringify(totals.data));assert.equal(totals.data.total,'1');assert.equal(totals.data.played,expected.played);assert.equal(totals.data.recharged,'5000');assert.ok(totals.data.items.every(row=>row.id===agent));
+  for(const [auth,role] of [[admin,'SUB_DISTRIBUTOR'],[subAuth,'AGENT']]){const rollup=await call('operator/totals',undefined,auth);assert.equal(rollup.status,200,JSON.stringify(rollup.data));assert.ok(rollup.data.items.every(row=>row.role===role));assert.equal(rollup.data.played,expected.played);}
   assert.equal((await call('operator/rounds?search=operator.south',undefined,operator)).data.total,'0');assert.equal((await call('operator/totals?search=operator.south',undefined,operator)).data.total,'0');
   assert.equal((await call('operator/rounds?from=2026-99-99',undefined,operator)).status,400);assert.equal((await call('operator/totals',undefined,playerAuth)).status,403);
   const member=(await call('operator/accounts?search=operator.player',undefined,operator)).data.items[0];assert.match(member.publicId,/^\d+$/);assert.equal(member.registeredIp,'127.0.0.1');assert.equal(member.lastIp,'127.0.0.1');assert.ok(BigInt(member.loginCount)>0n);assert.match(member.manager,/operator.agent/);
-  const own=(await call('operator/accounts?role=ALL&search='+agent,undefined,operator)).data.items[0];assert.equal(own.manager,null);
+  assert.equal((await call('operator/accounts?role=ALL&search='+agent,undefined,operator)).data.total,'0');
   assert.equal((await call('operator/accounts?search='+member.publicId,undefined,operator)).data.items[0].id,player);
  });
  await t.test('agent edits/reset/suspension are scoped and preserve the ledger',async()=>{
@@ -167,7 +192,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   ok(await call(`admin/accounts/${sub}/manage`,status,admin));
   for(const session of [childSession,leafSession])assert.equal((await call('me',undefined,session)).status,401);
   assert.equal((await call('auth/login',{username:'hierarchy.player',password:adminPassword})).status,401);
-  assert.equal((await call('operator/accounts?search='+child+'&role=ALL',undefined,admin)).data.items[0].branchEnabled,false);
+  assert.equal((await call('operator/accounts?search='+child+'&role=ALL',undefined,admin)).data.total,'0');
   ok(await call(`admin/accounts/${sub}/manage`,{...status,active:true,requestKey:randomUUID()},admin));
   childSession=await signin('hierarchy.agent');leafSession=await signin('hierarchy.player');
   // An individually suspended child must remain suspended after the parent is restored.
@@ -178,7 +203,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await call('me',undefined,childSession)).status,401);
   assert.equal((await call('auth/login',{username:'hierarchy.agent',password:adminPassword})).status,401);
   assert.equal((await call('operator/accounts?role=SUB_DISTRIBUTOR&status=ARCHIVED',undefined,admin)).data.items.some(r=>r.id===sub),true);
-  assert.equal((await call('admin/accounts',{parentId:sub,username:'blocked.child',displayName:'Blocked',password:adminPassword},admin)).status,409);
+  assert.equal((await call('admin/accounts',{parentId:sub,username:'blocked.child',displayName:'Blocked',password:adminPassword},admin)).status,403);
   ok(await call(`admin/accounts/${sub}/manage`,{...archive,archived:false,requestKey:randomUUID()},admin));
   await signin('hierarchy.agent');assert.equal((await call('auth/login',{username:'hierarchy.player',password:adminPassword})).status,401);
   assert.deepEqual(await wallet(child),before);assert.equal((await control.query('SELECT count(*)::text n FROM ledger_transactions')).rows[0].n,ledger);

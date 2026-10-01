@@ -48,6 +48,12 @@ export function directChild(actor:Actor,target:Actor|{role:string;branch_id:stri
  const next={MAIN_ADMIN:'SUB_DISTRIBUTOR',SUB_DISTRIBUTOR:'AGENT',AGENT:'PLAYER',PLAYER:null};
  return target.role===next[actor.role]&&(target.role==='PLAYER'?target.branch_id===actor.branch_id:target.parent_id===actor.branch_id);
 }
+/** Server-owned role and relationship predicates; aliases/parameters are internal constants. */
+export function directChildrenSql(role:Actor['role'],alias='a',branch='$1') {
+ const next={MAIN_ADMIN:'SUB_DISTRIBUTOR',SUB_DISTRIBUTOR:'AGENT',AGENT:'PLAYER',PLAYER:null}[role];
+ if(!next)return 'false';
+ return `(${alias}.role='${next}' AND ${next==='PLAYER'?`${alias}.branch_id=${branch}`:`EXISTS(SELECT 1 FROM branches direct_branch WHERE direct_branch.id=${alias}.branch_id AND direct_branch.parent_id=${branch})`})`;
+}
 export async function branchEnabled(db:PoolClient,branchId:string) {
  return !(await db.query(`SELECT 1 FROM accounts a JOIN branch_ancestors c ON c.ancestor_id=a.branch_id
  WHERE c.branch_id=$1 AND a.role<>'PLAYER' AND (NOT a.active OR a.archived_at IS NOT NULL) LIMIT 1`,[branchId])).rowCount;

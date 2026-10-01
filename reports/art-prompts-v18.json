@@ -1,0 +1,16 @@
+{
+  "tool": "Built-in ImageGen",
+  "assets": [
+    {
+      "path": "apps/player/public/art/abyss-caldera-v18.png",
+      "prompt": "Use case: stylized-concept. Asset type: original 2D fishing arcade arena background, wide 2:1 landscape. An abyssal volcanic caldera seen straight down through dark deep-ocean water. Center 75 percent is uncluttered dark purple basalt sand with faint violet caustics and luminous cracks, no plants. Around only the outer edges: sharp black obsidian rock shelves, dim orange hydrothermal vents, huge amethyst crystal deposits, a few luminous magenta anemones. Deep violet, midnight indigo and amber palette. Distinct premium casino arcade painting, sculpted texture, vivid but readable; dark center to contrast colorful moving creatures. No reef coral, no stone ruins, no shipwreck, no sea animals, no cannons, no lettering, no interface. Four player cannon sprites will be overlaid separately. Fill the entire canvas; no vignette covering the center.",
+      "transparent_background": false
+    },
+    {
+      "path": "apps/player/public/art/abyss-cannons-v18.png",
+      "prompt": "Use case: stylized-concept. Asset type: original transparent-background arcade cannon sprite atlas, 2 columns by 2 rows, four isolated mechanical cannons. Each cannon is viewed from above, axis pointing straight UP, aligned vertical, consistent scale, contained entirely within an equal square cell with generous transparent padding. Compact circular pivot base at lower center and a clearly projecting upward barrel. Top-left: black titanium twin-barrel abyss harpoon cannon with bright cyan energy core and fins. Top-right: obsidian crab-claw turret with orange crystal chamber and heavy orange plasma barrel. Bottom-left: violet nautilus-shell cannon with silver ribs, glowing magenta barrel and ornate curved armor. Bottom-right: angular cobalt dragonhead rail cannon with emerald power cell and green prongs. Detailed glossy 3D-style arcade illustration, clean strong silhouettes and metal highlights, polished premium casino cabinet weapon graphics. These are four different designs, not recolors. No characters, no bullets, no extra objects, no text, no logo, no background, true transparent alpha. Exactly four individual assets separated by ample transparent space.",
+      "transparent_background": true
+    }
+  ],
+  "source": "Original generated art, inspected before use; no third-party game assets copied."
+}

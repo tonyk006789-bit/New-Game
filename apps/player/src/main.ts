@@ -17,3 +17,5 @@ if(location.protocol==='http:'&&!['127.0.0.1','localhost'].includes(location.hos
 else createApp(App).mount('#app');
 
 import './arcade-v17.css';
+
+import './arcade-v18.css';

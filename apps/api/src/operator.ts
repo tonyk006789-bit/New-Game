@@ -1,11 +1,11 @@
 import {z} from 'zod';
 import {actorFor,parse,type Request} from './auth.js';
-import {transaction,directChild,fail,inScope,walletView,type Wallet} from './store.js';
+import {transaction,directChild,directChildrenSql,fail,inScope,walletView,type Wallet} from './store.js';
 
 export const paging={page:z.coerce.number().int().min(1).max(100000).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(20)};
 const search=z.string().trim().max(100).default('');
 export const date=z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v=>{const d=new Date(v);return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===v;},'Use a valid date.').optional();
-const accountQuery=z.object({...paging,search,role:z.enum(['ALL','PLAYER','AGENT','SUB_DISTRIBUTOR','MAIN_ADMIN']).default('PLAYER'),status:z.enum(['ALL','ACTIVE','SUSPENDED','ARCHIVED']).default('ALL'),sort:z.enum(['created','username','balance']).default('created'),order:z.enum(['asc','desc']).default('desc')}).strict();
+const accountQuery=z.object({...paging,search,role:z.enum(['ALL','PLAYER','AGENT','SUB_DISTRIBUTOR','MAIN_ADMIN']).default('ALL'),status:z.enum(['ALL','ACTIVE','SUSPENDED','ARCHIVED']).default('ALL'),sort:z.enum(['created','username','balance']).default('created'),order:z.enum(['asc','desc']).default('desc')}).strict();
 const recordQuery=z.object({...paging,search,kind:z.enum(['ALL','RECHARGE','REDEEM','REWARDS','GAMES','ADJUSTMENTS']).default('ALL'),from:date,to:date,accountId:z.uuid().optional()}).strict().refine(d=>!d.from||!d.to||d.from<=d.to,{message:'Start date must be before the end date.'});
 const scope=`JOIN branch_ancestors scope ON scope.branch_id=a.branch_id AND scope.ancestor_id=$1`;
 
@@ -14,7 +14,7 @@ export async function operatorAccounts(req:Request,query:unknown){
  return transaction(async db=>{
   const actor=await actorFor(db,req);if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
   const params=[actor.branch_id,q.search,q.role,q.status];
-  const filter=`${scope} WHERE ($2='' OR strpos(lower(a.username),lower($2))>0 OR strpos(lower(a.display_name),lower($2))>0 OR a.id::text=$2 OR a.public_id::text=$2) AND ($3='ALL' OR a.role::text=$3) AND ($4='ALL' OR ($4='ARCHIVED' AND a.archived_at IS NOT NULL) OR ($4='ACTIVE' AND a.active AND a.archived_at IS NULL) OR ($4='SUSPENDED' AND NOT a.active AND a.archived_at IS NULL))`;
+  const filter=`${scope} WHERE ${directChildrenSql(actor.role)} AND ($2='' OR strpos(lower(a.username),lower($2))>0 OR strpos(lower(a.display_name),lower($2))>0 OR a.id::text=$2 OR a.public_id::text=$2) AND ($3='ALL' OR a.role::text=$3) AND ($4='ALL' OR ($4='ARCHIVED' AND a.archived_at IS NOT NULL) OR ($4='ACTIVE' AND a.active AND a.archived_at IS NULL) OR ($4='SUSPENDED' AND NOT a.active AND a.archived_at IS NULL))`;
   const sort={created:'a.created_at',username:'a.username',balance:'(w.settled_units-w.reserved_units)'}[q.sort];
   // One statement gives the count and page the same database snapshot.
   const result=await db.query(`WITH matches AS (SELECT a.id,a.username,a.display_name,a.role,a.active,a.archived_at,a.branch_id,a.created_at,a.public_id::text,a.registered_ip,logins.login_count,logins.last_login,latest.last_ip,manager.manager,b.parent_id,b.name branch,NOT EXISTS(SELECT 1 FROM accounts staff JOIN branch_ancestors ac ON ac.ancestor_id=staff.branch_id WHERE ac.branch_id=a.branch_id AND staff.role<>'PLAYER' AND (NOT staff.active OR staff.archived_at IS NOT NULL)) branch_enabled,w.settled_units::text,w.reserved_units::text,w.version::text,${sort} sort_key
@@ -24,7 +24,7 @@ export async function operatorAccounts(req:Request,query:unknown){
  LEFT JOIN LATERAL (SELECT parent.username||' ('||parent.public_id::text||')' manager FROM accounts parent WHERE parent.branch_id=CASE WHEN a.role='PLAYER' THEN a.branch_id ELSE b.parent_id END AND parent.role<>'PLAYER' AND parent.id<>a.id AND EXISTS(SELECT 1 FROM branch_ancestors pc WHERE pc.branch_id=parent.branch_id AND pc.ancestor_id=$1) LIMIT 1) manager ON true ${filter}),
    page AS (SELECT * FROM matches ORDER BY sort_key ${q.order==='asc'?'ASC':'DESC'},id LIMIT $5 OFFSET $6)
    SELECT (SELECT count(*)::text FROM matches) total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY sort_key ${q.order==='asc'?'ASC':'DESC'},id) FROM page),'[]'::jsonb) items`,[...params,q.pageSize,(q.page-1)*q.pageSize]);
-  return {page:q.page,pageSize:q.pageSize,total:result.rows[0].total,items:result.rows[0].items.map((row:Wallet&{username:string;display_name:string;role:string;active:boolean;archived_at:string|null;parent_id:string|null;branch_enabled:boolean;branch:string;created_at:string;branch_id:string;public_id:string;registered_ip:string|null;login_count:string;last_login:string|null;last_ip:string|null;manager:string|null})=>({id:row.id,publicId:row.public_id,registeredIp:row.registered_ip,loginCount:row.login_count,lastLogin:row.last_login,lastIp:row.last_ip,manager:row.manager,username:row.username,displayName:row.display_name,role:row.role,active:row.active,archived:!!row.archived_at,branchEnabled:row.branch_enabled,branch:row.branch,createdAt:row.created_at,wallet:walletView(row),canManage:row.role!=='MAIN_ADMIN'&&(actor.role==='MAIN_ADMIN'||directChild(actor,row)),canRedeem:directChild(actor,row)}))};
+  return {page:q.page,pageSize:q.pageSize,total:result.rows[0].total,items:result.rows[0].items.map((row:Wallet&{username:string;display_name:string;role:string;active:boolean;archived_at:string|null;parent_id:string|null;branch_enabled:boolean;branch:string;created_at:string;branch_id:string;public_id:string;registered_ip:string|null;login_count:string;last_login:string|null;last_ip:string|null;manager:string|null})=>({id:row.id,publicId:row.public_id,registeredIp:row.registered_ip,loginCount:row.login_count,lastLogin:row.last_login,lastIp:row.last_ip,manager:row.manager,username:row.username,displayName:row.display_name,role:row.role,active:row.active,archived:!!row.archived_at,branchEnabled:row.branch_enabled,branch:row.branch,createdAt:row.created_at,wallet:walletView(row),canManage:directChild(actor,row),canRedeem:directChild(actor,row),canTransfer:directChild(actor,row)&&row.active&&!row.archived_at&&row.branch_enabled,canAdjust:actor.role==='MAIN_ADMIN'&&directChild(actor,row)}))};
  });
 }
 
@@ -59,11 +59,11 @@ export async function operatorRecords(req:Request,query:unknown){
  const q=parse(recordQuery,query);
  return transaction(async db=>{
   const actor=await actorFor(db,req);if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
-  if(q.accountId)await inScope(db,actor,q.accountId);
+  if(q.accountId){const target=await inScope(db,actor,q.accountId);if(target.id!==actor.id&&!directChild(actor,target))fail(404,'ACCOUNT_NOT_FOUND');}
   const kinds={ALL:[],RECHARGE:['TRANSFER'],REDEEM:['REDEEM'],REWARDS:['DAILY_WHEEL'],GAMES:['GAME_STAKE','GAME_PAYOUT'],ADJUSTMENTS:['MANUAL_ADD','MANUAL_REMOVE','REVERSAL']}[q.kind];
-  const filter=`WHERE ($2='' OR strpos(lower(a.username),lower($2))>0 OR a.id::text=$2 OR a.public_id::text=$2 OR t.id::text=$2) AND (cardinality($3::text[])=0 OR t.kind=ANY($3::text[])) AND ($4::date IS NULL OR t.created_at>=($4::date::timestamp AT TIME ZONE 'UTC')) AND ($5::date IS NULL OR t.created_at<(($5::date+1)::timestamp AT TIME ZONE 'UTC')) AND ($6::uuid IS NULL OR a.id=$6)`;
+  const filter=`WHERE (a.id=$9 OR ${directChildrenSql(actor.role)}) AND ($2='' OR strpos(lower(a.username),lower($2))>0 OR a.id::text=$2 OR a.public_id::text=$2 OR t.id::text=$2) AND (cardinality($3::text[])=0 OR t.kind=ANY($3::text[])) AND ($4::date IS NULL OR t.created_at>=($4::date::timestamp AT TIME ZONE 'UTC')) AND ($5::date IS NULL OR t.created_at<(($5::date+1)::timestamp AT TIME ZONE 'UTC')) AND ($6::uuid IS NULL OR a.id=$6)`;
   const result=await db.query(`WITH matches AS (SELECT ${recordFields} ${recordsFrom} ${filter}),page AS (SELECT * FROM matches ORDER BY created_at DESC,id DESC LIMIT $7 OFFSET $8)
-   SELECT (SELECT count(*)::text FROM matches) total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY created_at DESC,id DESC) FROM page),'[]'::jsonb) items`,[actor.branch_id,q.search,kinds,q.from||null,q.to||null,q.accountId||null,q.pageSize,(q.page-1)*q.pageSize]);
+   SELECT (SELECT count(*)::text FROM matches) total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY created_at DESC,id DESC) FROM page),'[]'::jsonb) items`,[actor.branch_id,q.search,kinds,q.from||null,q.to||null,q.accountId||null,q.pageSize,(q.page-1)*q.pageSize,actor.id]);
   return {page:q.page,pageSize:q.pageSize,...result.rows[0],timezone:'UTC'};
  });
 }
@@ -71,10 +71,10 @@ export async function operatorReceipt(req:Request,id:string){
  const receiptId=parse(z.uuid(),id);
  return transaction(async db=>{
   const actor=await actorFor(db,req);if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
-  const row=(await db.query(`SELECT ${recordFields} ${recordsFrom} WHERE t.id=$2`,[actor.branch_id,receiptId])).rows[0];
+  const row=(await db.query(`SELECT ${recordFields} ${recordsFrom} WHERE t.id=$2 AND (a.id=$3 OR ${directChildrenSql(actor.role)})`,[actor.branch_id,receiptId,actor.id])).rows[0];
   if(!row)fail(404,'RECEIPT_NOT_FOUND');
   // Never expose the outside distributor's wallet via a branch-visible receipt.
-  const postings=(await db.query(`SELECT a.username,p.units::text,p.before_units::text,p.after_units::text,p.wallet_version::text FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id JOIN accounts a ON a.id=w.account_id ${scope} WHERE p.transaction_id=$2 ORDER BY p.id`,[actor.branch_id,receiptId])).rows;
+  const postings=(await db.query(`SELECT a.username,p.units::text,p.before_units::text,p.after_units::text,p.wallet_version::text FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id JOIN accounts a ON a.id=w.account_id ${scope} WHERE p.transaction_id=$2 AND (a.id=$3 OR ${directChildrenSql(actor.role)}) ORDER BY p.id`,[actor.branch_id,receiptId,actor.id])).rows;
   return {...row,postings};
  });
 }

@@ -32,6 +32,7 @@ export async function adjust(req:Request,body:unknown){
  const data=parse(adjustmentSchema,body);
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);privileged(actor);const target=await inScope(db,actor,data.targetId);
+  if(target.id!==actor.id&&!directChild(actor,target))fail(403,'ADJUSTMENT_FORBIDDEN','Main Admin may adjust only its own wallet or a direct sub-contractor.');
   return idempotent(db,actor,`MANUAL_${data.direction}`,data.requestKey,data,async()=>{
    const [wallet]=await lockWallets(db,[target.id]);fresh(wallet,data.expectedVersion);
    const delta=BigInt(data.amount)*(data.direction==='ADD'?1n:-1n);
@@ -48,8 +49,8 @@ export async function transfer(req:Request,body:unknown){
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);if(!['SUB_DISTRIBUTOR','AGENT','MAIN_ADMIN'].includes(actor.role))fail(403,'TRANSFER_FORBIDDEN');
   const target=await inScope(db,actor,data.targetId);
-  const rank={MAIN_ADMIN:0,SUB_DISTRIBUTOR:1,AGENT:2,PLAYER:3};
-  if(!target.active||target.archived_at||!await branchEnabled(db,target.branch_id)||rank[target.role]<=rank[actor.role])fail(403,'TRANSFER_FORBIDDEN','Transfer only your own existing credits to a lower role in your branch.');
+  verifiedStaff(actor);
+  if(!target.active||target.archived_at||!await branchEnabled(db,target.branch_id)||!directChild(actor,target))fail(403,'TRANSFER_FORBIDDEN','Transfer only your own existing credits to a direct child account.');
   return idempotent(db,actor,'TRANSFER',data.requestKey,data,async()=>{
    const wallets=await lockWallets(db,[actor.id,target.id]);const source=wallets.find(w=>w.account_id===actor.id)!;const destination=wallets.find(w=>w.account_id===target.id)!;
    fresh(source,data.expectedVersion);fresh(destination,data.targetVersion);
@@ -65,6 +66,7 @@ export async function reverse(req:Request,body:unknown){
   const actor=await actorFor(db,req,true);privileged(actor);
   const original=(await db.query('SELECT t.*,p.units FROM ledger_transactions t JOIN ledger_postings p ON p.transaction_id=t.id AND p.wallet_id IS NOT NULL WHERE t.id=$1 AND t.kind IN (\'MANUAL_ADD\',\'MANUAL_REMOVE\')',[data.transactionId])).rows[0];
   if(!original)fail(404,'ADJUSTMENT_NOT_FOUND');const target=await inScope(db,actor,original.target_id);
+  if(target.id!==actor.id&&!directChild(actor,target))fail(403,'ADJUSTMENT_FORBIDDEN');
   return idempotent(db,actor,'REVERSAL',data.requestKey,data,async()=>{
    await db.query('SELECT id FROM ledger_transactions WHERE id=$1 FOR UPDATE',[original.id]);
    if((await db.query('SELECT id FROM ledger_transactions WHERE related_id=$1',[original.id])).rowCount)fail(409,'ALREADY_REVERSED');

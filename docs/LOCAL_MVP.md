@@ -13,7 +13,7 @@ From PowerShell in this folder, run `./scripts/start-local.ps1`.
 - Player: http://127.0.0.1:5173
 - Operator: http://127.0.0.1:5174
 - Player IDs/passwords: `.local/player-credentials.json`. Use `player.one` or `player.two`.
-- Main Admin credentials and authenticator enrollment secret: `.local/admin-credentials.json`. Import its `authenticatorUri` or secret into an authenticator before signing in. Main Admin requires a six-digit code.
+- Main Admin credentials and authenticator enrollment secret: `.local/admin-credentials.json`. Import its `authenticatorUri` or secret into an authenticator before signing in. Superseded by owner approval: staff sign-in and recent verification use passwords, without authenticator codes.
 
 These files are local, ignored by Git, and are not web assets. They contain actual development secrets; do not publish them. Accounts were created through the authenticated Main Admin account-creation endpoint and started at zero. Browser acceptance checks explicitly added and removed 1.00 credit through the real admin interface, leaving the test player's balance at zero and preserving the receipts.
 
@@ -25,7 +25,7 @@ For a fresh machine: install Node 24.19/pnpm 11.19 and PostgreSQL 17, create a l
 
 - Rich original neon lobby; dedicated login; temple reels, orchard keno and reef scenes; favorites/search/categories; phone, desktop and landscape layouts.
 - Scrypt password hashes; 12-hour database sessions; HttpOnly SameSite=Strict browser cookies; CSRF and origin checks on mutations; persisted login-attempt limits. Production cookies require Secure. Credentials never enter browser localStorage.
-- Main Admin TOTP authentication and five-minute privileged verification. Account creation follows Main Admin → Sub-distributor → Agent → Player. Main Admin can reset lower-account passwords or suspend/reactivate accounts; this revokes those accounts' sessions and preserves their credits/history.
+- Password authentication and five-minute privileged verification. Account creation follows Main Admin → Sub-distributor → Agent → Player. Each operator can reset only direct-child passwords or suspend/reactivate direct children; this revokes those accounts' sessions and preserves their credits/history.
 - Zero-start bigint wallets, balanced immutable postings, projection reconciliation, actor/reason/request/before/after/version records, immutable audit, durable idempotency and stale-version rejection. Available amounts exclude reservations. Linked manual reversals exist in the API; there is no balance overwrite or grant endpoint.
 - Manual ADD/REMOVE requires verified Main Admin. Transfers move only the caller's existing available balance. No transfer mints supply.
 - Neon Sevens practice: 3×3 reels; five explicit straight/diagonal lines; identical triples light their matching cells.
@@ -42,8 +42,8 @@ For a fresh machine: install Node 24.19/pnpm 11.19 and PostgreSQL 17, create a l
 
 | Actor | Source | Recipient | Issuance/removal |
 |---|---|---|---|
-| Main Admin | Own wallet | Active lower role in its subtree | Separate verified ADD/REMOVE |
-| Sub-distributor | Own wallet | Active agent/player in its subtree | Never |
+| Main Admin | Own wallet | Direct active sub-contractor | Verified ADD/REMOVE to self or direct sub-contractor |
+| Sub-contractor | Own wallet | Direct active agent | Never |
 | Agent | Own wallet | Active assigned player | Never |
 | Player | None | None | Never |
 

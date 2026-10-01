@@ -43,7 +43,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);});
     <div class="lounge-table">
      <div class="table-water" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in fishGuide(game).slice(0,6)" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">{{gameInfo.name.split(' ')[0]}} <b>{{gameInfo.name.split(' ')[1]}}</b></div></div>
      <div class="table-machine-front" aria-hidden="true"><i></i><span>NEW GAME<br><b>OCEAN SERIES</b></span><i></i></div>
-     <AquaticSprite v-for="seat in 4" :key="`cannon-${seat}`" :cannon="seat-1" class="table-cannon" :class="`position-${seat}`"/>
+     <AquaticSprite v-for="seat in 4" :key="`cannon-${seat}`" :cannon="seat-1" :game="game" class="table-cannon" :class="`position-${seat}`"/>
      <button v-for="seat in 4" :key="seat" class="lounge-seat" :class="[`position-${seat}`,{occupied:table.seats.some(s=>s.seat===seat),yours:table.seats.some(s=>s.seat===seat&&s.yours)}]" :disabled="busy||!running||table.seats.some(s=>s.seat===seat&&!s.yours)" :aria-label="`${table.id==='new'?'New table':`Table ${table.number}`} seat ${seat}${table.seats.some(s=>s.seat===seat)?' occupied':' open'}`" @click="join(table,seat)">
       <span class="seat-chair"><Icon name="user" :size="25"/><i>{{seat}}</i></span><b>{{table.seats.find(s=>s.seat===seat)?.display_name||'OPEN SEAT'}}</b>
      </button>

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { type Request, actorFor, parse, privileged, verifiedStaff } from './auth.js';
-import { type Wallet, audit, branchEnabled, directChild, fail, idempotent, inScope, transaction, walletView } from './store.js';
+import { type Wallet, audit, branchEnabled, directChild, directChildrenSql, fail, idempotent, inScope, transaction, walletView } from './store.js';
 import { passwordHash } from './security.js';
 import {clientIp} from './device.js';
 export async function me(req:Request){return transaction(async db=>{
@@ -11,7 +11,7 @@ export async function me(req:Request){return transaction(async db=>{
 export async function accounts(req:Request){return transaction(async db=>{
  const actor=await actorFor(db,req);if(actor.role==='PLAYER')fail(403,'STAFF_REQUIRED');
  const {rows}=await db.query(`SELECT a.id,a.username,a.display_name,a.role,a.active,b.name branch,w.settled_units,w.reserved_units,w.version FROM accounts a
- JOIN branches b ON b.id=a.branch_id JOIN branch_ancestors c ON c.branch_id=a.branch_id JOIN wallets w ON w.account_id=a.id WHERE c.ancestor_id=$1 ORDER BY a.created_at DESC LIMIT 500`,[actor.branch_id]);
+ JOIN branches b ON b.id=a.branch_id JOIN branch_ancestors c ON c.branch_id=a.branch_id JOIN wallets w ON w.account_id=a.id WHERE c.ancestor_id=$1 AND (a.id=$2 OR ${directChildrenSql(actor.role)}) ORDER BY a.created_at DESC LIMIT 500`,[actor.branch_id,actor.id]);
  return rows.map(row=>({id:row.id,username:row.username,displayName:row.display_name,role:row.role,active:row.active,branch:row.branch,wallet:walletView(row as Wallet)}));
 });}
 const createSchema=z.object({parentId:z.uuid(),username:z.string().regex(/^[a-z0-9][a-z0-9._-]{2,63}$/),displayName:z.string().trim().min(1).max(100),password:z.string().min(12).max(256),requestKey:z.string().min(8).max(128).optional()}).strict();
@@ -19,7 +19,8 @@ export async function createAccount(req:Request,body:unknown){
  const data=parse(createSchema,body);
  return transaction(async db=>{
   const actor=await actorFor(db,req,true);
-  if(actor.role==='MAIN_ADMIN')privileged(actor);else if(['SUB_DISTRIBUTOR','AGENT'].includes(actor.role)&&data.parentId===actor.id)verifiedStaff(actor);else fail(403,'ACCOUNT_CREATE_FORBIDDEN');
+  if(actor.role==='PLAYER'||data.parentId!==actor.id)fail(403,'ACCOUNT_CREATE_FORBIDDEN','Create accounts only directly under your own account.');
+  if(actor.role==='MAIN_ADMIN')privileged(actor);else verifiedStaff(actor);
   const parent=await inScope(db,actor,data.parentId);
   if(!parent.active||parent.archived_at||!await branchEnabled(db,parent.branch_id))fail(409,'PARENT_INACTIVE');
   return idempotent(db,actor,'ACCOUNT_CREATE',data.requestKey||`create:${data.username}`,data,async()=>{
@@ -40,7 +41,7 @@ export async function createAccount(req:Request,body:unknown){
  });
 }
 export async function history(req:Request,targetId?:string){return transaction(async db=>{
- const actor=await actorFor(db,req);const target=targetId?parse(z.uuid(),targetId):actor.id;await inScope(db,actor,target);
+ const actor=await actorFor(db,req);const target=targetId?parse(z.uuid(),targetId):actor.id;const account=await inScope(db,actor,target);if(target!==actor.id&&!directChild(actor,account))fail(404,'ACCOUNT_NOT_FOUND');
  return (await db.query(`SELECT t.id,t.kind,t.reason,t.created_at,t.related_id,p.units,p.before_units,p.after_units,p.wallet_version,a.display_name actor
  FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id JOIN ledger_transactions t ON t.id=p.transaction_id JOIN accounts a ON a.id=t.actor_id WHERE w.account_id=$1 ORDER BY p.id DESC LIMIT 100`,[target])).rows;
 });}
@@ -63,7 +64,7 @@ export async function manageAccount(req:Request,id:string,body:unknown){
  return transaction(async db=>{const actor=await actorFor(db,req,true);
   if(!['MAIN_ADMIN','SUB_DISTRIBUTOR','AGENT'].includes(actor.role))fail(403,'ACCOUNT_MANAGE_FORBIDDEN');
   verifiedStaff(actor);const target=await inScope(db,actor,targetId);
-  if(actor.role!=='MAIN_ADMIN'&&!directChild(actor,target))fail(403,'ACCOUNT_MANAGE_FORBIDDEN');
+  if(!directChild(actor,target))fail(403,'ACCOUNT_MANAGE_FORBIDDEN');
   const apply=async()=>{
   const hash=data.action==='RESET_PASSWORD'?await passwordHash(data.password):null;
   if(target.role==='MAIN_ADMIN')fail(403,'ROOT_RECOVERY_SEPARATE','Main Admin recovery requires the local operator recovery procedure.');

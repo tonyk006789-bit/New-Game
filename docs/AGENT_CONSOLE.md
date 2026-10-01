@@ -24,9 +24,9 @@ Removed standalone Audit log, Organization and Adjustments screens and the inven
 
 ## Accounts and credits
 
-Main Admin → Sub-contractor (`SUB_DISTRIBUTOR`) → Agent → Player. Main Admin manages the scoped hierarchy; sub-contractors manage direct agents; agents manage assigned players. Create always starts the next-role wallet at zero. Login IDs/branches are not silently edited or reassigned.
+Main Admin → Sub-contractor (`SUB_DISTRIBUTOR`) → Agent → Player. Main Admin manages only its direct sub-contractors; sub-contractors manage direct agents; agents manage assigned players. Create always starts the next-role wallet at zero. Login IDs/branches are not silently edited or reassigned.
 
-Recharge transfers the operator's own available credits to an active lower role in its branch. Redeem moves available credits from a direct child back to the parent actor. Skipped-level or unrelated redemption is denied. Only Main Admin may issue or retire credits through Add/Remove. Reservations cannot be taken, balances cannot become negative, and accepted winnings remain independent of operator funds.
+Recharge transfers the operator's own available credits to an active direct next-role child. Redeem moves available credits from a direct child back to the parent actor. Skipped-level or unrelated redemption is denied. Only Main Admin may issue or retire credits through Add/Remove, targeting its own wallet or a direct sub-contractor. Main Admin and sub-contractors cannot create, edit, fund, reset, suspend or archive individual players. Individual clients are managed only by their agent; higher roles see branch rollups grouped by their own direct staff children. Reservations cannot be taken, balances cannot become negative, and accepted winnings remain independent of operator funds.
 
 Editor actions include edit nickname, reset password, recharge, redeem and owner-approved archive/restore. Status changes suspend/reactivate. Staff archive/suspension blocks descendants; restoration does not undo individually suspended child accounts. Password and access changes revoke affected sessions while retaining all balances and history.
 

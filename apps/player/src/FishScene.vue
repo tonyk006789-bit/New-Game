@@ -13,12 +13,16 @@ import AquaticSprite from './AquaticSprite.vue';
 import {holdCredits,revealCredits} from './credit-presentation';
 import {FishWalletPresentation} from './fish-wallet';
 import {playSound} from './audio';
+import AbyssJackpotWheel from './AbyssJackpotWheel.vue';
+import {bossReveal,type BossReveal} from './boss-reveal';
+const jackpotReward=ref<BossReveal|null>(null);
 import FishRewardReveal from './FishRewardReveal.vue';
 import type {ReefImpact} from './reef-room';
 const rewardReveals=ref<{id:number;species:number;award:string}[]>([]);let revealId=0;
 const revealTimers=new Set<ReturnType<typeof setTimeout>>();
 function celebrate(species:number,award:string,x:number,y:number){
- const id=++revealId;rewardReveals.value=[...rewardReveals.value.slice(-3),{id,species,award}];
+ const id=++revealId;const boss=props.game==='abyss-legends'?bossReveal(`own-${id}`,room.value?.seat||1,species,true,award):null;
+ if(boss)jackpotReward.value=boss;else rewardReveals.value=[...rewardReveals.value.slice(-3),{id,species,award}];
  const timer=setTimeout(()=>{rewardReveals.value=rewardReveals.value.filter(r=>r.id!==id);revealTimers.delete(timer);},2500);revealTimers.add(timer);
  playSound(species===22||reefTier(species)==='boss'?'treasure':'win');
  if(props.reducedMotion)return;
@@ -68,7 +72,7 @@ function showPeerImpact(event:ReefImpact){
  if(!props.reducedMotion){
   const trail=new Graphics().moveTo(origin.x,origin.y).lineTo(event.flight.x,event.flight.y).stroke({color:[0xffd774,0x76d9ff,0xff978d,0xd5a0ff][event.seat-1],width:2,alpha:.6});effect(trail,0,0,.25,'trail');
  }
- if(event.captured){const label=new Text({text:`P${event.seat} +${formatCredits(event.award)}`,style:{fontFamily:'Georgia',fontSize:23,fontWeight:'bold',fill:0xffe28c,stroke:{color:0x152344,width:3}}});label.anchor.set(.5);effect(label,event.flight.x,event.flight.y,1.1,'particle',0,-24);}
+ if(event.captured){const boss=props.game==='abyss-legends'?bossReveal(event.id,event.seat,targetAt(event.targetId,0).species,event.captured,event.award):null;if(boss)jackpotReward.value=boss;const label=new Text({text:`P${event.seat} +${formatCredits(event.award)}`,style:{fontFamily:'Georgia',fontSize:23,fontWeight:'bold',fill:0xffe28c,stroke:{color:0x152344,width:3}}});label.anchor.set(.5);effect(label,event.flight.x,event.flight.y,1.1,'particle',0,-24);}
 }
 function effect(view:Container,x:number,y:number,life:number,kind='burst',vx=0,vy=0){view.position.set(x,y);world.addChild(view);if(effects.length>=400)effects.shift()!.view.destroy();effects.push({view,age:0,life,kind,vx,vy});}
 function impact(x:number,y:number,win=false){
@@ -107,7 +111,8 @@ function fireCannon(){
  if(shots.size>=48){notice.value='Shots are still arriving. Please wait a moment.';return;}
  if(!enoughCredits()){stopAuto('Insufficient available credits for this stake.');return;}
  trackTarget();const seat=room.value?.seat||1,cannon=cannons[seat-1],firedAt=Date.now()+clockOffset,flight=reefFlight(seat,cannon.angle,(firedAt-epoch)/1000,alive(),props.game);
- const view=new Graphics().ellipse(-9,0,15,5).fill({color:0x1bdfff,alpha:.24}).circle(0,0,5).fill(0xfff7bd).circle(0,0,2).fill(0xffffff);
+ const shotColor=props.game==='abyss-legends'?[0x42e8ff,0xff9a25,0xf365ff,0x8eff47][seat-1]:0x1bdfff;
+ const view=new Graphics().ellipse(-9,0,15,5).fill({color:shotColor,alpha:.5}).circle(0,0,5).fill(0xfff7bd).circle(0,0,2).fill(0xffffff);
  view.rotation=flight.angle;view.position.set(flight.origin.x,flight.origin.y);world.addChild(view);
  const requestKey=crypto.randomUUID();projectiles.push({view,flight,firedAt,roomId:room.value?.id,requestKey,age:0,stake:stage.stake});shots.set(requestKey,stage.stake);firedCount.value++;firing.value=true;nextAutoAt=performance.now()+(fast.value?125:250);cannon.recoil=.2;notice.value='';playSound('shot');
  if(!props.reducedMotion)effect(new Graphics().star(0,0,8,20,5).fill({color:0xffe795,alpha:.9}),flight.origin.x,flight.origin.y,.12);
@@ -116,7 +121,7 @@ function resize(){if(!app||!host.value)return;app.renderer.resize(host.value.cli
 onMounted(async()=>{
  try{
   app=new Application();await app.init({width:1200,height:600,backgroundAlpha:0,antialias:true,resolution:Math.min(devicePixelRatio,2),autoDensity:true,preference:'webgl'});
-  if(disposed){app.destroy(true);return;}art=await reefTextures(app);if(disposed){Object.values(art).flat().forEach(t=>t.destroy(true));app.destroy(true);return;}
+  if(disposed){app.destroy(true);return;}art=await reefTextures(app,props.game==='abyss-legends');if(disposed){Object.values(art).flat().forEach(t=>t.destroy(true));app.destroy(true);return;}
   world=new Container();app.stage.addChild(world);host.value!.appendChild(app.canvas);app.canvas.setAttribute('aria-label',`${props.game==='abyss-legends'?'Abyss Legends':'Reef Party'} four-cannon table with varied creatures and treasure chests`);app.canvas.setAttribute('role','img');
   for(let id=1;id<=80;id++){
    const p=targetAt(id,0),view=new Container(),texture=art.creatures[p.species],sprite=new MeshPlane({texture,verticesX:8,verticesY:3});sprite.pivot.set(texture.width/2,texture.height/2);sprite.scale.set(p.radius*2.8/texture.width);
@@ -126,7 +131,7 @@ onMounted(async()=>{
   for(let seat=1;seat<=4;seat++){
    const view=new Container(),base=reefCannon(seat),barrel=new Sprite(art.cannons[seat-1]);
    view.position.set(base.x,base.y);view.addChild(new Graphics().circle(0,0,42).fill({color:0x001b31,alpha:.85}).circle(0,0,38).stroke({color:[0xecc772,0x74bbf3,0xe86860,0xcf8dfd][seat-1],width:3}));
-   barrel.anchor.set(.5,.76);barrel.width=170;barrel.height=114;view.addChild(barrel);world.addChild(view);cannons.push({view,barrel,recoil:0,angle:seat<=2?-Math.PI/2:Math.PI/2});
+   barrel.anchor.set(.5,.76);barrel.width=props.game==='abyss-legends'?132:170;barrel.height=props.game==='abyss-legends'?145:114;view.addChild(barrel);world.addChild(view);cannons.push({view,barrel,recoil:0,angle:seat<=2?-Math.PI/2:Math.PI/2});
   }
   reticle=new Graphics().circle(0,0,45).stroke({color:0xffef7e,width:2}).moveTo(-58,0).lineTo(-32,0).moveTo(32,0).lineTo(58,0).moveTo(0,-58).lineTo(0,-32).moveTo(0,32).lineTo(0,58).stroke({color:0xffef7e,width:3});reticle.visible=false;world.addChild(reticle);
   resize();observer=new ResizeObserver(resize);observer.observe(host.value!);app.canvas.addEventListener('pointerdown',fire);app.canvas.addEventListener('pointermove',aimAt);
@@ -159,4 +164,4 @@ watch(()=>stage.recovered,()=>{stopAuto('Connection restored. Ready to fire.');v
 watch(()=>props.authenticated,()=>stopAuto());
 onBeforeUnmount(()=>{for(const timer of revealTimers)clearTimeout(timer);stopAuto();disposed=true;revealCredits(props.game);clearInterval(poll);observer?.disconnect();if(app?.renderer){app.canvas.removeEventListener('pointerdown',fire);app.canvas.removeEventListener('pointermove',aimAt);app.destroy(true,{children:true});if(art)Object.values(art).flat().forEach((t:RenderTexture)=>t.destroy(true));}});
 </script>
-<template><section class="reef-preview reef-deluxe" :class="game"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount"><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:room?.seat===seat}]"><small>{{room?.seat===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || 'Open seat'}}</b><em v-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
+<template><section class="reef-preview reef-deluxe" :class="game"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount"><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:room?.seat===seat}]"><small>{{room?.seat===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || 'Open seat'}}</b><em v-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><AbyssJackpotWheel v-if="game==='abyss-legends'" :reward="jackpotReward" :reduced-motion="reducedMotion"/><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
