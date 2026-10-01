@@ -7,7 +7,7 @@ export function restorePending(accountId:string){try{const pending=JSON.parse(lo
 export function savePending(pending:Pending){localStorage.setItem(`ng-stage-pending:${pending.accountId}`,JSON.stringify(pending));stage.pending=pending;}
 export function clearPending(){if(stage.pending)localStorage.removeItem(`ng-stage-pending:${stage.pending.accountId}`);stage.pending=null;stage.needsRecovery=false;}
 export function restoreFishPending(accountId:string){
- try{const saved=JSON.parse(localStorage.getItem(`ng-fish-pending:${accountId}`)||'[]');stage.fishPending=Array.isArray(saved)?saved.filter(p=>p.accountId===accountId&&p.path==='staging/reef-party/rounds'&&typeof p.body?.requestKey==='string').map(p=>({...p,recover:true})):[];}catch{stage.fishPending=[];}
+ try{const saved=JSON.parse(localStorage.getItem(`ng-fish-pending:${accountId}`)||'[]');stage.fishPending=Array.isArray(saved)?saved.filter(p=>p.accountId===accountId&&/^staging\/(reef-party|abyss-legends)\/rounds$/.test(p.path)&&typeof p.body?.requestKey==='string').map(p=>({...p,recover:true})):[];}catch{stage.fishPending=[];}
 }
 function persistFish(accountId:string){const pending=stage.fishPending.filter(p=>p.accountId===accountId);if(pending.length)localStorage.setItem(`ng-fish-pending:${accountId}`,JSON.stringify(pending));else localStorage.removeItem(`ng-fish-pending:${accountId}`);}
 export function saveFishPending(pending:FishPending){stage.fishPending.push(pending);try{persistFish(pending.accountId);}catch(error){stage.fishPending.pop();throw error;}}

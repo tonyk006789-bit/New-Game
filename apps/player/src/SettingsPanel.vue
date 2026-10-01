@@ -12,7 +12,7 @@ async function change(){
 async function toggle(kind:'music'|'sound'){await unlockAudio();audioPreferences[kind]=!audioPreferences[kind];if(kind==='sound')playSound();}
 </script>
 <template><section class="arcade-panel settings-panel simple-settings">
- <div><span><strong>Music</strong><p>Arcade background music</p></span><button class="toggle" :class="{on:audioPreferences.music}" role="switch" :aria-checked="audioPreferences.music" aria-label="Music" @click="toggle('music')"><i></i></button></div>
+ <div><span><strong>Music</strong><p>Original casino tracks · Changes with each game</p></span><button class="toggle" :class="{on:audioPreferences.music}" role="switch" :aria-checked="audioPreferences.music" aria-label="Music" @click="toggle('music')"><i></i></button></div>
  <div><span><strong>Sound</strong><p>Buttons, cannons and wins</p></span><button class="toggle" :class="{on:audioPreferences.sound}" role="switch" :aria-checked="audioPreferences.sound" aria-label="Sound effects" @click="toggle('sound')"><i></i></button></div>
  <div><span><strong>Reduced motion</strong><p>Shorter reveals and calmer effects</p></span><button class="toggle" :class="{on:reducedMotion}" role="switch" :aria-checked="reducedMotion" aria-label="Reduced motion" @click="emit('update:reducedMotion',!props.reducedMotion)"><i></i></button></div>
  <div v-if="account"><span><strong>{{account.displayName}}</strong><p>{{account.username}}</p></span><button class="secondary" :aria-expanded="changing" @click="changing=!changing">Change password</button></div>

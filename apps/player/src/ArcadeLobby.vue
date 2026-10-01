@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
+import {computed,nextTick,onBeforeUnmount,onMounted,ref,watch} from 'vue';
 import {catalog,type GameId} from '@new-game/contracts';
 import Icon from '@new-game/ui/Icon.vue';
 import GamePoster from './GamePoster.vue';
@@ -31,6 +31,7 @@ function tick(now:number){const dt=Math.max(0,now-last)/1000;last=now;
 }
 watch(()=>props.running,running=>{if(!running){walking.value=false;selected.value=null;pose.value=0;}});
 watch(()=>props.games,()=>{floorPage.value=0;walking.value=false;selected.value=null;pose.value=0;});
+async function selectCabinet(id:GameId){const index=props.games.findIndex(g=>g.id===id);if(index<0)return;floorPage.value=Math.floor(index/8);await nextTick();choose(id);}
 function changeFloor(direction:number){floorPage.value=Math.max(0,Math.min(floorPages.value-1,floorPage.value+direction));walking.value=false;selected.value=null;pose.value=0;}
 onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnimationFrame(raf));
 </script>
@@ -40,8 +41,8 @@ onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnim
   <div ref="floor" class="hall-floor" tabindex="0" aria-label="Walk around the arcade with arrow keys or WASD. Enter plays the nearest cabinet." @pointerdown="walkFloor" @keydown="keyboard">
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
     <button class="hall-cabinet-button" :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
-     <span class="machine-crown">{{game.category==='Fish'?'FISH TABLE':game.category==='Keno'?'LUCKY NUMBERS':'REELS & FEATURES'}}</span>
-     <span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
+     <span class="machine-crown">{{game.detail}}</span>
+     <span v-if="['abyss-legends','ruby-rush','sapphire-crown','solar-fortune'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
      <span class="machine-deck"><i></i><b>{{game.name}}</b><i></i></span>
      <span class="machine-pedestal"><em>PLAY</em><span>✦</span><em>ENTER</em></span>
     </button>
@@ -55,6 +56,7 @@ onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnim
    </div>
    <div v-if="!games.length" class="hall-empty">No cabinets in this collection.<small>Choose another category or search.</small></div>
   </div>
+  <nav class="floor-directory" aria-label="All walking-floor games"><span>ALL {{games.length}} CABINETS</span><button v-for="game in games" :key="game.id" :aria-label="`Walk to ${game.name}`" :disabled="!running" @click="selectCabinet(game.id)">{{game.name}}</button></nav>
   <div class="hall-guide"><span class="hall-status" role="status">{{status}}</span><span>WALK <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> <b>↵</b> PLAY</span></div>
  </section>
 </template>

@@ -10,7 +10,7 @@ import FeatureGame from './FeatureGame.vue';
 import CabinetGame from './CabinetGame.vue';
 import ArcadeLobby from './ArcadeLobby.vue';
 import GameShelf from './GameShelf.vue';
-import {isCabinetGame} from '@new-game/game-math';
+import {isCabinetGame,isFishGame} from '@new-game/game-math';
 import {isPortraitGame,portraitRotationQuery} from './cabinet-layout';
 import FishingLobby from './FishingLobby.vue';
 import type {ReefRoom} from './reef-room';
@@ -19,7 +19,8 @@ import SettingsPanel from './SettingsPanel.vue';
 import SharePanel from './SharePanel.vue';
 import DailyWheel from './DailyWheel.vue';
 import {creditPresentation,revealCredits} from './credit-presentation';
-import {unlockAudio,playSound,setAudioActive} from './audio';
+import {unlockAudio,playSound,setAudioActive,setMusicScene,audioPreferences,musicNow} from './audio';
+async function toggleMusic(){await unlockAudio();audioPreferences.music=!audioPreferences.music;}
 const loginNotice=ref('');
 const onGesture=(event:Event)=>{void unlockAudio();if((event.target as Element)?.closest('button'))playSound('click');};
 function passwordChanged(){clearAccount();loginNotice.value='Password changed. Sign in with your new password.';}
@@ -50,7 +51,7 @@ const modal = ref<'about' | 'support' | 'share' | 'wheel' | 'rules' | null>(null
 const selectedTable=ref<ReefRoom|null>(null),atFishTable=ref(false),fishLeaving=ref(false);
 function joinTable(room:ReefRoom|null){selectedTable.value=room;atFishTable.value=true;}
 async function leaveTable(){if(!atFishTable.value||fishLeaving.value)return;fishLeaving.value=true;try{if(selectedTable.value&&account.value&&online.value)await api('practice/reef/leave',{roomId:selectedTable.value.id});}catch{/* A disconnected seat expires on the server. */}finally{selectedTable.value=null;atFishTable.value=false;fishLeaving.value=false;}}
-async function backFromGame(){if(activeGame.value==='reef-party'&&atFishTable.value)await leaveTable();else activeGame.value=null;}
+async function backFromGame(){if(isFishGame(activeGame.value)&&atFishTable.value)await leaveTable();else activeGame.value=null;}
 const favorites = ref<string[]>([]);
 const reducedMotion = ref(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const foreground = ref(!document.hidden);
@@ -135,6 +136,7 @@ onBeforeUnmount(() => {
   nativeListeners.forEach(listener => void listener.remove());
 });
 watch(ready,value=>setAudioActive(value));
+watch(activeGame,game=>setMusicScene(game||'lobby'),{immediate:true});
 watch(page,()=>{void syncAccount();void loadHistory();});
 </script>
 <template>
@@ -149,8 +151,8 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Preview actions are paused until you reconnect.</div>
       <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
       <main v-if="currentGame" class="immersive-game" :class="{'portrait-cabinet':portraitGame,'portrait-blocked':portraitGame&&rotatePortrait}" :data-layout="portraitGame?'portrait':'wide'">
-        <div class="game-topline"><button class="round-control" :aria-label="activeGame==='reef-party'&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{activeGame==='reef-party'&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="activeGame==='reef-party'&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
-        <template v-if="activeGame==='reef-party'"><FishScene v-if="atFishTable" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
+        <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><button class="game-music-button" :aria-pressed="audioPreferences.music" :aria-label="`Music ${audioPreferences.music?'on':'off'}: ${musicNow.title}`" :title="musicNow.title" :data-track="musicNow.scene" @click="toggleMusic">♫</button><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
+        <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
         <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />

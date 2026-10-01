@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-10-01",
+  "tool": "Built-in ImageGen",
+  "assets": [
+    {
+      "path": "apps/player/public/art/abyss-creatures-v17.png",
+      "prompt": "Original premium illustrated arcade fishing game sprite atlas, transparent background. Exactly 8 isolated assets in an evenly spaced 4-column by 2-row grid, each fully inside its own identical square cell, generous transparent margin, no overlap, no text or borders. Landscape 2:1 atlas. Top row left to right: (1) tiny luminous cyan anglerfish with golden lure, facing right; (2) ornate turquoise leafy seadragon facing right; (3) silver armored hammerhead shark facing right; (4) large violet kraken with curling golden-tipped tentacles facing right. Bottom row left to right: (5) orange and pearl chambered nautilus facing right; (6) red royal spiny lobster with gold armor facing right; (7) richly detailed CLOSED pirate treasure chest, emerald lock, barnacles, gold metal edges, isolated three-quarter top view; (8) long cobalt sea serpent with gold fins coiled gently facing right. Sculpted 3D-like casino arcade art, glossy scales, rich saturated colors, detailed highlights, clear silhouettes, no flat vector cartoon, no lettering, transparent alpha. This is a sprite sheet for a playable original game.",
+      "transparentBackground": true
+    },
+    {
+      "path": "apps/player/public/art/abyss-seabed-v17.png",
+      "prompt": "Original illustrated arcade fishing table seabed background for Abyss Legends. Wide landscape 2:1 top-down underwater view. Dark sapphire and teal water, luminous aqua caustic ripples across a broad unobstructed central sandy arena covering 75 percent. Around edges only: ruined ancient stone arch fragments, a pirate shipwreck corner, purple bioluminescent tube coral, emerald seaweed, small scattered gold coins and closed treasure boxes. Four small clear cannon mounting spaces at top-left quarter, top-right quarter, bottom-left quarter, bottom-right quarter. Jewel-toned casino arcade painting, hand-rendered sculpted detail, atmospheric undersea glow with clear contrast for colorful moving sprites. No fish, no creatures, no cannons, no words, no logos, no UI.",
+      "transparentBackground": false
+    }
+  ]
+}

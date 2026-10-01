@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {computed} from 'vue';
-import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefTierProfile,stagingRules,stakeLimits,type StagingGame} from '@new-game/game-math';
+import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefTierProfile,stagingRules,stakeLimits,isFishGame,type StagingGame} from '@new-game/game-math';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 const props=defineProps<{game:StagingGame;staked:boolean}>();
 const instructions:Record<StagingGame,string[]>={
+ 'abyss-legends':['Choose one of four seats in the Abyss Lounge. Each player controls their own cannon and stake.','Aim, click to fire, or enable AUTO and LOCK. Lantern anglers, leafy seadragons, armored sharks, krakens and leviathans use the same size-based rewards as Reef Party.','A treasure chest is a medium target. Catching it reveals its 3× award. Boss catches show a jackpot wheel celebrating the committed 20× award. These animations add no extra stake, payout or progressive pool.'],
  'ruby-rush':['Three reels, three rows. Choose your stake and press SPIN. All five paylines are active.','Match all three symbols on a line. Red diamonds use the gem award. The line review highlights each winning path in turn.'],
  'sapphire-crown':['Play in portrait orientation. Choose your stake and press SPIN. All nine paylines are active.','The crown is WILD. It substitutes in left-to-right runs of three or more; an all-crown run pays once on each line.'],
  'solar-fortune':['Five reels show a single row of symbols. A sun coin locks its reel. Choose your stake and press SPIN.','Only unlocked reels respin, up to three times, with no additional stake. New locks do not reset the counter. Collect all five sun coins to win.'],
@@ -14,7 +15,7 @@ const instructions:Record<StagingGame,string[]>={
  'aurora-vault':['Play in portrait orientation. Start with three crystals already locked in a 3-column, 5-row vault.','You have three pulses. New crystals stay locked and reset the remaining pulses to three. The sequence ends when the vault is full or no pulses remain.'],
  'ember-relics':['Start a sequence on the 6 × 5 relic board. Groups of four or more matching relics connected horizontally or vertically clear together.','New relics fall into the gaps. The sequence continues until no group remains, with a maximum of six clearing cascades. Diagonal connections do not count.'],
  'orchard-numbers':['Select 4–10 different numbers from 1–80, then press DRAW. Twenty different numbers are drawn.','QUICK PICK selects six numbers you can change. CLEAR removes your selection. A hit is one of your selected numbers appearing in the draw.'],
- 'reef-party':['Choose a table and one of four player seats. Aim and click or tap for each shot. Several shots can travel at once; each valid hit uses the cannon stake selected when it was fired.','AUTO keeps firing in your aim direction. LOCK tracks a creature; tap another creature to change targets. FAST doubles the automatic firing cadence. Turning it on does not change capture chances or rewards.','Only a server-validated hit spends credits. Shots that miss, expire, or reach an already-caught creature cost nothing. A resisted hit still spends its stake.','Each valid hit has an independent capture chance. Larger creatures pay more and usually need more hits, but there is no fixed health bar or guaranteed number of shots.','Auto fire stops when you pause, leave the table, change stake, lose connection, or have insufficient credits. Catch celebrations show the existing award; there is no separate progressive jackpot.']
+ 'reef-party':['Choose a table and one of four player seats. Aim and click or tap for each shot. Several shots can travel at once; each valid hit uses the cannon stake selected when it was fired.','AUTO keeps firing in your aim direction. LOCK tracks a creature; tap another creature to change targets. FAST doubles the automatic firing cadence. Turning it on does not change capture chances or rewards.','Only a server-validated hit spends credits. Shots that miss, expire, or reach an already-caught creature cost nothing. A resisted hit still spends its stake.','Each valid hit has an independent capture chance. Larger creatures pay more and usually need more hits, but there is no fixed health bar or guaranteed number of shots.','Treasure chests use the medium tier (3×); boss wheel animations reveal the existing 20× catch award. There is no additional wheel stake or jackpot pool.','Auto fire stops when you pause, leave the table, change stake, lose connection, or have insufficient credits. Catch celebrations show the existing award; there is no separate progressive jackpot.']
 };
 const lines=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game].lines:props.game==='temple-lights'?[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]:[]);
 const cabinet=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game]:null);
@@ -30,8 +31,8 @@ const tiers=Object.values(reefTierProfile.tiers);
   <p class="rules-mode">{{staked?'PLAY CREDITS':'GUEST / FREE PREVIEW'}} <span>• No cash or prizes of value</span></p>
   <h3>HOW TO PLAY</h3>
   <ol><li v-for="instruction in instructions[game]" :key="instruction">{{instruction}}</li></ol>
-  <section class="rules-return"><h3>{{game==='reef-party'?'CREATURE RETURNS':'WINNING RETURNS'}}</h3>
-   <template v-if="game==='reef-party'">
+  <section class="rules-return"><h3>{{isFishGame(game)?'CREATURE RETURNS':'WINNING RETURNS'}}</h3>
+   <template v-if="isFishGame(game)">
     <table><thead><tr><th>Size</th><th>Return</th><th>Capture / hit</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td></tr></tbody></table>
     <p>At a 0.25 stake, a successful small, medium, large or boss catch returns 0.25, 0.75, 2.00 or 5.00 credits respectively. Open SPECIES at the table to see each creature’s size tier.</p>
    </template>
@@ -41,7 +42,7 @@ const tiers=Object.values(reefTierProfile.tiers);
   <table v-if="cabinet && baseGame!=='coin-carnival'" class="symbol-paytable"><thead><tr><th>Symbol</th><th v-for="count in matchCounts" :key="count">{{count}}</th></tr></thead><tbody><tr v-for="symbol in cabinet.symbols" :key="symbol"><th><ArcadeSymbol :symbol="symbol" :theme="game"/><span>{{symbolName(symbol)}}</span></th><td v-for="count in matchCounts" :key="count">{{returns(symbol,count)}}×</td></tr></tbody></table>
   <div v-if="lines.length" class="rules-lines" aria-label="Active payline paths"><figure v-for="(line,index) in lines" :key="index"><svg :viewBox="`0 0 ${line.length*20} 60`" role="img" :aria-label="`Line ${index+1}: rows ${line.map(row=>row+1).join(', ')}`"><path :d="`M0 20H${line.length*20}M0 40H${line.length*20}`" stroke="#ffffff25" fill="none"/><polyline :points="line.map((row,col)=>`${col*20+10},${row*20+10}`).join(' ')" fill="none" stroke="#ffd76c" stroke-width="3"/></svg><figcaption>LINE {{index+1}}</figcaption></figure></div>
   <h3>STAKE & CONTROLS</h3>
-  <p>Use −, +, the stake menu or MAX to choose {{(stakeLimits.min/100).toFixed(2)}}–{{(stakeLimits.max/100).toFixed(2)}} credits in {{(stakeLimits.step/100).toFixed(2)}} steps. {{game==='reef-party'?'The stake is per valid hit.':'One stake pays for the complete spin, draw or feature sequence. Fast animation and Show result do not alter the outcome.'}}</p>
+  <p>Use −, +, the stake menu or MAX to choose {{(stakeLimits.min/100).toFixed(2)}}–{{(stakeLimits.max/100).toFixed(2)}} credits in {{(stakeLimits.step/100).toFixed(2)}} steps. {{isFishGame(game)?'The stake is per valid hit.':'One stake pays for the complete spin, draw or feature sequence. Fast animation and Show result do not alter the outcome.'}}</p>
   <p>{{staked?'Plays require an online session and enough available credits. Accepted results are saved; reconnecting restores them without charging for a new play.':'Guest previews and free practice do not spend or award credits. The returns above describe the play-credit games.'}}</p>
  </div>
 </template>

@@ -4,7 +4,7 @@ export const MAX_UNITS = 9223372036854775807n;
 export const Units = z.string().regex(/^(0|[1-9]\d{0,18})$/).pipe(z.string().refine(value => BigInt(value) <= MAX_UNITS, 'Exceeds PostgreSQL bigint'));
 export const PositiveUnits = Units.pipe(z.string().refine(value => BigInt(value) > 0n, 'Amount must be positive'));
 export const Role = z.enum(['MAIN_ADMIN', 'SUB_DISTRIBUTOR', 'AGENT', 'PLAYER']);
-export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
+export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -46,6 +46,7 @@ export const FishCommand = z.object({
 export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SERVICE_NOT_READY', 'FORBIDDEN', 'STALE_WALLET', 'INSUFFICIENT_AVAILABLE', 'IDEMPOTENCY_CONFLICT']);
 
 export const catalog = [
+  { id: 'abyss-legends', name: 'Abyss Legends', category: 'Fish', tagline: 'Enter the deep. Discover the legends.', description: 'Four cannons share a sunken kingdom with krakens, leviathans, armored sharks and treasure chests.', detail: '4 seats · Treasure & legends', color: '#60e1db' },
   { id: 'ruby-rush', name: 'Ruby Rush', category: 'Slots', tagline: 'Classic reels. Radiant rubies.', description: 'Three mechanical reels with ruby sevens, cherries, bells, BARs and red diamonds. Five lines pay matching triples.', detail: '3 reels · 5 lines', color: '#ff4569' },
   { id: 'sapphire-crown', name: 'Sapphire Crown', category: 'Slots', tagline: 'Every crown holds a possibility.', description: 'A royal blue cabinet with nine paylines and substituting crown wilds. Uses the Jade Fortune test rules.', detail: 'Portrait · 5 reels', color: '#67b8ff' },
   { id: 'solar-fortune', name: 'Solar Fortune', category: 'Slots', tagline: 'Hold the sun. Complete the constellation.', description: 'Center sun coins hold their entire reel through up to three respins. Uses the Coin Carnival test rules.', detail: '5 reels · Single-row hold', color: '#ffc764' },

@@ -42,3 +42,9 @@ it('keeps an older account poll from undoing a newer committed shot wallet',asyn
  const account={...session.current} as Account,poll=refreshAccount(),shot=api('practice/reef/shots',{requestKey:'poll-race'});
  respond(1,result('2','975'));await shot;respond(0,account);await poll;expect(session.current!.wallet.version).toBe('2');
 });
+
+it('restores Abyss shots under the original game without adding a second charge',async()=>{
+ const shot=api('practice/reef/shots',{game:'abyss-legends',requestKey:'abyss-lost'});expect(stage.fishPending[0].path).toBe('staging/abyss-legends/rounds');expect(requests[0].body.game).toBeUndefined();
+ requests[0].reject(new Error('Network lost'));await expect(shot).rejects.toThrow();restoreFishPending('player-a');expect(stage.fishPending).toHaveLength(1);
+ const recovered=recoverRound();expect(requests[1].body.game).toBe('abyss-legends');respond(1,{status:'SETTLED',result:{...result('2','1050'),game:'abyss-legends',award:'75'}});await recovered;expect(stage.fishPending).toHaveLength(0);expect(session.current!.wallet.available).toBe('1050');
+});

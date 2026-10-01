@@ -1,14 +1,14 @@
 import {describe,it,expect} from 'vitest';
-import {reefTarget,reefSpecies,reefOutcome,reefTier,reefTierProfile,stagingMultiplier,reefFlight} from '@new-game/game-math';
+import {reefTarget,reefOutcome,reefTier,reefTierProfile,stagingMultiplier,reefFlight,fishGuide} from '@new-game/game-math';
 describe('sparse reef migrations and tiered catches',()=>{
- it('never exceeds fourteen targets or one boss and spaces arrivals three seconds apart',()=>{
+ it('never exceeds twenty targets or one boss and spaces arrivals two seconds apart',()=>{
   const species=new Set<number>();let smallest=100,largest=0;
   for(let t=0;t<960;t+=.5){const visible=Array.from({length:80},(_,i)=>reefTarget(i+1,t)).filter(p=>p.active);
-   expect(visible.length).toBeLessThanOrEqual(14);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
+   expect(visible.length).toBeLessThanOrEqual(20);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
    for(const p of visible){species.add(p.species);smallest=Math.min(smallest,p.radius);largest=Math.max(largest,p.radius);expect(p.y).toBeGreaterThan(70);expect(p.y).toBeLessThan(510);}
   }
-  for(let id=2;id<=80;id++)expect(reefTarget(id,0).spawnAt-reefTarget(id-1,0).spawnAt).toBe(3);
-  expect(largest/smallest).toBeGreaterThanOrEqual(10);expect(species.size).toBe(reefSpecies.length);
+  for(let id=2;id<=80;id++)expect(reefTarget(id,0).spawnAt-reefTarget(id-1,0).spawnAt).toBe(2);
+  expect(largest/smallest).toBeGreaterThanOrEqual(10);expect(species.size).toBe(fishGuide('reef-party').length);
  });
  it('cannot collide with a creature before its spawn window',()=>{
   expect(reefTarget(80,0).active).toBe(false);
@@ -23,6 +23,6 @@ describe('sparse reef migrations and tiered catches',()=>{
  });
  it('keeps legacy 3x receipts evaluable and rejects invented species',()=>{
   expect(stagingMultiplier({id:'old',game:'reef-party',description:'',captured:true})).toBe(3);
-  expect(()=>reefOutcome('bad',81,()=>0)).toThrow();expect(()=>reefTier(16)).toThrow();
+  expect(()=>reefOutcome('bad',81,()=>0)).toThrow();expect(()=>reefTier(24)).toThrow();
  });
 });

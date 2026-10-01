@@ -163,3 +163,12 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 - Sapphire Crown is an upright five-reel cabinet; Aurora Vault presents its existing fifteen independent cells in three columns and five rows. On phone-sized landscape viewports these games require portrait orientation before accepting a new play. An already accepted result still completes.
 - Solar Fortune presents only its existing scoring row as five individual reel windows. Its persisted sequence and hold/respin award remain unchanged. Other cabinets retain wide five-reel and six-column cascade formats.
 - Publication continues on the existing authorized Vercel player test link. No migration, new account, funding, hosted play, operator deployment or production-math approval is included. Evidence and rollback guidance: `../reports/REFINEMENT_V16.md`.
+
+
+## 1 October 2026 music, full walking floor and second fish world
+
+- Owner requested energetic, distinct game music, all new cabinets on Walk the Floor, more creatures, treasure boxes and jackpot spins for four simultaneous players, plus another fish game.
+- Owner explicitly approved **“Use existing fish rewards and reveal effects.”** Abyss Legends reuses `reef-tiers-v1`: small 1×/30%, medium 3×/20%, large 8×/10%, boss 20×/4% capture per valid hit. Treasure and jackpot presentations reveal the committed catch award without additional RNG, credit grants or a progressive pool. Production play remains blocked.
+- Two fish variants now have separate branch-scoped four-seat rooms; real peers share recent committed impact effects. Spawn timing and eight new characters use `reef-ballistics-v5`; old clients must refresh for new shots while accepted receipts still recover unchanged.
+- Twelve catalog entries appear in the shelf and walking-floor directory. Original per-game synthesized arrangements respect Music/Sound and background/reduced-motion preferences. Original ImageGen art only; prompts and provenance are recorded.
+- Additive migration 014 adds fish variant identity and impact lookup indexes. Applied to local and hosted test databases; encrypted hosted backup made and all nine wallets/reservations/versions unchanged. Vercel publication continues under existing owner authorization. See `../reports/REFINEMENT_V17.md`.

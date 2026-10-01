@@ -20,7 +20,7 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
    <article v-for="game in visible" :key="game.id" class="shelf-game" :style="{'--tile-color':game.color}">
     <button class="shelf-play" :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
      <GamePoster :game="game.id" :name="game.name"/>
-     <span v-if="['ruby-rush','sapphire-crown','solar-fortune'].includes(game.id)" class="new-ribbon">NEW</span>
+     <span v-if="['abyss-legends','ruby-rush','sapphire-crown','solar-fortune'].includes(game.id)" class="new-ribbon">NEW</span>
      <span class="shelf-game-caption"><b>{{game.name}}</b><small>{{game.detail}}</small></span>
      <span class="shelf-enter">PLAY <span>▶</span></span>
     </button>

@@ -1,4 +1,5 @@
 export const mathStatus = Object.freeze({
+  'abyss-legends': { approved: false, profileId: null, mathHash: null },
   'ruby-rush': { approved: false, profileId: null, mathHash: null },
   'sapphire-crown': { approved: false, profileId: null, mathHash: null },
   'solar-fortune': { approved: false, profileId: null, mathHash: null },
@@ -198,12 +199,12 @@ export const reefTierProfile={id:'reef-tiers-v1',tiers:{
  boss:{label:'Boss',multiplier:20,captureTickets:400}
 }} as const;
 export function reefTier(species:number){
- if(!Number.isInteger(species)||species<0||species>15)throw new Error('Invalid reef species');
- return [7,8,9].includes(species)?'boss':[3,5,10,11].includes(species)?'large':[2,4,6,13].includes(species)?'medium':'small';
+ if(!Number.isInteger(species)||species<0||species>23)throw new Error('Invalid reef species');
+ return [7,8,9,19,23].includes(species)?'boss':[3,5,10,11,18,21].includes(species)?'large':[2,4,6,13,17,22].includes(species)?'medium':'small';
 }
-export function reefOutcome(id:string,targetId:number,random:RandomIndex):StagingVisual{
- const {species}=reefTarget(targetId,0),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
- return {id,game:'reef-party',captured,fish:{species,tier,profileId:reefTierProfile.id},description:captured?`${reefSpecies[species]} caught! ${rule.multiplier}× shot stake returned.`:`${reefSpecies[species]} resisted the hit.`};
+export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame='reef-party'):StagingVisual{
+ const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
+ return {id,game,captured,fish:{species,tier,profileId:reefTierProfile.id},description:captured?`${reefSpecies[species]} caught! ${rule.multiplier}× shot stake returned.`:`${reefSpecies[species]} resisted the hit.`};
 }
 export function validStake(value:string):boolean{return /^[1-9]\d{1,3}$/.test(value)&&Number(value)>=stakeLimits.min&&Number(value)<=stakeLimits.max&&Number(value)%stakeLimits.step===0;}
 // Explicit local experiment. This is not registered in the production approval registry.
@@ -233,9 +234,9 @@ export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagi
  rules:{'neon-sevens':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add all five lines.',
  'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
 } as const;
-export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules};
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'abyss-legends':stagingProfile.rules['reef-party']};
 export type StagingGame=keyof typeof stagingRules;
-export function stagingGameProfileId(game:string){return game==='reef-party'?reefTierProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export function stagingGameProfileId(game:string){return isFishGame(game)?reefTierProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
@@ -250,7 +251,7 @@ export function stagingMultiplier(outcome:StagingVisual):number {
  return outcome.captured?(outcome.fish?reefTierProfile.tiers[reefTier(outcome.fish.species)].multiplier:3):0;
 }
 export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[]):StagingVisual {
- if(game==='reef-party')throw new Error('A server-validated fish target is required. Use reefOutcome.');
+ if(isFishGame(game))throw new Error('A server-validated fish target is required. Use reefOutcome.');
  const paying=random(10000)<3000;
  // Rejection sampling conditions the visible outcome distribution, never a player's history.
  for(let attempt=0;attempt<10000;attempt++){
@@ -271,13 +272,20 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
  throw new Error('Experimental sampler exhausted; no round accepted.');
 }
 
-export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish'] as const;
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v4'} as const;
+export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan'] as const;
+export type FishGame='reef-party'|'abyss-legends';
+export function isFishGame(game:unknown):game is FishGame{return game==='reef-party'||game==='abyss-legends';}
+export const fishSpeciesPools={
+ 'reef-party':[14,15,0,2,1,4,12,3,16,6,20,13,17,5,10,22,11],
+ 'abyss-legends':[16,20,17,18,16,22,20,21,6,17,16,20,18,22,21,5]
+} as const;
+export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...(game==='abyss-legends'?[19,23]:[7,8,9])])];}
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v5'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
-export function reefLeadAngle(seat:number,targetId:number,time:number){
- const origin=reefCannon(seat);let target=reefTarget(targetId,time);
- for(let i=0;i<6;i++){const travel=Math.max(0,(Math.hypot(target.x-origin.x,target.y-origin.y)-56)/reefBallistics.speed);target=reefTarget(targetId,time+travel);}
+export function reefLeadAngle(seat:number,targetId:number,time:number,game:FishGame='reef-party'){
+ const origin=reefCannon(seat);let target=reefTarget(targetId,time,game);
+ for(let i=0;i<6;i++){const travel=Math.max(0,(Math.hypot(target.x-origin.x,target.y-origin.y)-56)/reefBallistics.speed);target=reefTarget(targetId,time+travel,game);}
  return Math.atan2(target.y-origin.y,target.x-origin.x);
 }
 /** Swept relative-circle intersection: moving targets cannot be skipped by a fast projectile. */
@@ -287,14 +295,14 @@ export function sweptCircle(ax:number,ay:number,bx:number,by:number,radius:numbe
  const b=2*(ax*dx+ay*dy),d=b*b-4*a*c;if(d<0)return null;
  const t=(-b-Math.sqrt(d))/(2*a);return t>=0&&t<=1?t:null;
 }
-export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:readonly number[]){
+export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:readonly number[],game:FishGame='reef-party'){
  const cannon=reefCannon(seat),vx=Math.cos(angle)*reefBallistics.speed,vy=Math.sin(angle)*reefBallistics.speed;
  const origin={x:cannon.x+Math.cos(angle)*56,y:cannon.y+Math.sin(angle)*56};
  let previous=origin;
  for(let time=reefBallistics.step;time<=reefBallistics.lifetime+1e-6;time+=reefBallistics.step){
   const current={x:origin.x+vx*time,y:origin.y+vy*time};let hit:{targetId:number;time:number;x:number;y:number}|null=null;
   for(const id of targetIds){
-   const before=reefTarget(id,roomTime+time-reefBallistics.step),after=reefTarget(id,roomTime+time);
+   const before=reefTarget(id,roomTime+time-reefBallistics.step,game),after=reefTarget(id,roomTime+time,game);
    if(!before.active||!after.active)continue;
    if(Math.abs(after.x-before.x)>600)continue; // A fish wrapping offscreen never sweeps across the table.
    const contact=sweptCircle(previous.x-before.x,previous.y-before.y,current.x-after.x,current.y-after.y,after.radius+reefBallistics.radius);
@@ -306,15 +314,15 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
  }
  return {targetId:null,time:reefBallistics.lifetime,x:previous.x,y:previous.y,origin,vx,vy,angle};
 }
-export function reefTarget(id:number,time:number){
+export function reefTarget(id:number,time:number,game:FishGame='reef-party'){
  if(!Number.isInteger(id)||id<1||id>80||!Number.isFinite(time))throw new Error('Invalid reef target');
- // One scheduled arrival every three seconds; at most fourteen on stage and one boss.
- // Uncaught targets may return on the next 240-second migration. Captured IDs never respawn.
- const pattern=[14,15,0,2,8,1,4,12,3,14,6,15,0,13,1,5,9,14,2,15,10,12,6,11];
- const slot=(id-1)%24,species=id%20===5?[8,9,7,8][Math.floor(id/20)]:[7,8,9].includes(pattern[slot])?14:pattern[slot];
- const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10][species];
- const duration={small:32,medium:38,large:44,boss:50}[tier],spawnAt=(id-1)*3-36;
- const age=((time-spawnAt)%240+240)%240,active=time>=spawnAt&&age<duration;
+ // Staggered two-second arrivals: about 16 targets, bounded to 20 and one boss.
+ // Captured IDs remain unavailable for the lifetime of the shared room.
+ const pattern=fishSpeciesPools[game],bosses=game==='abyss-legends'?[19,23]:[8,9,7,8];
+ const species=id%20===5?bosses[Math.floor(id/20)%bosses.length]:pattern[(id-1)%pattern.length];
+ const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98][species];
+ const duration={small:28,medium:32,large:36,boss:38}[tier],spawnAt=(id-1)*2-28;
+ const age=((time-spawnAt)%160+160)%160,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
  const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;
  const y=125+((id*83)%340)+Math.sin(age*.32+id)*({small:15,medium:20,large:12,boss:8}[tier]);
