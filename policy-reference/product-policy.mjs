@@ -26,7 +26,7 @@ export function planManualAdjustment({principal,wallet,direction,amountUnits,rea
  if(!Number.isSafeInteger(expectedWalletVersion)||expectedWalletVersion!==wallet.version)fail('STALE_WALLET');
  if(direction!=='ADD'&&direction!=='REMOVE')fail('BAD_DIRECTION');
  units(amountUnits,1n,'BAD_AMOUNT');
- const why=text(reason,5,500,'REASON_REQUIRED');
+ const why=reason === undefined || typeof reason === 'string' && !reason.trim() ? '' : text(reason,5,500,'REASON_REQUIRED');
  const key=text(idempotencyKey,8,128,'BAD_IDEMPOTENCY_KEY');
  if(direction==='REMOVE'&&amountUnits>available)fail('INSUFFICIENT_AVAILABLE');
  const delta=direction==='ADD'?amountUnits:-amountUnits;

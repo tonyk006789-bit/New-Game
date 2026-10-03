@@ -17,7 +17,8 @@ test('remove exactly available preserves the reserved amount',()=>{const p=planM
 test('all lower roles are denied adjustment even with a forged step-up flag',()=>{for(const role of ['SUB_DISTRIBUTOR','AGENT','PLAYER','MAIN_DISTRIBUTOR'])throwsCode(()=>planManualAdjustment({...request(),principal:{...request().principal,role}}),'FORBIDDEN');});
 test('inactive root is denied',()=>throwsCode(()=>planManualAdjustment({...request(),principal:{...request().principal,active:false}}),'FORBIDDEN'));
 test('root requires trusted step-up claim',()=>throwsCode(()=>planManualAdjustment({...request(),principal:{...request().principal,stepUpVerified:false}}),'STEP_UP_REQUIRED'));
-test('reason must be meaningful and bounded',()=>{for(const reason of ['', '    ','a'.repeat(501)])throwsCode(()=>planManualAdjustment({...request(),reason}),'REASON_REQUIRED');});
+test('provided nonempty reasons remain bounded',()=>{for(const reason of ['ab','a'.repeat(501)])throwsCode(()=>planManualAdjustment({...request(),reason}),'REASON_REQUIRED');});
+test('owner-approved empty reasons remain empty in the adjustment plan',()=>{for(const reason of [undefined,'','   '])assert.equal(planManualAdjustment({...request(),reason}).reason,'');});
 test('idempotency key is mandatory but helper does not persist it',()=>throwsCode(()=>planManualAdjustment({...request(),idempotencyKey:''}),'BAD_IDEMPOTENCY_KEY'));
 test('stale preview fails',()=>throwsCode(()=>planManualAdjustment({...request(),expectedWalletVersion:6}),'STALE_WALLET'));
 test('negative zero float and oversized amounts fail',()=>{for(const amountUnits of [0n,-1n,2.5,MAX_UNITS+1n])throwsCode(()=>planManualAdjustment({...request(),amountUnits}),'BAD_AMOUNT');});

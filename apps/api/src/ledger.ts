@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { OperatorReason } from '@new-game/contracts';
 import { type PoolClient } from 'pg';
 import { actorFor, parse, privileged, verifiedStaff, type Request } from './auth.js';
 import { type Actor, type Wallet, audit, branchEnabled, directChild, fail, idempotent, inScope, transaction, walletView } from './store.js';
 const units=z.string().regex(/^[1-9]\d{0,14}$/);
 const version=z.string().regex(/^(0|[1-9]\d{0,18})$/);
-const base={targetId:z.uuid(),amount:units,reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128),expectedVersion:version};
+const base={targetId:z.uuid(),amount:units,reason:OperatorReason,requestKey:z.string().min(8).max(128),expectedVersion:version};
 const adjustmentSchema=z.object({...base,direction:z.enum(['ADD','REMOVE'])}).strict();
 const transferSchema=z.object({...base,targetVersion:version}).strict();
 const reversalSchema=z.object({transactionId:z.uuid(),reason:base.reason,requestKey:base.requestKey,expectedVersion:version}).strict();

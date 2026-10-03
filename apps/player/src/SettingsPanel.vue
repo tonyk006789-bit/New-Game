@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed,ref} from 'vue';
 import {api,type Account} from './api';
-import {audioPreferences,unlockAudio,playSound} from './audio';
+import {audioPreferences,unlockAudio,playSound,musicNow,selectMusicTrack} from './audio';
+import {musicPlaylists} from './music-score';
+const playlist=computed(()=>musicPlaylists[musicNow.scene]);
+async function chooseTrack(event:Event){await unlockAudio();selectMusicTrack(Number((event.target as HTMLSelectElement).value));}
 const props=defineProps<{account:Account|null;reducedMotion:boolean}>();
 const emit=defineEmits<{'update:reducedMotion':[value:boolean];logout:[];passwordChanged:[]}>();
 const changing=ref(false),busy=ref(false),error=ref(''),current=ref(''),password=ref(''),confirm=ref('');
@@ -13,6 +16,7 @@ async function toggle(kind:'music'|'sound'){await unlockAudio();audioPreferences
 </script>
 <template><section class="arcade-panel settings-panel simple-settings">
  <div><span><strong>Music</strong><p>Original casino tracks · Changes with each game</p></span><button class="toggle" :class="{on:audioPreferences.music}" role="switch" :aria-checked="audioPreferences.music" aria-label="Music" @click="toggle('music')"><i></i></button></div>
+ <div class="music-library"><span><strong>Casino playlist</strong><p>Three tracks per game · Automatically rotates</p></span><select aria-label="Music track" :value="musicNow.index" @change="chooseTrack"><option v-for="(track,index) in playlist" :key="track.name" :value="index">{{track.name}}</option></select></div>
  <div><span><strong>Sound</strong><p>Buttons, cannons and wins</p></span><button class="toggle" :class="{on:audioPreferences.sound}" role="switch" :aria-checked="audioPreferences.sound" aria-label="Sound effects" @click="toggle('sound')"><i></i></button></div>
  <div><span><strong>Reduced motion</strong><p>Shorter reveals and calmer effects</p></span><button class="toggle" :class="{on:reducedMotion}" role="switch" :aria-checked="reducedMotion" aria-label="Reduced motion" @click="emit('update:reducedMotion',!props.reducedMotion)"><i></i></button></div>
  <div v-if="account"><span><strong>{{account.displayName}}</strong><p>{{account.username}}</p></span><button class="secondary" :aria-expanded="changing" @click="changing=!changing">Change password</button></div>

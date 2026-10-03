@@ -20,14 +20,16 @@ export type WalletSnapshot = z.infer<typeof WalletSnapshot>;
 // Server-side representation after session verification; never decode this from a request body as authority.
 export const Principal = z.object({ accountId: z.uuid(), role: Role, branchId: z.uuid(), sessionId: z.uuid(), active: z.boolean() }).strict();
 export type Principal = z.infer<typeof Principal>;
+// Owner-approved blank operator notes. Historical nonempty notes remain valid.
+export const OperatorReason = z.string().trim().max(500).refine(value => value.length === 0 || value.length >= 5).default('');
 export const CreditAdjustmentRequest = z.object({
   targetWalletId: z.uuid(), direction: z.enum(['ADD', 'REMOVE']), amountUnits: PositiveUnits,
-  reason: z.string().trim().min(5).max(500), expectedWalletVersion: Units
+  reason: OperatorReason, expectedWalletVersion: Units
 }).strict();
 export const IdempotencyKey = z.string().min(8).max(128).regex(/^[a-zA-Z0-9_-]+$/);
 export const TransferRequest = z.object({
   sourceWalletId: z.uuid(), targetWalletId: z.uuid(), amountUnits: PositiveUnits,
-  expectedSourceVersion: Units, expectedTargetVersion: Units, reason: z.string().trim().min(5).max(500)
+  expectedSourceVersion: Units, expectedTargetVersion: Units, reason: OperatorReason
 }).strict().refine(value => value.sourceWalletId !== value.targetWalletId, 'Wallets must differ');
 export const RoundRequest = z.object({
   gameId: GameId, ruleVersion: z.string().min(1).max(80), costUnits: PositiveUnits,

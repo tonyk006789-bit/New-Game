@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { OperatorReason } from '@new-game/contracts';
 import { type Request, actorFor, parse, privileged, verifiedStaff } from './auth.js';
 import { type Wallet, audit, branchEnabled, directChild, directChildrenSql, fail, idempotent, inScope, transaction, walletView } from './store.js';
 import { passwordHash } from './security.js';
@@ -54,10 +55,10 @@ export async function report(req:Request){return transaction(async db=>{
 });}
 export async function auditHistory(req:Request){return transaction(async db=>{const actor=await actorFor(db,req);if(actor.role!=='MAIN_ADMIN')fail(403,'MAIN_ADMIN_REQUIRED');return (await db.query('SELECT e.id,e.event_type,e.details,e.created_at,a.display_name actor FROM audit_events e JOIN accounts a ON a.id=e.actor_id JOIN branch_ancestors c ON c.branch_id=e.branch_id_at_event WHERE c.ancestor_id=$1 ORDER BY e.created_at DESC LIMIT 100',[actor.branch_id])).rows;});}
 const manageSchema=z.discriminatedUnion('action',[
- z.object({action:z.literal('SET_ARCHIVED'),archived:z.boolean(),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128)}).strict(),
- z.object({action:z.literal('RESET_PASSWORD'),password:z.string().min(12).max(256),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict(),
- z.object({action:z.literal('SET_ACTIVE'),active:z.boolean(),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict(),
- z.object({action:z.literal('EDIT_PROFILE'),displayName:z.string().trim().min(1).max(100),reason:z.string().trim().min(5).max(500),requestKey:z.string().min(8).max(128).optional()}).strict()
+ z.object({action:z.literal('SET_ARCHIVED'),archived:z.boolean(),reason:OperatorReason,requestKey:z.string().min(8).max(128)}).strict(),
+ z.object({action:z.literal('RESET_PASSWORD'),password:z.string().min(12).max(256),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict(),
+ z.object({action:z.literal('SET_ACTIVE'),active:z.boolean(),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict(),
+ z.object({action:z.literal('EDIT_PROFILE'),displayName:z.string().trim().min(1).max(100),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict()
 ]);
 export async function manageAccount(req:Request,id:string,body:unknown){
  const targetId=parse(z.uuid(),id),data=parse(manageSchema,body);

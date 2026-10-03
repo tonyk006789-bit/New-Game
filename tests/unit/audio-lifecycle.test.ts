@@ -24,7 +24,15 @@ describe('casino audio lifecycle',()=>{
   audio.setMusicScene('abyss-legends');expect(vi.getTimerCount()).toBe(1);
   expect(firstTrack.every(s=>s.stop.mock.calls.length===2)).toBe(true);
   expect(audio.musicNow.scene).toBe('abyss-legends');
+  audio.nextMusicTrack();expect(audio.musicNow.title).toBe('Deep Current');
+  audio.selectMusicTrack(2);expect(audio.musicNow.title).toBe('Midnight Leviathan');
+  audio.selectMusicTrack(99);expect(audio.musicNow.index).toBe(2);
+  audio.setMusicScene('lobby');audio.setMusicScene('abyss-legends');expect(audio.musicNow.index).toBe(2);
+  expect(vi.getTimerCount()).toBe(1);
+  for(let i=0;i<1500;i++){context.currentTime+=.05;vi.advanceTimersByTime(50);}
+  expect(audio.musicNow.index).toBe(0);expect(vi.getTimerCount()).toBe(1);
   audio.audioPreferences.music=false;await nextTick();expect(vi.getTimerCount()).toBe(0);
+  const pausedIndex=audio.musicNow.index;context.currentTime+=100;vi.advanceTimersByTime(100000);expect(audio.musicNow.index).toBe(pausedIndex);
   const before=sources.length;audio.playSound('shot');expect(sources.length).toBeGreaterThan(before);
   audio.audioPreferences.sound=false;await nextTick();const muted=sources.length;audio.playSound('treasure');expect(sources.length).toBe(muted);
   audio.audioPreferences.music=true;await nextTick();expect(vi.getTimerCount()).toBe(1);

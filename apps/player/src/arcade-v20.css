@@ -1,0 +1,6 @@
+.music-controls{display:inline-flex;gap:4px;align-items:center;flex-shrink:0}
+.music-controls .game-music-button{margin:0;flex-shrink:0}
+.music-controls .music-next{font-size:15px;width:30px;min-width:30px}
+.simple-settings .music-library{gap:14px;flex-wrap:wrap}
+.music-library select{max-width:100%;padding:10px 12px;border:1px solid #b79549;border-radius:7px;background:#071b20;color:#ffeab1}
+@media(max-width:700px){.header-controls{gap:5px}.header-controls .music-controls{gap:2px}.header-controls .game-music-button{width:28px;height:28px;min-width:28px;font-size:17px}.header-controls .music-next{font-size:12px;width:24px;min-width:24px}.game-topline .music-controls{gap:2px}.game-topline .music-next{width:25px;min-width:25px}.game-topline h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.game-topline>div:not(.music-controls){min-width:0}}

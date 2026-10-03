@@ -209,6 +209,46 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.deepEqual(await wallet(child),before);assert.equal((await control.query('SELECT count(*)::text n FROM ledger_transactions')).rows[0].n,ledger);
   assert.equal((await call('me',undefined,leafSession)).status,401);
  });
+ await t.test('all three operator tiers can manage and move credits with empty reasons and durable receipts',async()=>{
+  const prior=(await control.query("SELECT id,reason FROM ledger_transactions ORDER BY id")).rows;
+  const sub=await create(adminId,'blank.sub'),subSession=await signin('blank.sub');
+  const child=await create(sub,'blank.agent',subSession),childSession=await signin('blank.agent');
+  const leaf=await create(child,'blank.player',childSession);
+  const receipts=[];
+  const grant=async(targetId,direction,amount)=>{
+   const body={targetId,direction,amount,expectedVersion:(await wallet(targetId)).version,requestKey:randomUUID()};
+   const accepted=await call('admin/credit-adjustments',body,admin);ok(accepted);receipts.push(accepted.data.id);assert.equal(accepted.data.reason,'');
+   const retried=await call('admin/credit-adjustments',{...body,reason:''},admin);ok(retried);assert.equal(retried.data.id,accepted.data.id);return accepted.data;
+  };
+  await grant(adminId,'ADD','1000');
+  for(const [auth,parent,target] of [[admin,adminId,sub],[subSession,sub,child],[childSession,child,leaf]]){
+   const body={targetId:target,amount:'100',expectedVersion:(await wallet(parent)).version,targetVersion:(await wallet(target)).version,requestKey:randomUUID()};
+   const attempts=await Promise.all([call('credit-transfers',body,auth),call('credit-transfers',{...body,reason:'   '},auth)]);attempts.forEach(ok);assert.equal(attempts[0].data.id,attempts[1].data.id);assert.equal(attempts[0].data.reason,'');receipts.push(attempts[0].data.id);
+   const edit={action:'EDIT_PROFILE',displayName:'No reason required',requestKey:randomUUID()};ok(await call(`admin/accounts/${target}/manage`,edit,auth));ok(await call(`admin/accounts/${target}/manage`,{...edit,reason:''},auth));
+  }
+  for(const [auth,parent,target] of [[childSession,child,leaf],[subSession,sub,child],[admin,adminId,sub]]){
+   const accepted=await move('operator/redeems',auth,parent,target,'25',{reason:undefined});ok(accepted);assert.equal(accepted.data.reason,'');receipts.push(accepted.data.id);
+  }
+  await grant(sub,'ADD','50');await grant(sub,'REMOVE','5');const addition=await grant(sub,'ADD','25');
+  const reversed=await call('admin/reversals',{transactionId:addition.id,expectedVersion:(await wallet(sub)).version,requestKey:randomUUID()},admin);ok(reversed);receipts.push(reversed.data.id);assert.equal(reversed.data.reason,'');
+  for(const [auth,target] of [[admin,sub],[subSession,child],[childSession,leaf]]){
+   const beforeManagement=await wallet(target);
+   ok(await call(`admin/accounts/${target}/manage`,{action:'SET_ACTIVE',active:false,requestKey:randomUUID()},auth));
+   ok(await call(`admin/accounts/${target}/manage`,{action:'SET_ACTIVE',active:true,requestKey:randomUUID()},auth));
+   ok(await call(`admin/accounts/${target}/manage`,{action:'SET_ARCHIVED',archived:true,requestKey:randomUUID()},auth));
+   ok(await call(`admin/accounts/${target}/manage`,{action:'SET_ARCHIVED',archived:false,requestKey:randomUUID()},auth));
+   ok(await call(`admin/accounts/${target}/manage`,{action:'RESET_PASSWORD',password:adminPassword,requestKey:randomUUID()},auth));
+   assert.deepEqual(await wallet(target),beforeManagement);
+   // Suspending a staff parent revokes its sessions. Refresh before testing the next tier.
+   if(target===sub)Object.assign(subSession,await signin('blank.sub'));
+   if(target===child)Object.assign(childSession,await signin('blank.agent'));
+  }
+  const stored=(await control.query('SELECT t.reason,sum(p.units)::text total FROM ledger_transactions t JOIN ledger_postings p ON p.transaction_id=t.id WHERE t.id=ANY($1::uuid[]) GROUP BY t.id',[receipts])).rows;
+  assert.equal(stored.length,receipts.length);assert.ok(stored.every(row=>row.reason===''&&row.total==='0'));
+  assert.deepEqual((await control.query('SELECT id,reason FROM ledger_transactions WHERE id=ANY($1::uuid[]) ORDER BY id',[prior.map(row=>row.id)])).rows,prior);
+  assert.ok((await control.query("SELECT details FROM audit_events WHERE actor_id=ANY($1::uuid[]) AND event_type='EDIT_PROFILE'",[[adminId,sub,child]])).rows.some(row=>row.details.reason===''));
+  assert.equal((await call('admin/credit-adjustments',{targetId:leaf,direction:'ADD',amount:'1',expectedVersion:(await wallet(leaf)).version,requestKey:randomUUID()},childSession)).status,403);
+ });
  await t.test('bigint balances survive paginated JSON without precision loss',async()=>{
   for(let i=0;i<10;i++)ok(await adjust(peer,'999999999999999'));
   ok(await adjust(peer,'1'));const expected='9999999999999991';assert.equal((await wallet(peer)).settled,expected);

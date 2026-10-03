@@ -183,3 +183,10 @@ This record supersedes pending-transfer wording in the original handoff. Runtime
 # 3 October 2026 — game animation refinement
 
 Owner requested enhanced motion, specifically slower slot result stops, and research into other games. V19 changes presentation timing only: progressive reel braking, survivor-preserving cascades, crystal docking, paced keno reveals and smoother cannon/effect motion. Existing approved test outcomes, payouts, server settlement and win-before-balance presentation remain authoritative. Evidence: `reports/REFINEMENT_V19.md`.
+
+## 3 October 2026 — more music and no operator Reason section
+
+- Owner requested more frontend music and removal of the Reason section throughout Main Admin, Sub-contractor and Agent workflows, explicitly saying to leave it empty. This supersedes earlier mandatory operator-reason guidance. New operator actions omit the field and normalize to an empty string; no fabricated note is inserted. Existing ledger/audit notes and durable pending requests are preserved. Reviews and receipts no longer display the section.
+- Migration 015 permits empty ledger reasons while preserving the existing bounds on nonempty notes. Password verification, hierarchy, wallet versions, balanced entries, reserved credits and request idempotency remain enforced.
+- Added two original synthesized compositions per game/lobby, giving three tracks for each of thirteen scenes. Playlists rotate automatically and have next-track controls; Music/Sound and background suspension remain independent. No licensed provider music or game-math changes.
+- Publish both existing Vercel test sites under the ongoing owner authorization. Verification, migration and rollback evidence: `../reports/REFINEMENT_V20.md`.

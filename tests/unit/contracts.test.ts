@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { CreditAdjustmentRequest, RoundRequest, Units, WalletSnapshot, TransferRequest } from '@new-game/contracts';
+import { CreditAdjustmentRequest, RoundRequest, Units, WalletSnapshot, TransferRequest, OperatorReason } from '@new-game/contracts';
 import { adjustmentPreview, canAnimatePreview, canStake, formatCredits, parseCredits, zeroWallet } from '@new-game/domain';
 import { evaluateLines, mathStatus, previewGrid, requireApprovedGame } from '@new-game/game-math';
 const id = '10000000-0000-4000-8000-000000000001';
 describe('credit and authorization boundaries', () => {
+  it('normalizes missing or blank operator reasons without inventing descriptions', () => {
+    for (const reason of [undefined,'','   ']) expect(OperatorReason.parse(reason)).toBe('');
+    expect(OperatorReason.parse('Existing manual reason')).toBe('Existing manual reason');
+    for(const reason of [null,42,{},'x'.repeat(501)]) expect(OperatorReason.safeParse(reason).success).toBe(false);
+    expect(CreditAdjustmentRequest.parse({targetWalletId:id,direction:'ADD',amountUnits:'1',expectedWalletVersion:'0'}).reason).toBe('');
+  });
   it('preserves bigint values beyond JavaScript numeric precision', () => { expect(parseCredits('90071992547409.91')).toBe('9007199254740991'); expect(formatCredits('9223372036854775807')).toBe('92,233,720,368,547,758.07'); });
   it.each(['-1', '1.001', '1e3', '00.5', 'NaN', 'Infinity', ' 2', '92233720368547758.08'])('rejects invalid credit input %s', input => expect(() => parseCredits(input)).toThrow());
   it.each(['01', '-1', '1.2', '9223372036854775808', '1e3'])('rejects noncanonical or overflowing units %s', input => expect(Units.safeParse(input).success).toBe(false));

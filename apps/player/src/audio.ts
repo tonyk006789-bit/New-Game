@@ -1,7 +1,9 @@
 import {reactive,watch} from 'vue';
-import {musicScores,scoreStep,type MusicScene} from './music-score';
+import {musicScores,musicPlaylists,musicTrack,scoreStep,TRACK_STEPS,type MusicScene} from './music-score';
 export const audioPreferences=reactive({music:false,sound:true});
-export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string});
+export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length});
+const selectedTracks=new Map<MusicScene,number>();
+function trackInfo(index:number){musicNow.index=index;musicNow.title=musicTrack(musicNow.scene,index).name;musicNow.total=musicPlaylists[musicNow.scene].length;selectedTracks.set(musicNow.scene,index);}
 try{const saved=JSON.parse(localStorage.getItem('ng-audio')||'{}');if(typeof saved.music==='boolean')audioPreferences.music=saved.music;if(typeof saved.sound==='boolean')audioPreferences.sound=saved.sound;}catch{/* Optional settings. */}
 let context:AudioContext|undefined,musicGain:GainNode|undefined,soundGain:GainNode|undefined,noise:AudioBuffer|undefined;
 let timer:ReturnType<typeof setInterval>|undefined,active=true,step=0,nextAt=0;
@@ -23,14 +25,15 @@ function drum(start:number,duration:number,level:number,hat:boolean){
 }
 function scheduleMusic(){
  if(!context||!musicGain||!active||!audioPreferences.music||context.state!=='running')return;
- const score=musicScores[musicNow.scene],eighth=30/score.bpm;
  if(nextAt<context.currentTime)nextAt=context.currentTime+.03;
  while(nextAt<context.currentTime+.18){
-  for(const e of scoreStep(musicNow.scene,step)){
+  const score=musicTrack(musicNow.scene,musicNow.index),eighth=30/score.bpm;
+  for(const e of scoreStep(musicNow.scene,step,musicNow.index)){
    if(e.kind==='hat'||e.kind==='snare')drum(nextAt,e.duration,e.level,e.kind==='hat');
    else tone(e.note,nextAt,e.duration,musicGain,e.level,e.kind==='kick'?'sine':e.kind==='bass'?'triangle':e.kind==='chord'?'sawtooth':score.wave,true,e.kind==='kick');
   }
-  nextAt+=eighth*(step%2?1-score.swing:1+score.swing);step=(step+1)%128;
+  nextAt+=eighth*(step%2?1-score.swing:1+score.swing);step++;
+  if(step===TRACK_STEPS){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
  }
 }
 function stopMusic(){clearInterval(timer);timer=undefined;for(const node of musicNodes){try{node.stop();}catch{/* Already ended. */}}musicNodes.clear();}
@@ -39,7 +42,9 @@ function update(){
  if(!active||!audioPreferences.music){stopMusic();return;}
  if(context.state==='running'&&!timer){nextAt=context.currentTime+.03;scheduleMusic();timer=setInterval(scheduleMusic,50);}
 }
-export function setMusicScene(scene:string){const next=Object.hasOwn(musicScores,scene)?scene as MusicScene:'lobby';if(next===musicNow.scene)return;stopMusic();step=0;musicNow.scene=next;musicNow.title=musicScores[next].name;update();}
+export function setMusicScene(scene:string){const next=Object.hasOwn(musicScores,scene)?scene as MusicScene:'lobby';if(next===musicNow.scene)return;stopMusic();step=0;musicNow.scene=next;trackInfo(selectedTracks.get(next)||0);update();}
+export function selectMusicTrack(index:number){if(!Number.isInteger(index)||index<0||index>=musicNow.total)return;stopMusic();step=0;trackInfo(index);update();}
+export function nextMusicTrack(){selectMusicTrack((musicNow.index+1)%musicNow.total);}
 export async function unlockAudio(){
  if(!active)return;
  try{if(!context){context=new AudioContext();musicGain=context.createGain();soundGain=context.createGain();
