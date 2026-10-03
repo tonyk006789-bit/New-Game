@@ -60,4 +60,11 @@ Retain migration 016 on application rollback: restoring the old whitelist after 
 
 ## Publication
 
-Vercel deployment details and live verification will be recorded after publication.
+Source commit `8a6e22f` was pushed to GitHub `main`. Both prebuilt Vercel deployments are READY:
+
+- Player: `dpl_AxBAQVHPzebwkHFdmebsPRbyezs9`, https://new-game-test-topaz.vercel.app/ (immutable: https://new-game-test-iixf9p5s2-tonyk006789-7532.vercel.app/).
+- Operator: `dpl_9RnmsxpryxGTYZAzui5CtZzkuj1v`, https://new-game-operator.vercel.app/ (immutable: https://new-game-operator-3uubnvv5g-tonyk006789-7532.vercel.app/).
+- Both public aliases returned HTTP 200 with the exact built assets: player `index-kZbcDt9M.js` / `index-CMtp-iFM.css`; operator `index-DfH8092F.js` / `index-CTLbK85O.css`.
+- Live operator session restored successfully. Main Admin's new Sub-contractor form exposes minimum length 6 and the shared letter/number pattern for username and password. The form was dismissed without submission; existing balances were not changed.
+- Live Abyss Legends guest preview shows three labeled bot teammates and coordinated assist cannon/net effects. Auto fire was tested in the free preview and returned to OFF. Browser warning/error logs were empty. Read-only inspection of canvas attributes timed out in the hosted browser; the screenshot, visible controls and labels verified the live presentation, with detailed shot counters verified locally above.
+- Live screenshots: `reports/screenshots-v21/six-character-credentials-live.png` and `abyss-bot-teammates-live.png`. Both published tabs remain available in the browser; local verification tabs were closed.
