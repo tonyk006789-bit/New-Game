@@ -4,6 +4,11 @@ export const MAX_UNITS = 9223372036854775807n;
 export const Units = z.string().regex(/^(0|[1-9]\d{0,18})$/).pipe(z.string().refine(value => BigInt(value) <= MAX_UNITS, 'Exceeds PostgreSQL bigint'));
 export const PositiveUnits = Units.pipe(z.string().refine(value => BigInt(value) > 0n, 'Amount must be positive'));
 export const Role = z.enum(['MAIN_ADMIN', 'SUB_DISTRIBUTOR', 'AGENT', 'PLAYER']);
+export const credentialHint='At least 6 characters, including a letter and a number.';
+export const credentialPattern='(?=.*[A-Za-z])(?=.*[0-9]).{6,256}';
+export const NewPassword=z.string().min(6,credentialHint).max(256).regex(/[A-Za-z]/,credentialHint).regex(/[0-9]/,credentialHint);
+export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
+ z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));
 export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({

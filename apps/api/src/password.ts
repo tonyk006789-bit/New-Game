@@ -1,10 +1,11 @@
 import {z} from 'zod';
+import {NewPassword} from '@new-game/contracts';
 import {actorFor,checkOrigin,parse,readToken,sessionCookie,type Request,type Response} from './auth.js';
 import {audit,fail,transaction} from './store.js';
 import {digest,passwordHash,passwordMatches} from './security.js';
 export async function changePassword(req:Request,res:Response,body:unknown){
  checkOrigin(req);
- const data=parse(z.object({currentPassword:z.string().min(1).max(256),newPassword:z.string().min(12).max(256)}).strict(),body);
+ const data=parse(z.object({currentPassword:z.string().min(1).max(256),newPassword:NewPassword}).strict(),body);
  const result=await transaction(async db=>{
   const candidate=(await db.query('SELECT account_id FROM sessions WHERE token_hash=$1',[digest(readToken(req))])).rows[0];
   if(!candidate)fail(401,'AUTH_REQUIRED');

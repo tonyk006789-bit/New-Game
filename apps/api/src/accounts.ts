@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { OperatorReason } from '@new-game/contracts';
+import { OperatorReason, NewUsername, NewPassword } from '@new-game/contracts';
 import { type Request, actorFor, parse, privileged, verifiedStaff } from './auth.js';
 import { type Wallet, audit, branchEnabled, directChild, directChildrenSql, fail, idempotent, inScope, transaction, walletView } from './store.js';
 import { passwordHash } from './security.js';
@@ -15,7 +15,7 @@ export async function accounts(req:Request){return transaction(async db=>{
  JOIN branches b ON b.id=a.branch_id JOIN branch_ancestors c ON c.branch_id=a.branch_id JOIN wallets w ON w.account_id=a.id WHERE c.ancestor_id=$1 AND (a.id=$2 OR ${directChildrenSql(actor.role)}) ORDER BY a.created_at DESC LIMIT 500`,[actor.branch_id,actor.id]);
  return rows.map(row=>({id:row.id,username:row.username,displayName:row.display_name,role:row.role,active:row.active,branch:row.branch,wallet:walletView(row as Wallet)}));
 });}
-const createSchema=z.object({parentId:z.uuid(),username:z.string().regex(/^[a-z0-9][a-z0-9._-]{2,63}$/),displayName:z.string().trim().min(1).max(100),password:z.string().min(12).max(256),requestKey:z.string().min(8).max(128).optional()}).strict();
+const createSchema=z.object({parentId:z.uuid(),username:NewUsername,displayName:z.string().trim().min(1).max(100),password:NewPassword,requestKey:z.string().min(8).max(128).optional()}).strict();
 export async function createAccount(req:Request,body:unknown){
  const data=parse(createSchema,body);
  return transaction(async db=>{
@@ -56,7 +56,7 @@ export async function report(req:Request){return transaction(async db=>{
 export async function auditHistory(req:Request){return transaction(async db=>{const actor=await actorFor(db,req);if(actor.role!=='MAIN_ADMIN')fail(403,'MAIN_ADMIN_REQUIRED');return (await db.query('SELECT e.id,e.event_type,e.details,e.created_at,a.display_name actor FROM audit_events e JOIN accounts a ON a.id=e.actor_id JOIN branch_ancestors c ON c.branch_id=e.branch_id_at_event WHERE c.ancestor_id=$1 ORDER BY e.created_at DESC LIMIT 100',[actor.branch_id])).rows;});}
 const manageSchema=z.discriminatedUnion('action',[
  z.object({action:z.literal('SET_ARCHIVED'),archived:z.boolean(),reason:OperatorReason,requestKey:z.string().min(8).max(128)}).strict(),
- z.object({action:z.literal('RESET_PASSWORD'),password:z.string().min(12).max(256),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict(),
+ z.object({action:z.literal('RESET_PASSWORD'),password:NewPassword,reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict(),
  z.object({action:z.literal('SET_ACTIVE'),active:z.boolean(),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict(),
  z.object({action:z.literal('EDIT_PROFILE'),displayName:z.string().trim().min(1).max(100),reason:OperatorReason,requestKey:z.string().min(8).max(128).optional()}).strict()
 ]);

@@ -206,6 +206,24 @@ export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:Fi
  const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
  return {id,game,captured,fish:{species,tier,profileId:reefTierProfile.id},description:captured?`${reefSpecies[species]} caught! ${rule.multiplier}× shot stake returned.`:`${reefSpecies[species]} resisted the hit.`};
 }
+// Owner-approved test profile. Legacy reef-tiers-v1 outcomes remain replayable.
+export const reefAssistProfile={id:'reef-assist-v1',baseProfile:reefTierProfile.id,soloHumanCount:1,maxFreeAssists:3,maxAwardsPerPaidHit:1} as const;
+export type ReefAssistance={profileId:string;botSeats:number[];attempts:{seat:number;captured:boolean}[];humanCaptured:boolean};
+export function reefBotSeats(humanSeats:readonly number[]):number[]{
+ return humanSeats.length===1&&[1,2,3,4].includes(humanSeats[0])?[1,2,3,4].filter(seat=>seat!==humanSeats[0]):[];
+}
+export function reefAssistedOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame,humanSeats:readonly number[]):StagingVisual&{assistance:ReefAssistance}{
+ const visual=reefOutcome(id,targetId,random,game),botSeats=reefBotSeats(humanSeats);
+ const assistance:ReefAssistance={profileId:reefAssistProfile.id,botSeats,attempts:[],humanCaptured:!!visual.captured};
+ for(const seat of botSeats){
+  if(visual.captured)break;
+  const captured=random(10000)<reefTierProfile.tiers[visual.fish!.tier].captureTickets;
+  assistance.attempts.push({seat,captured});visual.captured=captured;
+ }
+ visual.fish={...visual.fish!,profileId:reefAssistProfile.id};
+ if(visual.captured&&!assistance.humanCaptured)visual.description=`Bot assist captured ${reefSpecies[visual.fish.species]}! ${reefTierProfile.tiers[visual.fish.tier].multiplier}× shot stake returned.`;
+ return {...visual,assistance};
+}
 export function validStake(value:string):boolean{return /^[1-9]\d{1,3}$/.test(value)&&Number(value)>=stakeLimits.min&&Number(value)<=stakeLimits.max&&Number(value)%stakeLimits.step===0;}
 // Explicit local experiment. This is not registered in the production approval registry.
 export const stagingProfile = {
@@ -234,9 +252,10 @@ export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagi
  rules:{'neon-sevens':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add all five lines.',
  'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
 } as const;
-export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'abyss-legends':stagingProfile.rules['reef-party']};
+const currentFishRules=`${stagingProfile.rules['reef-party']} Solo tables add up to three free bot attempts after a resisted paid hit, stopping at the first capture. At most one tier award; bots stop when another human joins. Profile: ${reefAssistProfile.id}.`;
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'reef-party':currentFishRules,'abyss-legends':currentFishRules};
 export type StagingGame=keyof typeof stagingRules;
-export function stagingGameProfileId(game:string){return isFishGame(game)?reefTierProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export function stagingGameProfileId(game:string){return isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;

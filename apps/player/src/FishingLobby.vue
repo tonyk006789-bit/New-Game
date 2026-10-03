@@ -34,7 +34,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);});
 </script>
 <template>
  <section class="fishing-lobby" :class="[game,{'stage-paused':!running}]" aria-label="Fishing table lobby">
-  <header class="fishing-lobby-title"><span>{{game==='abyss-legends'?'THE ABYSS LOUNGE':'THE OCEAN LOUNGE'}}</span><h2>Choose your table</h2><p>Four seats. Your own cannon. A reef to share.</p></header>
+  <header class="fishing-lobby-title"><span>{{game==='abyss-legends'?'THE ABYSS LOUNGE':'THE OCEAN LOUNGE'}}</span><h2>Choose your table</h2><p>Four seats. Solo players get three bot teammates.</p></header>
   <p v-if="error" class="fishing-lobby-error" role="alert">{{error}}</p>
   <p v-if="loading" class="fishing-loading" role="status">Finding open tables…</p>
   <div v-else class="fishing-tables">

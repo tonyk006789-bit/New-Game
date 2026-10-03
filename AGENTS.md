@@ -23,9 +23,12 @@ Private group; non-purchasable, nonredeemable play credits; no money, prizes of 
 - Do not copy the v1 96% illustration into production configuration. Both named slot examples are tests only. Scaffold generic evaluation and reports, but block actual credit-staked slot play until the owner approves the metric, paytable, profile and version.
 - Keno and fish models need their own approvals. A slot-only target is not a fish capture rate or a keno paytable.
 - No per-player odds, adaptive loss recovery, budget-based suppression, guaranteed 3 wins per 10 spins, fake occupancy or hidden bots.
+- Owner-approved exception (3 October): test fish tables with exactly one human have three explicitly labeled bot teammates. After each valid paid hit fails its normal capture attempt, up to three free bot attempts use the existing tier chance, stopping on capture. At most one tier award belongs to the human. Bots stop when a second human joins, never hold wallets or count as human occupants, and do not independently grant credits. Use versioned `reef-assist-v1`; preserve all prior receipts.
 - The server owns outcomes; clients present committed results. Every slot grid must evaluate to its persisted award. Retries cannot resample an accepted round.
 
 ## Mobile implementation
+
+Owner credential amendment (3 October): newly set usernames and passwords need at least six characters including a letter and a number. Do not require lowercase-only usernames, mixed case or special characters. Usernames remain case-insensitive; existing usernames/passwords and numeric IDs are preserved. Apply the same policy to all new accounts, password resets and self-service password changes.
 Proposed shared client: Vue/TypeScript plus PixiJS, packaged in Android/iOS using Capacitor. NestJS core API, Colyseus rooms and PostgreSQL remain the proposed backend. Pin compatible revisions in Sprint 0. Record a real Android and iPhone rendering/lifecycle smoke test early, including fish-scene density; browser emulation does not certify native performance. Do not silently switch engines if a gate fails.
 Use platform-secure credential storage, TLS, safe areas, sound/motion settings and pause/resume recovery. No accepted credit-staked actions while offline or backgrounded. Already accepted actions settle on the server. Keep the privileged admin console out of the player app bundle.
 

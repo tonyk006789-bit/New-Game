@@ -26,13 +26,15 @@ await control.query("INSERT INTO accounts(id,branch_id,role,display_name,active,
 const admin={headers:{origin},ip:'fixture'};
 const auth=await login(admin,{setHeader(name,value){if(name==='Set-Cookie')admin.headers.cookie=(Array.isArray(value)?value:[value]).map(cookie=>cookie.split(';')[0]).join('; ');}},{username:'fixture.admin',password,code:totp(secret)});admin.headers['x-csrf-token']=auth.csrf;
 async function fixtureSession(username){const req={headers:{origin},ip:'fixture'};const account=await login(req,{setHeader(name,value){if(name==='Set-Cookie')req.headers.cookie=(Array.isArray(value)?value:[value]).map(c=>c.split(';')[0]).join('; ');}},{username,password});req.headers['x-csrf-token']=account.csrf;return req;}
-const distributor=await createAccount(admin,{parentId:root,username:'fixture.circle',displayName:'Circle',password}),subSession=await fixtureSession('fixture.circle');
-const agent=await createAccount(subSession,{parentId:distributor.id,username:'fixture.agent',displayName:'Agent',password}),agentSession=await fixtureSession('fixture.agent');
+const distributor=await createAccount(admin,{parentId:root,username:'fixture.circle1',displayName:'Circle',password}),subSession=await fixtureSession('fixture.circle1');
+const agent=await createAccount(subSession,{parentId:distributor.id,username:'fixture.agent1',displayName:'Agent',password}),agentSession=await fixtureSession('fixture.agent1');
 async function fixtureWallet(id){return (await control.query('SELECT version FROM wallets WHERE account_id=$1',[id])).rows[0];}
 await adjust(admin,{targetId:distributor.id,direction:'ADD',amount:'600000',expectedVersion:'0',requestKey:randomUUID(),reason:'Explicit isolated hosted-adapter fixture'});
 await transfer(subSession,{targetId:agent.id,amount:'600000',expectedVersion:'1',targetVersion:'0',requestKey:randomUUID(),reason:'Fixture distribution to direct agent'});
 for(const username of ['tester.one','tester.two','tester.three','tester.four','tester.five','outside.player']){
- const account=await createAccount(agentSession,{parentId:agent.id,username,displayName:username,password});
+ const account=await createAccount(agentSession,{parentId:agent.id,username:username+'1',displayName:username,password});
+ // Existing tester IDs predate the six-character letter/number creation policy.
+ await control.query('UPDATE accounts SET username=$1 WHERE id=$2',[username,account.id]);
  await transfer(agentSession,{targetId:account.id,amount:'100000',expectedVersion:(await fixtureWallet(agent.id)).version,targetVersion:'0',requestKey:randomUUID(),reason:'Fixture distribution to assigned player'});
 }
 
@@ -62,12 +64,12 @@ test('separate operator hosted transport is password-only and staff-only',async 
   assert.equal((await call('/v1/auth/verify',{password},session)).status,201);
  });
  await t.test('hosted staff creates a zero-balance sub-contractor and archives it',async()=>{
-  const r=await call('/v1/admin/accounts',{parentId:root,username:'hosted.sub',displayName:'Hosted Sub',password,requestKey:randomUUID()},session);
+  const r=await call('/v1/admin/accounts',{parentId:root,username:'hosted.sub1',displayName:'Hosted Sub',password,requestKey:randomUUID()},session);
   assert.equal(r.status,201,JSON.stringify(r.data));
-  const row=(await call('/v1/operator/accounts?role=SUB_DISTRIBUTOR&search=hosted.sub',undefined,session)).data.items[0];
+  const row=(await call('/v1/operator/accounts?role=SUB_DISTRIBUTOR&search=hosted.sub1',undefined,session)).data.items[0];
   assert.equal(row.wallet.available,'0');assert.equal(row.canRedeem,true);
   assert.equal((await call(`/v1/admin/accounts/${r.data.id}/manage`,{action:'SET_ARCHIVED',archived:true,reason:'Hosted archive acceptance',requestKey:randomUUID()},session)).status,201);
-  assert.equal((await call('/v1/auth/login',{username:'hosted.sub',password})).status,401);
+  assert.equal((await call('/v1/auth/login',{username:'hosted.sub1',password})).status,401);
   const records=await call('/v1/operator/records?kind=ADJUSTMENTS&pageSize=1',undefined,session);assert.equal(records.status,200);
   const receipt=await call('/v1/operator/receipts/'+records.data.items[0].id,undefined,session);assert.equal(receipt.status,200);
  });
@@ -85,7 +87,7 @@ test('separate operator hosted transport is password-only and staff-only',async 
   assert.equal((await call('/v1/operator/devices',{action:'SET_REVIEW',enabled:false},approvedAuth)).status,403);
   const current=devices.data.items.find(d=>d.current);assert.equal((await call('/v1/operator/devices',{action:'REJECT',id:current.id},reviewer)).status,409);
   assert.equal((await call('/v1/operator/devices',{action:'REJECT',id:target.id},reviewer)).status,201);assert.equal((await call('/v1/me',undefined,approvedAuth)).status,401);
-  const agentLogin=await call('/v1/auth/login',{username:'fixture.agent',password});const agentAuth={cookie:agentLogin.cookies,csrf:agentLogin.data.csrf};
+  const agentLogin=await call('/v1/auth/login',{username:'fixture.agent1',password});const agentAuth={cookie:agentLogin.cookies,csrf:agentLogin.data.csrf};
   assert.equal((await call('/v1/operator/devices',{action:'APPROVE',id:current.id},agentAuth)).status,403);
   assert.equal((await call('/v1/operator/devices?unknown=bad',undefined,reviewer)).status,400);
   assert.equal((await call('/v1/operator/devices',{action:'SET_REVIEW',enabled:false},reviewer)).status,201);session=reviewer;
@@ -96,7 +98,7 @@ test('separate operator hosted transport is password-only and staff-only',async 
   assert.equal((await call('/v1/operator/devices',{action:'SET_REVIEW',enabled:false},freshAuth)).status,201);
  });
  await t.test('API credentials are hashed, IP restricted, read-only and revoked by rotation and password reset',async()=>{
-  const signed=await call('/v1/auth/login',{username:'fixture.agent',password});const auth={cookie:signed.cookies,csrf:signed.data.csrf};
+  const signed=await call('/v1/auth/login',{username:'fixture.agent1',password});const auth={cookie:signed.cookies,csrf:signed.data.csrf};
   const generated=await call('/v1/operator/api',{action:'REGENERATE'},auth);assert.equal(generated.status,201,JSON.stringify(generated.data));const key=generated.data.secret;assert.match(key,/^ng_[a-f0-9]{64}$/);
   const headers={Authorization:'Bearer '+key};assert.equal((await call('/v1/integration/users',undefined,undefined,headers)).status,401);
   assert.equal((await call('/v1/operator/api',{action:'WHITELIST',ips:['invalid']},auth)).status,400);
@@ -108,7 +110,7 @@ test('separate operator hosted transport is password-only and staff-only',async 
   const saved=(await control.query('SELECT * FROM operator_api_keys WHERE account_id=$1',[agent.id])).rows[0];assert.notEqual(saved.key_hash,key);assert.ok(!JSON.stringify(saved).includes(key));
   const newer=await call('/v1/operator/api',{action:'REGENERATE'},auth);assert.equal((await call('/v1/integration/users',undefined,undefined,headers)).status,401);
   assert.equal((await call('/v1/integration/users',undefined,undefined,{Authorization:'Bearer '+newer.data.secret})).status,200);
-  const subLogin=await call('/v1/auth/login',{username:'fixture.circle',password});const subAuth={cookie:subLogin.cookies,csrf:subLogin.data.csrf};
+  const subLogin=await call('/v1/auth/login',{username:'fixture.circle1',password});const subAuth={cookie:subLogin.cookies,csrf:subLogin.data.csrf};
   const reset=await call('/v1/admin/accounts/'+agent.id+'/manage',{action:'RESET_PASSWORD',password:'ResetApiFixturePassword-123',reason:'Verify API credential revocation',requestKey:randomUUID()},subAuth);assert.equal(reset.status,201);
   assert.equal((await call('/v1/integration/users',undefined,undefined,{Authorization:'Bearer '+newer.data.secret})).status,401);
   assert.ok(!JSON.stringify((await control.query('SELECT details FROM audit_events')).rows).includes(key));

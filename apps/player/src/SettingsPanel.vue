@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed,ref} from 'vue';
+import {credentialHint,credentialPattern} from '@new-game/contracts';
 import {api,type Account} from './api';
 import {audioPreferences,unlockAudio,playSound,musicNow,selectMusicTrack} from './audio';
 import {musicPlaylists} from './music-score';
@@ -22,8 +23,8 @@ async function toggle(kind:'music'|'sound'){await unlockAudio();audioPreferences
  <div v-if="account"><span><strong>{{account.displayName}}</strong><p>{{account.username}}</p></span><button class="secondary" :aria-expanded="changing" @click="changing=!changing">Change password</button></div>
  <form v-if="changing&&account" class="password-form" @submit.prevent="change">
   <label>Current password<input v-model="current" type="password" autocomplete="current-password" required maxlength="256"></label>
-  <label>New password<input v-model="password" type="password" autocomplete="new-password" required minlength="12" maxlength="256" placeholder="At least 12 characters"></label>
-  <label>Confirm new password<input v-model="confirm" type="password" autocomplete="new-password" required minlength="12" maxlength="256"></label>
+  <label>New password<input v-model="password" type="password" autocomplete="new-password" required minlength="6" :pattern="credentialPattern" :title="credentialHint" maxlength="256" :placeholder="credentialHint"></label>
+  <label>Confirm new password<input v-model="confirm" type="password" autocomplete="new-password" required minlength="6" :pattern="credentialPattern" :title="credentialHint" maxlength="256"></label>
   <p>Changing your password signs out all your devices.</p><p v-if="error" role="alert" class="error">{{error}}</p>
   <button class="gold-button" :disabled="busy">{{busy?'SAVING…':'SAVE PASSWORD'}}</button>
  </form>

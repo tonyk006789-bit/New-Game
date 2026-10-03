@@ -19,6 +19,6 @@ describe('approved themed cabinets preserve their base rules',()=>{
   expect(stagingProfile.id).toBe('stage-paying30-v2');expect(Object.keys(stagingProfile.rules)).toHaveLength(8);
   expect(cabinetExpansionProfile.baseProfile).toBe(stagingProfile.id);
   expect(stagingGameProfileId('neon-sevens')).toBe(classicReelsProfile.id);
-  expect(stagingGameProfileId('reef-party')).toBe('reef-tiers-v1');
+  expect(stagingGameProfileId('reef-party')).toBe('reef-assist-v1');
  });
 });

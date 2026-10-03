@@ -1,6 +1,6 @@
 import {randomInt,randomUUID} from 'node:crypto';
 import {z} from 'zod';
-import {stagingProfile,stagingRules,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,reefOutcome,reefTierProfile,reefFlight,reefBallistics,isFishGame,validStake,type StagingGame} from '@new-game/game-math';
+import {stagingProfile,stagingRules,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,reefAssistedOutcome,reefAssistProfile,reefTierProfile,reefFlight,reefBallistics,isFishGame,validStake,type StagingGame} from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import {actorFor,parse,type Request} from './auth.js';
 import {transaction,fail,idempotent} from './store.js';
@@ -20,22 +20,25 @@ export async function stagingRound(req:Request,id:string,body:unknown){
   const result=await idempotent<Record<string,unknown>>(db,actor,'ROUND',data.requestKey,{game,...data},async()=>{
    // Accepted historical receipts replay before checking the profile for new plays.
    const profileId=stagingGameProfileId(game);
-   const roundProfileHash=isFishGame(game)?digest(canonical({profile:reefTierProfile,ballistics:reefBallistics.version})):profileId===classicReelsProfile.id?digest(canonical(classicReelsProfile)):profileId===cabinetExpansionProfile.id?digest(canonical(cabinetExpansionProfile)):profileHash;
+   const roundProfileHash=isFishGame(game)?digest(canonical({profile:reefAssistProfile,tiers:reefTierProfile,ballistics:reefBallistics.version})):profileId===classicReelsProfile.id?digest(canonical(classicReelsProfile)):profileId===cabinetExpansionProfile.id?digest(canonical(cabinetExpansionProfile)):profileHash;
    if(data.profileId!==profileId)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
    if(isFishGame(game)&&data.trajectoryVersion!==reefBallistics.version)fail(400,'PROFILE_CHANGED','Refresh the arcade before firing.');
  if(isFishGame(game)&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v===undefined))fail(400,'TARGET_REQUIRED');
+   // Same membership lock as join/leave: a second human disables assists atomically.
+   if(isFishGame(game))await db.query('SELECT pg_advisory_xact_lock(772451)');
    const [wallet]=await lockWallets(db,[actor.id]);
    if(BigInt(wallet.settled_units)-BigInt(wallet.reserved_units)<BigInt(data.stake))fail(409,'INSUFFICIENT_AVAILABLE','Insufficient available play credits.');
    if(isFishGame(game)){
     // Burst allowance for manual clicks; the wallet lock still serializes debits.
     if(Number((await db.query("SELECT count(*) n FROM staging_rounds WHERE account_id=$1 AND game_id IN ('reef-party','abyss-legends') AND created_at>clock_timestamp()-interval '1 second'",[actor.id])).rows[0].n)>=20)fail(429,'SLOW_DOWN','Too many shots arriving. Please pause briefly.');
    }else if((await db.query("SELECT id FROM staging_rounds WHERE account_id=$1 AND created_at>clock_timestamp()-interval '250 milliseconds'",[actor.id])).rowCount)fail(429,'SLOW_DOWN');
-   let shotSeat:number|undefined;
+   let shotSeat:number|undefined;let humanSeats:number[]=[];
    if(isFishGame(game)){
     const room=(await db.query("SELECT r.*,s.seat FROM practice_rooms r JOIN practice_seats s ON s.room_id=r.id WHERE r.id=$1 AND r.branch_id=$2 AND s.account_id=$3 AND s.heartbeat_at>now()-interval '20 seconds' AND r.expires_at>now()",[data.roomId,actor.branch_id,actor.id])).rows[0];
     if(!room)fail(409,'JOIN_REQUIRED');
     if(room.game_id!==game)fail(409,'WRONG_TABLE','Choose a table for this game.');
     shotSeat=room.seat;
+    humanSeats=(await db.query("SELECT seat FROM practice_seats WHERE room_id=$1 AND heartbeat_at>clock_timestamp()-interval '20 seconds' ORDER BY seat",[data.roomId])).rows.map(row=>Number(row.seat));
     const now=Date.now();
     if(data.firedAt!>now+100||now-data.firedAt!>12000||data.observedAt!>now+120||now-data.observedAt!>10000)fail(409,'STALE_AIM','Shot expired; no credits charged.');
     const targets=(await db.query('SELECT target_id FROM practice_targets WHERE room_id=$1 AND captured_by IS NULL',[data.roomId])).rows.map(row=>Number(row.target_id));
@@ -44,7 +47,7 @@ export async function stagingRound(req:Request,id:string,body:unknown){
     const target=(await db.query('SELECT * FROM practice_targets WHERE room_id=$1 AND target_id=$2 FOR UPDATE',[data.roomId,data.targetId])).rows[0];
     if(!target||target.captured_by)fail(409,'TARGET_UNAVAILABLE','This fish is already caught. No credits charged.');
    }
-   const visual=isFishGame(game)?reefOutcome(randomUUID(),data.targetId!,randomInt,game):stagingOutcome(game,randomUUID(),randomInt,data.picks),multiplier=stagingMultiplier(visual),award=BigInt(data.stake)*BigInt(multiplier);
+   const visual=isFishGame(game)?reefAssistedOutcome(randomUUID(),data.targetId!,randomInt,game,humanSeats):stagingOutcome(game,randomUUID(),randomInt,data.picks),multiplier=stagingMultiplier(visual),award=BigInt(data.stake)*BigInt(multiplier);
    const stakeTx=await beginLedger(db,actor,actor,'GAME_STAKE',`Staging ${game} / ${profileId}`,data.requestKey);
    const debit=await posting(db,stakeTx,wallet,-BigInt(data.stake));
    await db.query("INSERT INTO ledger_postings(transaction_id,system_account,units) VALUES($1,'GAME_CLEARING',$2)",[stakeTx,data.stake]);

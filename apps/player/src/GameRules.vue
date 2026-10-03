@@ -33,7 +33,7 @@ const tiers=Object.values(reefTierProfile.tiers);
   <ol><li v-for="instruction in instructions[game]" :key="instruction">{{instruction}}</li></ol>
   <section class="rules-return"><h3>{{isFishGame(game)?'CREATURE RETURNS':'WINNING RETURNS'}}</h3>
    <template v-if="isFishGame(game)">
-    <table><thead><tr><th>Size</th><th>Return</th><th>Capture / hit</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td></tr></tbody></table>
+    <p>When you are the only human at the table, three labeled bot teammates assist each paid hit. If your first attempt fails, they take up to three free attempts using the same tier chance, stopping at the first capture. You receive at most one tier award. Bots stop when another human joins; they never spend credits or claim awards themselves.</p><table><thead><tr><th>Size</th><th>Return</th><th>Per attempt</th><th>With solo assists</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td><td>{{(100*(1-(1-tier.captureTickets/10000)**4)).toFixed(2)}}%</td></tr></tbody></table>
     <p>At a 0.25 stake, a successful small, medium, large or boss catch returns 0.25, 0.75, 2.00 or 5.00 credits respectively. Open SPECIES at the table to see each creature’s size tier.</p>
    </template>
    <p v-else>{{stagingRules[game]}}</p>

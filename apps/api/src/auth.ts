@@ -32,7 +32,8 @@ export function verifiedStaff(actor: Actor) {
  if(!actor.verified_at || Date.now()-actor.verified_at.getTime()>300000)fail(403,'VERIFICATION_REQUIRED','Verify your password to continue.');
 }
 export function parse<T>(schema: z.ZodType<T>, body: unknown): T { const result=schema.safeParse(body);if(!result.success)return fail(400,'INVALID_REQUEST',result.error.issues.map(issue=>`${issue.path.join('.')}: ${issue.message}`).join('; '));return result.data; }
-const credentials=z.object({username:z.string().min(3).max(64).transform(v=>v.toLowerCase()),password:z.string().min(1).max(256),code:z.string().max(6).optional()}).strict();
+// Login accepts legacy credentials; the new-account policy applies only when setting them.
+const credentials=z.object({username:z.string().trim().min(1).max(256).transform(v=>v.toLowerCase()),password:z.string().min(1).max(256),code:z.string().max(6).optional()}).strict();
 export async function login(req: Request,res: Response,body: unknown, audience?:'staff'|'player') {
  checkOrigin(req);const data=parse(credentials,body);const key=digest(`${req.ip}:${data.username}`);
  // Return errors after COMMIT so failed-attempt counters cannot be rolled back by rejection.

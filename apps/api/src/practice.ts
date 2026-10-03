@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { actorFor, type Request, parse } from './auth.js';
 import { canonical, digest } from './security.js';
 import { fail, transaction } from './store.js';
-import { featurePractice, cabinetPractice, isCabinetGame } from '@new-game/game-math';
+import { featurePractice, cabinetPractice, isCabinetGame, reefBotSeats } from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import type {PoolClient} from 'pg';
 const schema=z.object({requestKey:z.string().min(8).max(128),picks:z.array(z.number().int().min(1).max(80)).max(10).optional()}).strict();
@@ -71,7 +71,8 @@ export async function reefRoom(req:Request,join=false,body:unknown={}){const dat
  const targets=(await db.query('SELECT target_id,captured_by IS NOT NULL captured FROM practice_targets WHERE room_id=$1 ORDER BY target_id',[seat.room_id])).rows;
  const score=(await db.query('SELECT count(*)::integer score FROM practice_targets WHERE room_id=$1 AND captured_by=$2',[seat.room_id,actor.id])).rows[0].score;
  const impacts=stagingEnabled()?(await db.query("SELECT id,result->>'seat' seat,result->>'targetId' target_id,result->>'captured' captured,result->>'award' award,result->'flight' flight FROM staging_rounds WHERE result->>'roomId'=$1 AND game_id IN ('reef-party','abyss-legends') AND created_at>clock_timestamp()-interval '3 seconds' ORDER BY created_at DESC LIMIT 64",[seat.room_id])).rows.filter(r=>r.flight&&r.seat).map(r=>({id:r.id,seat:Number(r.seat),targetId:Number(r.target_id),captured:r.captured==='true',award:r.award,flight:r.flight})):[];
- return {id:seat.room_id,game:room.game_id,impacts,seat:seat.seat,seats,targets,score,startedAt:room.created_at,expiresAt:room.expires_at,serverTime:Date.now(),mode:'PRACTICE',creditsChanged:false};
+ const bots=stagingEnabled()?reefBotSeats(seats.map(s=>s.seat)).map(seat=>({seat,display_name:`Bot ${seat}`,kind:'BOT' as const})):[];
+ return {id:seat.room_id,game:room.game_id,impacts,seat:seat.seat,seats,bots,targets,score,startedAt:room.created_at,expiresAt:room.expires_at,serverTime:Date.now(),mode:'PRACTICE',creditsChanged:false};
 });}
 const shotSchema=z.object({roomId:z.uuid(),targetId:z.number().int().min(1).max(80),requestKey:z.string().min(8).max(128)}).strict();
 export async function reefShot(req:Request,body:unknown){
