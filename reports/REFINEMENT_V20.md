@@ -44,4 +44,10 @@ No game outcomes, payout profiles, stake settings or permission hierarchy change
 
 ## Publication
 
-Deployment identifiers and live verification will be recorded after publication.
+Source commit `4cf63d2` was pushed to GitHub `main`. Both prebuilt Vercel deployments are READY:
+
+- Player: `dpl_A5U7Js6TcRkeAkpZvrFrh8oJkfuF`, https://new-game-test-topaz.vercel.app/ (immutable: https://new-game-test-5bzsvnwbw-tonyk006789-7532.vercel.app/).
+- Operator: `dpl_H484SupVAFPtkCEMfBp4UQu9Z3Jq`, https://new-game-operator.vercel.app/ (immutable: https://new-game-operator-ozwhcsqxb-tonyk006789-7532.vercel.app/).
+- Both aliases return HTTP 200 and the exact built assets: player `index-CnSAfSEN.js` / `index-CMtp-iFM.css`; operator `index-Di3R9Gbn.js` / `index-CTLbK85O.css`.
+- Live player guest Settings displayed the three lobby tracks; Music enabled and selected After Hours (3/3), then was returned to off. Live Main Admin sign-in succeeded; the subcontractor Add Credits dialog displayed only Amount, with no Reason section, and was dismissed without submission. No account balances were changed by live verification.
+- Local screenshot evidence: `reports/screenshots-v20/music-settings-live.png`, `admin-add-no-reason-live.png`, `agent-recharge-no-reason.png`, `ruby-music-local.png` and `music-settings-local.png`. Player browser logs returned no warnings/errors during local music checks.
