@@ -41,4 +41,13 @@ Browser evidence is kept locally under ignored `reports/screenshots-v19/`, inclu
 
 ## Migration and rollback
 
+Published source `09368e4ab00cc8bd5a75bfa53a56b4c4821aa1d7` to GitHub main and the Vercel player project:
+
+- Deployment `dpl_5cPaempxazS6uevBaJ4jYJBX4Nmw`, READY.
+- Public alias: https://new-game-test-topaz.vercel.app/.
+- Immutable deployment: https://new-game-test-d3t3h5l73-tonyk006789-7532.vercel.app/.
+- Public HTML and browser DOM reference the expected `index-CTKRez7O.js` and `index-BYieGAS-.css` build. The environment endpoint remained reachable in the existing test configuration. The development harness is absent from the public entry bundle.
+- Existing player session restored after reload, and Ruby Rush loaded its saved round and available controls. No hosted spin, daily claim, shot or adjustment was submitted. The displayed account balance stayed 1,427.05 during these read-only checks. Screenshot: `reports/screenshots-v19/ruby-live.png`.
+- The existing browser log contained historical Pixi texture-destruction warnings from the older `Geometry-CNKh-uDs.js` build; no error from the new release was observed. The operator deployment was not changed.
+
 No database migration or data write is required. Revert the V19 player components, motion helper and stylesheet, rebuild and redeploy the player project to roll back. Keep the V18 operator hierarchy fixes. No native build or physical-device test is claimed; Android/iPhone hardware is still unavailable.
