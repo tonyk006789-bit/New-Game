@@ -19,3 +19,4 @@ else createApp(App).mount('#app');
 import './arcade-v17.css';
 
 import './arcade-v18.css';
+import './arcade-v19.css';

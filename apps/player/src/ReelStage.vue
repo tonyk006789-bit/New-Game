@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 import {playSound} from './audio';
 import { previewGrid, symbols } from '@new-game/game-math';
+import { reelMotion } from './game-motion';
 const props = defineProps<{ reducedMotion: boolean; initialGrid?: string[][]; stripSymbols?: readonly string[]; highlighted?: number[]; locked?: number[]; theme?:string }>();
 const root = ref<HTMLElement>();
 const initial = props.initialGrid || previewGrid(0);
@@ -32,21 +33,16 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
   const strips = root.value.querySelectorAll<HTMLElement>('.reel-strip');
   await Promise.all(Array.from(strips, async (strip, index) => {
     if (held.includes(index)) return;
-    const distance = (columns.value[index].length - rows.value) * strip.parentElement!.clientHeight / rows.value;
-    const animation = strip.animate([
-      { transform: 'translateY(0)', filter: 'blur(0px)', offset: 0, easing: 'ease-out' },
-      { transform: 'translateY(9px)', filter: 'blur(0px)', offset: .045, easing: 'ease-in' },
-      { transform: `translateY(${-distance * .08}px)`, filter: 'blur(2px)', offset: .17, easing: 'linear' },
-      { transform: `translateY(${-distance * .89}px)`, filter: 'blur(2px)', offset: .77, easing: 'cubic-bezier(.12,.5,.3,1)' },
-      { transform: `translateY(${-distance - 8}px)`, filter: 'blur(0px)', offset: .96, easing: 'ease-out' },
-      { transform: `translateY(${-distance}px)`, filter: 'blur(0px)', offset: 1 }
-    ], { duration: (1100 + index * 170) / (fast ? 1.8 : 1), delay:index*35/(fast?1.8:1), easing:'linear', fill: 'both' });
+    // Percent transforms track the strip's live height, including an orientation change.
+    const motion = reelMotion(index, columns.value[index].length - rows.value, columns.value[index].length, fast);
+    const animation = strip.animate(motion.keyframes, { duration: motion.duration, delay: motion.delay, easing: 'linear', fill: 'both' });
     animations.push(animation);
     try { await animation.finished; if (token === generation) {landed.value.push(index);playSound('reel-stop');} } catch { /* Paused, resized or unmounted. */ }
   }));
   if (token === generation) settle(grid, matches);
 }
 defineExpose({ play, settle });
+watch(() => props.reducedMotion, value => { if (value && rolling.value) settle(); });
 onBeforeUnmount(() => settle());
 </script>
 <template><div ref="root" class="reel-frame kinetic-reels" :style="{gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, '--visible-rows':rows}" :class="{ 'reels-rolling': rolling }" role="img" :aria-label="`${columns.length} reel ${rows} row result`"><div v-for="(column, c) in columns" :key="c" class="reel-window" :class="{ 'reel-landed': landed.includes(c), 'reel-locked': locked?.includes(c) }"><div class="reel-strip"><div v-for="(symbol, r) in column" :key="r" class="symbol reel-symbol" :data-symbol="symbol" :class="[symbol, { 'matching-symbol': !rolling && (lines.some(line => line.row === r && c < line.count) || highlighted?.includes(r * columns.length + c)) }]"><ArcadeSymbol :symbol="symbol" :theme="theme" /></div></div><span v-if="locked?.includes(c)" class="reel-lock-label">LOCKED</span></div><div class="reel-glass" aria-hidden="true"></div></div></template>

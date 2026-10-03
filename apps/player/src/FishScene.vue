@@ -13,6 +13,7 @@ import AquaticSprite from './AquaticSprite.vue';
 import {holdCredits,revealCredits} from './credit-presentation';
 import {FishWalletPresentation} from './fish-wallet';
 import {playSound} from './audio';
+import {dampAngle, recoilOffset, effectProgress} from './game-motion';
 import AbyssJackpotWheel from './AbyssJackpotWheel.vue';
 import {bossReveal,type BossReveal} from './boss-reveal';
 const jackpotReward=ref<BossReveal|null>(null);
@@ -49,7 +50,7 @@ function toggleAuto(){if(autoOn.value){stopAuto('Auto fire stopped.');return;}if
 function selectTarget(x=600,y=300){const time=(Date.now()+clockOffset-epoch)/1000;lockedTarget.value=alive().filter(id=>{const p=targetAt(id,time);return p.x>20&&p.x<1180;}).sort((a,b)=>{const p=targetAt(a,time),q=targetAt(b,time);return Math.hypot(p.x-x,p.y-y)-Math.hypot(q.x-x,q.y-y);})[0]??null;}
 function toggleLock(){lockOn.value=!lockOn.value;if(lockOn.value){selectTarget();notice.value='Target lock on. Tap a creature to change target.';}else{lockedTarget.value=null;notice.value='Free aim.';}}
 let app:Application|undefined,world:Container,art:Awaited<ReturnType<typeof reefTextures>>,disposed=false,polling=false,clockOffset=0,epoch=Date.now(),poll:ReturnType<typeof setInterval>|undefined,observer:ResizeObserver|undefined;
-const creatures:{id:number;view:Container;sprite:MeshPlane;vertices:Float32Array;hit:number;captured:boolean}[]=[],cannons:{view:Container;barrel:Sprite;recoil:number;angle:number}[]=[],effects:{view:Container;age:number;life:number;kind:string;vx:number;vy:number}[]=[];
+const creatures:{id:number;view:Container;sprite:MeshPlane;vertices:Float32Array;hit:number;captured:boolean}[]=[],cannons:{view:Container;barrel:Sprite;recoil:number;angle:number;visualAngle:number}[]=[],effects:{view:Container;age:number;life:number;kind:string;vx:number;vy:number;x:number;y:number}[]=[];
 type Projectile={view:Graphics;flight:Flight;firedAt:number;roomId?:string;requestKey:string;age:number;stake:string};
 const projectiles:Projectile[]=[];
 function alive(){const caught=new Set(creatures.filter(f=>f.captured).map(f=>f.id));return room.value?room.value.targets.filter(t=>!t.captured&&!caught.has(t.target_id)).map(t=>t.target_id):creatures.filter(f=>!f.captured).map(f=>f.id);}
@@ -67,14 +68,14 @@ function showPeerImpact(event:ReefImpact){
  if(seenImpacts.has(event.id))return;seenImpacts.add(event.id);if(seenImpacts.size>512)seenImpacts.delete(seenImpacts.values().next().value!);
  if(event.seat===room.value?.seat||!world)return;
  const origin=reefCannon(event.seat),cannon=cannons[event.seat-1];if(!cannon)return;
- cannon.angle=event.flight.angle;cannon.recoil=.2;
+ cannon.angle=event.flight.angle;cannon.visualAngle=cannon.angle;cannon.recoil=.24;
  impact(event.flight.x,event.flight.y,event.captured);
  if(!props.reducedMotion){
   const trail=new Graphics().moveTo(origin.x,origin.y).lineTo(event.flight.x,event.flight.y).stroke({color:[0xffd774,0x76d9ff,0xff978d,0xd5a0ff][event.seat-1],width:2,alpha:.6});effect(trail,0,0,.25,'trail');
  }
  if(event.captured){const boss=props.game==='abyss-legends'?bossReveal(event.id,event.seat,targetAt(event.targetId,0).species,event.captured,event.award):null;if(boss)jackpotReward.value=boss;const label=new Text({text:`P${event.seat} +${formatCredits(event.award)}`,style:{fontFamily:'Georgia',fontSize:23,fontWeight:'bold',fill:0xffe28c,stroke:{color:0x152344,width:3}}});label.anchor.set(.5);effect(label,event.flight.x,event.flight.y,1.1,'particle',0,-24);}
 }
-function effect(view:Container,x:number,y:number,life:number,kind='burst',vx=0,vy=0){view.position.set(x,y);world.addChild(view);if(effects.length>=400)effects.shift()!.view.destroy();effects.push({view,age:0,life,kind,vx,vy});}
+function effect(view:Container,x:number,y:number,life:number,kind='burst',vx=0,vy=0){view.position.set(x,y);world.addChild(view);if(effects.length>=400)effects.shift()!.view.destroy();effects.push({view,age:0,life,kind,vx,vy,x,y});}
 function impact(x:number,y:number,win=false){
  const net=new Graphics();for(const r of [14,30,48])net.circle(0,0,r).stroke({color:win?0xffdf70:0xafffff,width:1.5,alpha:.85});
  for(let a=0;a<Math.PI*2;a+=Math.PI/6)net.moveTo(0,0).lineTo(Math.cos(a)*48,Math.sin(a)*48).stroke({color:0xffffff,width:1,alpha:.7});effect(net,x,y,.65);
@@ -114,7 +115,7 @@ function fireCannon(){
  const shotColor=props.game==='abyss-legends'?[0x42e8ff,0xff9a25,0xf365ff,0x8eff47][seat-1]:0x1bdfff;
  const view=new Graphics().ellipse(-9,0,15,5).fill({color:shotColor,alpha:.5}).circle(0,0,5).fill(0xfff7bd).circle(0,0,2).fill(0xffffff);
  view.rotation=flight.angle;view.position.set(flight.origin.x,flight.origin.y);world.addChild(view);
- const requestKey=crypto.randomUUID();projectiles.push({view,flight,firedAt,roomId:room.value?.id,requestKey,age:0,stake:stage.stake});shots.set(requestKey,stage.stake);firedCount.value++;firing.value=true;nextAutoAt=performance.now()+(fast.value?125:250);cannon.recoil=.2;notice.value='';playSound('shot');
+ const requestKey=crypto.randomUUID();projectiles.push({view,flight,firedAt,roomId:room.value?.id,requestKey,age:0,stake:stage.stake});shots.set(requestKey,stage.stake);firedCount.value++;firing.value=true;nextAutoAt=performance.now()+(fast.value?125:250);cannon.visualAngle=cannon.angle;cannon.recoil=.24;notice.value='';playSound('shot');
  if(!props.reducedMotion)effect(new Graphics().star(0,0,8,20,5).fill({color:0xffe795,alpha:.9}),flight.origin.x,flight.origin.y,.12);
 }
 function resize(){if(!app||!host.value)return;app.renderer.resize(host.value.clientWidth,host.value.clientHeight);world.scale.set(app.screen.width/1200,app.screen.height/600);}
@@ -131,7 +132,7 @@ onMounted(async()=>{
   for(let seat=1;seat<=4;seat++){
    const view=new Container(),base=reefCannon(seat),barrel=new Sprite(art.cannons[seat-1]);
    view.position.set(base.x,base.y);view.addChild(new Graphics().circle(0,0,42).fill({color:0x001b31,alpha:.85}).circle(0,0,38).stroke({color:[0xecc772,0x74bbf3,0xe86860,0xcf8dfd][seat-1],width:3}));
-   barrel.anchor.set(.5,.76);barrel.width=props.game==='abyss-legends'?132:170;barrel.height=props.game==='abyss-legends'?145:114;view.addChild(barrel);world.addChild(view);cannons.push({view,barrel,recoil:0,angle:seat<=2?-Math.PI/2:Math.PI/2});
+   barrel.anchor.set(.5,.76);barrel.width=props.game==='abyss-legends'?132:170;barrel.height=props.game==='abyss-legends'?145:114;view.addChild(barrel);world.addChild(view);cannons.push({view,barrel,recoil:0,angle:seat<=2?-Math.PI/2:Math.PI/2,visualAngle:seat<=2?-Math.PI/2:Math.PI/2});
   }
   reticle=new Graphics().circle(0,0,45).stroke({color:0xffef7e,width:2}).moveTo(-58,0).lineTo(-32,0).moveTo(32,0).lineTo(58,0).moveTo(0,-58).lineTo(0,-32).moveTo(0,32).lineTo(0,58).stroke({color:0xffef7e,width:3});reticle.visible=false;world.addChild(reticle);
   resize();observer=new ResizeObserver(resize);observer.observe(host.value!);app.canvas.addEventListener('pointerdown',fire);app.canvas.addEventListener('pointermove',aimAt);
@@ -149,11 +150,11 @@ onMounted(async()=>{
    trackTarget();reticle.visible=lockOn.value&&lockedTarget.value!==null;if(reticle.visible){const p=targetAt(lockedTarget.value!,time);reticle.position.set(p.x,p.y);reticle.rotation=props.reducedMotion?0:time*.5;}
    if(walletPresentation&&session.current){const displayed=walletPresentation.reconcile(session.current.wallet,performance.now(),!firing.value&&!stage.fishPending.length);holdCredits(props.game,session.current.id,displayed.available);}
    if(autoOn.value&&performance.now()>=nextAutoAt){if(stage.pending||stage.busy||stage.fishPending.some(p=>p.recover))stopAuto('Reconnecting. Auto fire is off.');else fireCannon();}
-   for(let i=0;i<cannons.length;i++){const c=cannons[i];c.recoil=Math.max(0,c.recoil-dt);c.barrel.rotation=c.angle+Math.PI/2;c.barrel.position.set(-Math.cos(c.angle)*c.recoil*45,-Math.sin(c.angle)*c.recoil*45);c.view.scale.y=Math.min(1,world.scale.x/world.scale.y);c.view.alpha=!room.value||room.value.seat===i+1||room.value.seats.some(s=>s.seat===i+1)?1:.6;}
+   for(let i=0;i<cannons.length;i++){const c=cannons[i];c.recoil=Math.max(0,c.recoil-dt);c.visualAngle=props.reducedMotion?c.angle:dampAngle(c.visualAngle,c.angle,dt);c.barrel.rotation=c.visualAngle+Math.PI/2;const kick=props.reducedMotion?0:recoilOffset(c.recoil);c.barrel.position.set(-Math.cos(c.visualAngle)*kick,-Math.sin(c.visualAngle)*kick);c.view.scale.y=Math.min(1,world.scale.x/world.scale.y);c.view.alpha=!room.value||room.value.seat===i+1||room.value.seats.some(s=>s.seat===i+1)?1:.6;}
    for(let i=projectiles.length-1;i>=0;i--){const s=projectiles[i];s.age=(Date.now()+clockOffset-s.firedAt)/1000;const t=Math.min(s.age,s.flight.time);s.view.position.set(s.flight.origin.x+s.flight.vx*t,s.flight.origin.y+s.flight.vy*t);
     if(s.age>=s.flight.time){s.view.destroy();projectiles.splice(i,1);void settleShot(s);}
    }
-   for(let i=effects.length-1;i>=0;i--){const e=effects[i];e.age+=dt;e.view.alpha=Math.max(0,1-e.age/e.life);if(e.kind==='particle'||e.kind==='coin'){e.view.x+=e.vx*dt;e.view.y+=e.vy*dt;if(e.kind==='coin'){e.vy+=148*dt;e.view.scale.x=Math.cos(e.age*12);e.view.rotation=e.age*.6;}}else if(e.kind!=='trail')e.view.scale.set(props.reducedMotion?1:.55+e.age/e.life*.8);if(e.age>=e.life){e.view.destroy({children:true});effects.splice(i,1);}}
+   for(let i=effects.length-1;i>=0;i--){const e=effects[i];e.age+=dt;const progress=Math.min(1,e.age/e.life);e.view.alpha=1-progress**2;if(e.kind==='particle'||e.kind==='coin'){e.view.x=e.x+e.vx*e.age;e.view.y=e.y+e.vy*e.age+(e.kind==='coin'?74*e.age**2:0);if(e.kind==='coin'){e.view.scale.x=Math.cos(e.age*12);e.view.rotation=e.age*.6;}}else if(e.kind!=='trail')e.view.scale.set(props.reducedMotion?1:.3+effectProgress(e.age,e.life)*1.05);if(e.age>=e.life){e.view.destroy({children:true});effects.splice(i,1);}}
   });if(!props.running)app.stop();
  }catch(e){error.value=`The reef renderer could not start: ${(e as Error).message}`;}
 });

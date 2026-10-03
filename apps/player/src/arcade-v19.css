@@ -1,0 +1,27 @@
+/* Bounded presentation motion; committed grids and collision paths remain authoritative. */
+.kinetic-reels .reel-strip{will-change:auto;backface-visibility:hidden}
+.kinetic-reels.reels-rolling .reel-strip{will-change:transform}
+.kinetic-reels .reel-window.reel-landed{animation:reel-seat-light .32s ease-out both}
+@keyframes reel-seat-light{0%{box-shadow:inset 0 0 22px #fff0b3aa}100%{box-shadow:inset 0 4px 15px #120e2080}}
+.reels-rolling .reel-window:not(.reel-landed):not(.reel-locked):after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#08051366,transparent 28%,transparent 72%,#08051366)}
+.cascade-board{position:relative;overflow:hidden;isolation:isolate}
+.phase-fall .relic-cell{animation:none}
+.feature-active .relic-cell{will-change:transform,opacity}
+.phase-highlight .cluster-cell{transition:background .2s,box-shadow .2s}
+.phase-highlight .cluster-cell svg{animation:relic-breathe calc(.65s * var(--motion-rate,1)) ease-in-out both}
+.phase-clear .cluster-cell{animation:relic-dissolve calc(.32s * var(--motion-rate,1)) ease-in both}
+@keyframes relic-breathe{0%,100%{transform:scale(1)}45%{transform:scale(1.13);filter:drop-shadow(0 0 9px #ffdc66)}}
+@keyframes relic-dissolve{0%{transform:scale(1);opacity:1}32%{transform:scale(1.1);opacity:1}100%{transform:scale(.35);opacity:0}}
+.phase-pulse .vault-cell:not(.locked) .cell-rune{animation:vault-search calc(1s * var(--motion-rate,1)) ease-in-out both;animation-delay:var(--cell-delay)}
+.vault-cell.just-locked .vault-crystal{animation:crystal-dock calc(.85s * var(--motion-rate,1)) cubic-bezier(.2,.65,.3,1) both;animation-delay:var(--cell-delay)}
+@keyframes vault-search{0%,100%{opacity:.25;transform:scale(.9)}45%{opacity:.85;transform:scale(1.07)}}
+@keyframes crystal-dock{0%{opacity:0;transform:translateY(-42%) scale(.65)}55%{opacity:1;transform:translateY(3%) scale(1.06)}78%{transform:translateY(-2%) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.draw-track{position:relative}
+.draw-ball-enter-active{transition:transform calc(.3s * var(--motion-rate,1)) cubic-bezier(.18,.75,.25,1.12),opacity calc(.2s * var(--motion-rate,1))}
+.draw-ball-enter-from{transform:translateY(-25px) rotate(-35deg) scale(.7);opacity:0}
+.draw-ball-move{transition:transform calc(.2s * var(--motion-rate,1)) ease-out}
+.keno-board .just-drawn{animation:keno-soft-land calc(.4s * var(--motion-rate,1)) ease-out both}
+@keyframes keno-soft-land{0%{transform:scale(.83);filter:brightness(1.5)}50%{transform:scale(1.08)}100%{transform:scale(1);filter:brightness(1)}}
+@media(max-height:650px) and (min-width:701px){.draw-track{position:absolute}}
+@media(prefers-reduced-motion:reduce){.kinetic-reels *,.cascade-board *,.vault-board *,.draw-track *,.keno-board *{animation:none!important;transition:none!important;will-change:auto!important}}
+.reduce-motion .kinetic-reels *,.reduce-motion .cascade-board *,.reduce-motion .vault-board *,.reduce-motion .draw-track *,.reduce-motion .keno-board *{animation:none!important;transition:none!important;will-change:auto!important}

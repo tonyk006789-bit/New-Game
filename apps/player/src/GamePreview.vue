@@ -7,6 +7,8 @@ import { api } from './api';
 import BetControls from './BetControls.vue';
 import {stage} from './staging-state';
 import {creditPresentation} from './credit-presentation';
+import {kenoDelay} from './game-motion';
+import {playSound} from './audio';
 const staked=computed(()=>stage.enabled&&props.authenticated);
 const props = defineProps<{ game: string; running: boolean; reducedMotion: boolean; authenticated?: boolean; balance?: string }>();
 type PracticeResult = { id: string; game: string; grid?: string[][]; drawn?: number[]; picks?: number[]; description: string; lines?: { row: number; count: number }[] };
@@ -16,9 +18,9 @@ const animating = ref(false), fast = ref(false), notice = ref(staked.value?'Sele
 const reels = ref<InstanceType<typeof ReelStage>>();
 const recentBalls = computed(() => drawn.value.slice(-7));
 const matched = computed(() => selected.value.filter(n => drawn.value.includes(n)).length);
-let timer: ReturnType<typeof setInterval> | undefined, disposed = false, frame = 0;
+let timer: ReturnType<typeof setTimeout> | undefined, disposed = false, frame = 0, generation = 0;
 const sampleDraw = [7, 24, 51, 13, 36, 68, 42, 2, 75, 18, 30, 59, 46, 80, 5, 63, 22, 39, 54, 71];
-function stop() { clearInterval(timer); animating.value = false; }
+function stop() { clearTimeout(timer); generation++; animating.value = false; }
 function finish(interrupted = false) {
   stop();
   if (props.game === 'temple-lights') reels.value?.settle(result.value?.grid || previewGrid(frame), result.value?.lines || []);
@@ -42,15 +44,24 @@ async function animate() {
     finally { requestBusy.value = false; }
   }
   if (disposed) return;
-  frame++; stop(); animating.value = true;
+  frame++; stop(); animating.value = true; const token = generation;
   if (!props.running || props.reducedMotion) { finish(); return; }
   if (props.game === 'temple-lights') {
     notice.value = 'Reels in motion…';
     await reels.value?.play(result.value?.grid || previewGrid(frame), result.value?.lines || [], fast.value);
-    if (!disposed) finish();
+    if (!disposed && token === generation) finish();
   } else {
     drawn.value = []; const numbers = result.value?.drawn || sampleDraw; let step = 0;
-    timer = setInterval(() => { drawn.value.push(numbers[step++]); if (step >= numbers.length) finish(); }, fast.value ? 65 : 145);
+    const reveal = () => {
+      timer = setTimeout(() => {
+        if (disposed || token !== generation) return;
+        drawn.value.push(numbers[step++]); playSound('click');
+        notice.value = `${step} of ${numbers.length} drawn · ${matched.value} matched`;
+        if (step < numbers.length) reveal();
+        else timer = setTimeout(() => { if (!disposed && token === generation) finish(); }, fast.value ? 250 : 500);
+      }, kenoDelay(step, numbers.length, fast.value));
+    };
+    reveal();
   }
 }
 watch(() => props.running, value => { if (!value && animating.value) finish(true); });
@@ -74,10 +85,10 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <section class="game-preview" :class="game === 'temple-lights' ? 'temple-game' : 'keno-game'">
+  <section class="game-preview" :class="game === 'temple-lights' ? 'temple-game' : 'keno-game'" :style="{'--motion-rate':fast ? .5 : 1}">
     <div class="preview-hud"><span class="eyebrow">{{ game === 'temple-lights' ? 'Moonlit sanctuary' : 'Pick your possibilities' }}</span><span class="pill">{{ authenticated ? (staked ? 'PLAY' : 'FREE PRACTICE') : 'PREVIEW ONLY' }}</span></div>
     <template v-if="game === 'temple-lights'"><div class="temple-scene-title"><span>✧</span> TEMPLE LIGHTS <span>✧</span></div><ReelStage ref="reels" :reduced-motion="reducedMotion" /></template>
     <template v-else><div class="keno-intro"><h2>Orchard Numbers</h2><span>{{ selected.length }} / 10 selected · {{ matched }} matched</span></div><div class="keno-layout"><aside class="keno-wood-sign"><strong>ORCHARD<br>HARVEST</strong><span class="orchard-apples">🍎</span><small>Pick 4–10 numbers.<br>Watch twenty reveal.</small><strong class="harvest-count">{{ matched }}</strong><small>NUMBERS MATCHED</small></aside><div class="keno-board" aria-label="Keno number selection"><button v-for="number in 80" :key="number" :aria-label="`Number ${number}`" :aria-pressed="selected.includes(number)" :disabled="loading || !!pendingKey || requestBusy || animating || !running" :class="{ chosen: selected.includes(number), drawn: drawn.includes(number), matched: selected.includes(number) && drawn.includes(number), 'just-drawn': drawn.at(-1) === number }" @click="toggleNumber(number)">{{ number }}</button></div></div><div class="draw-track" aria-label="Most recent drawn numbers"><span>DRAW {{ drawn.length }} / 20</span><TransitionGroup name="draw-ball"><b v-for="number in recentBalls" :key="number" :class="{ hit: selected.includes(number) }">{{ number }}</b></TransitionGroup></div><div class="keno-tools"><span>Choose 4–10 numbers</span><button class="secondary" :disabled="loading || !!pendingKey || requestBusy || animating || !running" @click="quickPick">Quick pick</button><button class="secondary" :disabled="loading || !!pendingKey || requestBusy || animating || !running" @click="selected = []; drawn = []">Clear</button></div></template>
-    <div class="preview-controls"><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="animating||requestBusy" /><div><small>Available credits</small><strong>{{ balance || '0.00' }}</strong></div><button class="speed-control" :aria-pressed="fast" aria-label="Fast animations" @click="fast = !fast">{{ fast ? 'FAST' : 'NORMAL' }}</button><button v-if="animating" class="primary" @click="finish()">Show result</button><button v-else class="primary" :disabled="creditPresentation.held!==null || loading || requestBusy || !running || (game !== 'temple-lights' && selected.length < 4)" @click="animate"><Icon :name="requestBusy ? 'clock' : 'gem'" :size="18" />{{ loading ? 'Loading…' : requestBusy ? 'Saving…' : game === 'temple-lights' ? (authenticated ? (staked ? 'Spin' : 'Spin practice') : 'Preview reels') : (authenticated ? (staked ? 'Draw' : 'Draw practice') : 'Preview reveal') }}</button><div class="practice-only-meter"><small>Stake / Award</small><strong>{{staked ? (Number(stage.stake)/100).toFixed(2) : "—"}} / {{staked && stage.last?.game===game ? (Number(stage.last.award)/100).toFixed(2) : "—"}}</strong></div></div><p class="preview-notice" aria-live="polite">{{ notice }}</p>
+    <div class="preview-controls"><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="animating||requestBusy" /><div><small>Available credits</small><strong>{{ balance || '0.00' }}</strong></div><button class="speed-control" :aria-pressed="fast" :disabled="animating || requestBusy" aria-label="Fast animations" @click="fast = !fast">{{ fast ? 'FAST' : 'NORMAL' }}</button><button v-if="animating" class="primary" @click="finish()">Show result</button><button v-else class="primary" :disabled="creditPresentation.held!==null || loading || requestBusy || !running || (game !== 'temple-lights' && selected.length < 4)" @click="animate"><Icon :name="requestBusy ? 'clock' : 'gem'" :size="18" />{{ loading ? 'Loading…' : requestBusy ? 'Saving…' : game === 'temple-lights' ? (authenticated ? (staked ? 'Spin' : 'Spin practice') : 'Preview reels') : (authenticated ? (staked ? 'Draw' : 'Draw practice') : 'Preview reveal') }}</button><div class="practice-only-meter"><small>Stake / Award</small><strong>{{staked ? (Number(stage.stake)/100).toFixed(2) : "—"}} / {{staked && stage.last?.game===game ? (Number(stage.last.award)/100).toFixed(2) : "—"}}</strong></div></div><p class="preview-notice" aria-live="polite">{{ notice }}</p>
   </section>
 </template>
