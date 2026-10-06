@@ -1,5 +1,8 @@
 export * from './blackjack.ts';
 export const mathStatus = Object.freeze({
+  'disco-diamonds': {approved:false,profileId:null,mathHash:null},
+  'midnight-express': {approved:false,profileId:null,mathHash:null},
+  'pirate-gold': {approved:false,profileId:null,mathHash:null},
   'sunken-dynasty': {approved:false,profileId:null,mathHash:null},
   'polar-odyssey': {approved:false,profileId:null,mathHash:null},
   'royal-blackjack': {approved:false,profileId:null,mathHash:null},
@@ -148,15 +151,19 @@ const originalCabinetGames = {
   'coin-carnival': { columns: 5, symbols: ['coin', 'cherry', 'bell', 'bar', 'seven'], lines: [], wild: false }
 } as const;
 export const cabinetAliases = {'ruby-rush':'neon-sevens','sapphire-crown':'jade-fortune','solar-fortune':'coin-carnival'} as const;
+export const newCabinetAliases={'disco-diamonds':'neon-sevens','midnight-express':'jade-fortune','pirate-gold':'coin-carnival'} as const;
 export const legacyCabinetGames = {...originalCabinetGames,
+ 'disco-diamonds':originalCabinetGames['neon-sevens'],
+ 'midnight-express':originalCabinetGames['jade-fortune'],
+ 'pirate-gold':originalCabinetGames['coin-carnival'],
  'ruby-rush':originalCabinetGames['neon-sevens'],
  'sapphire-crown':originalCabinetGames['jade-fortune'],
  'solar-fortune':originalCabinetGames['coin-carnival']
 } as const;
 const classicCabinet={...originalCabinetGames['neon-sevens'],columns:3,lines:[[1,1,1],[0,0,0],[2,2,2],[0,1,2],[2,1,0]]} as const;
-export const cabinetGames={...legacyCabinetGames,'neon-sevens':classicCabinet,'ruby-rush':classicCabinet} as const;
+export const cabinetGames={...legacyCabinetGames,'neon-sevens':classicCabinet,'ruby-rush':classicCabinet,'disco-diamonds':classicCabinet} as const;
 export type CabinetGameId = keyof typeof cabinetGames;
-export function cabinetBase(game:CabinetGameId):keyof typeof originalCabinetGames{return Object.hasOwn(cabinetAliases,game)?cabinetAliases[game as keyof typeof cabinetAliases]:game as keyof typeof originalCabinetGames;}
+export function cabinetBase(game:CabinetGameId):keyof typeof originalCabinetGames{return Object.hasOwn(newCabinetAliases,game)?newCabinetAliases[game as keyof typeof newCabinetAliases]:Object.hasOwn(cabinetAliases,game)?cabinetAliases[game as keyof typeof cabinetAliases]:game as keyof typeof originalCabinetGames;}
 export function isCabinetGame(game:string):game is CabinetGameId{return Object.hasOwn(cabinetGames,game);}
 export type CabinetMatch = { line: number; rows: number[]; symbol: string; count: number };
 export type CabinetFrame = { grid: string[][]; locked: number[]; remaining: number };
@@ -260,13 +267,19 @@ export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagi
  'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
 } as const;
 const currentFishRules=`${stagingProfile.rules['reef-party']} Solo tables add up to three free bot attempts after a resisted paid hit, stopping at the first capture. At most one tier award; bots stop when another human joins. Profile: ${reefAssistProfile.id}.`;
-export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
+export const newCabinetsProfile={id:'stage-cabinets-v23',baseProfiles:[stagingProfile.id,classicReelsProfile.id],payingProbability:stagingProfile.payingProbability,aliases:newCabinetAliases,rules:{
+ 'disco-diamonds':classicReelsProfile.rules['neon-sevens'],
+ 'midnight-express':stagingProfile.rules['jade-fortune'].replace('Dragon substitutes.','Locomotive substitutes.'),
+ 'pirate-gold':stagingProfile.rules['coin-carnival'].replace('center coins','center doubloons')
+}} as const;
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,...newCabinetsProfile.rules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
 export type StagingGame=keyof typeof stagingRules;
 export const premiumKenoProfile={id:'stage-keno-cabinets-v1',baseProfile:stagingProfile.id,aliases:{'neon-numbers':'orchard-numbers','pearl-keno':'orchard-numbers'}} as const;
-export function stagingGameProfileId(game:string){return Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export function stagingGameProfileId(game:string){return Object.hasOwn(newCabinetAliases,game)?newCabinetsProfile.id:Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
+ if(Object.hasOwn(newCabinetAliases,game))return stagingMultiplier({...outcome,game:newCabinetAliases[game as keyof typeof newCabinetAliases]});
  if(Object.hasOwn(cabinetAliases,game))return stagingMultiplier({...outcome,game:cabinetAliases[game as keyof typeof cabinetAliases]});
  if(game==='neon-sevens')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({cherry:1,bell:2,bar:2,gem:3,seven:5}[m.symbol]||0)*({3:1,4:2,5:4}[m.count]||0),0);
  if(game==='jade-fortune')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({3:2,4:4,5:8}[m.count]||0),0);

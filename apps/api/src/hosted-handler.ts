@@ -13,7 +13,7 @@ import {changePassword} from './password.js';
 export const testAudience = new Set(['tester.one','tester.two','tester.three','tester.four','tester.five']);
 const reads = new Set(['/v1/blackjack','/v1/environment','/v1/health','/v1/games','/v1/me','/v1/history','/v1/staging/history','/v1/staging/stats','/v1/practice/reef/room','/v1/practice/reef/tables','/v1/daily-wheel']);
 const writes = new Set(['/v1/blackjack','/v1/auth/login','/v1/auth/logout','/v1/auth/password','/v1/daily-wheel/spin','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
-const rounds = /^\/v1\/staging\/(sunken-dynasty|polar-odyssey|neon-numbers|pearl-keno|neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party|abyss-legends|ruby-rush|sapphire-crown|solar-fortune)\/rounds$/;
+const rounds = /^\/v1\/staging\/(disco-diamonds|midnight-express|pirate-gold|sunken-dynasty|polar-odyssey|neon-numbers|pearl-keno|neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party|abyss-legends|ruby-rush|sapphire-crown|solar-fortune)\/rounds$/;
 export function playerRoute(method:string, path:string){return method==='GET'?reads.has(path):method==='POST'&&(writes.has(path)||rounds.test(path));}
 const json=(body:unknown,status=200,extra:Record<string,string|string[]>={})=>{
  const headers=new Headers({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});

@@ -1,62 +1,66 @@
-export const musicScores={
- 'royal-blackjack':{name:'Velvet Aces',bpm:120,key:60,wave:'triangle',swing:.2,motif:[0,7,11,14,9,4,12,7],bass:[0,5,2,7]},
- 'sunken-dynasty':{name:'Jade Armada',bpm:130,key:62,wave:'triangle',swing:.04,motif:[7,12,14,9,4,2,9,7],bass:[0,7,2,5]},
- 'polar-odyssey':{name:'Aurora Expedition',bpm:136,key:65,wave:'sine',swing:0,motif:[12,7,14,16,9,12,4,7],bass:[0,-3,5,2]},
- 'neon-numbers':{name:'Electric Eighty',bpm:134,key:59,wave:'square',swing:0,motif:[0,12,3,10,7,15,5,10],bass:[0,3,-2,5]},
- 'pearl-keno':{name:'Pearl Promenade',bpm:124,key:67,wave:'sine',swing:.12,motif:[4,12,9,7,14,16,11,7],bass:[0,5,-3,7]},
- lobby:{name:'Midnight Casino',bpm:118,key:60,wave:'triangle',swing:.16,motif:[0,4,7,11,9,7,4,2],bass:[0,-3,5,7]},
- 'neon-sevens':{name:'Neon Jackpot',bpm:134,key:64,wave:'square',swing:0,motif:[0,7,12,7,10,7,3,5],bass:[0,0,-2,3]},
- 'ruby-rush':{name:'Ruby Disco',bpm:128,key:62,wave:'sawtooth',swing:.08,motif:[0,3,7,10,12,10,7,5],bass:[0,-2,-4,-5]},
- 'sapphire-crown':{name:'Royal Lights',bpm:122,key:65,wave:'triangle',swing:0,motif:[0,7,12,11,7,4,9,7],bass:[0,5,-3,7]},
- 'solar-fortune':{name:'Solar Drive',bpm:138,key:60,wave:'sawtooth',swing:0,motif:[0,12,7,10,3,7,15,12],bass:[0,3,-2,5]},
- 'jade-fortune':{name:'Jade Palace',bpm:124,key:62,wave:'triangle',swing:.04,motif:[0,2,4,7,9,7,4,2],bass:[0,7,5,2]},
- 'coin-carnival':{name:'Golden Parade',bpm:132,key:67,wave:'square',swing:.12,motif:[0,4,7,12,9,7,5,4],bass:[0,5,0,7]},
- 'temple-lights':{name:'Temple Pulse',bpm:120,key:57,wave:'triangle',swing:0,motif:[0,3,7,10,7,5,3,2],bass:[0,-2,3,5]},
- 'aurora-vault':{name:'Crystal Skyline',bpm:126,key:69,wave:'sine',swing:0,motif:[0,7,12,14,11,7,4,2],bass:[0,-3,5,7]},
- 'ember-relics':{name:'Ember Rush',bpm:140,key:57,wave:'sawtooth',swing:0,motif:[0,3,5,7,12,10,7,5],bass:[0,0,3,-2]},
- 'orchard-numbers':{name:'Lucky Orchard',bpm:116,key:65,wave:'triangle',swing:.2,motif:[0,4,9,7,12,9,5,4],bass:[0,5,7,0]},
- 'reef-party':{name:'Reef Carnival',bpm:132,key:62,wave:'triangle',swing:.1,motif:[0,7,9,12,14,12,9,7],bass:[0,5,-2,7]},
- 'abyss-legends':{name:'Abyss Pursuit',bpm:138,key:59,wave:'sawtooth',swing:0,motif:[0,3,7,12,10,7,5,2],bass:[0,-2,-5,3]}
-} as const;
-export type MusicScene=keyof typeof musicScores;
-export type MusicScore={name:string;bpm:number;key:number;wave:OscillatorType;swing:number;motif:readonly number[];bass:readonly number[];groove?:'house'|'swing'|'breaks'};
-const track=(name:string,bpm:number,key:number,wave:OscillatorType,groove:'house'|'swing'|'breaks',motif:number[],bass:number[]):MusicScore=>({name,bpm,key,wave,groove,swing:groove==='swing'?.18:0,motif,bass});
-// Original compositions: each scene gets two additional melodies and progressions.
-const additions:Record<MusicScene,readonly MusicScore[]>={
- 'royal-blackjack':[track('Ace of Nights',128,62,'triangle','swing',[11,7,4,9,14,12,16,7],[0,5,7,-3]),track('Green Felt Groove',122,57,'sine','house',[0,7,3,12,14,10,5,7],[0,-2,5,3])],
- 'sunken-dynasty':[track('Imperial Tide',136,65,'sine','house',[0,4,9,14,12,7,2,9],[0,5,2,7]),track('Dragon Lanterns',126,60,'triangle','breaks',[7,2,12,9,14,4,7,12],[0,7,5,2])],
- 'polar-odyssey':[track('Icebound Pulse',140,62,'sawtooth','breaks',[12,17,10,7,15,3,10,5],[0,-5,-2,3]),track('Crystal Voyage',128,69,'sine','house',[4,7,14,19,16,9,12,2],[0,-3,5,7])],
- 'neon-numbers':[track('Number Runner',142,64,'square','house',[3,12,7,15,10,5,0,7],[0,3,5,-2]),track('Lucky Voltage',130,60,'sawtooth','breaks',[10,7,12,3,17,15,5,7],[0,-2,3,-5])],
- 'pearl-keno':[track('Moon Pearl',128,65,'triangle','swing',[9,4,12,16,14,7,11,2],[0,5,7,2]),track('Ocean Gems',132,62,'sine','house',[14,12,7,4,9,16,7,2],[0,-3,2,5])],
- lobby:[track('Velvet Roulette',124,62,'triangle','swing',[7,9,12,16,14,9,5,2],[0,5,-2,7]),track('After Hours',128,57,'sine','house',[12,7,10,14,15,10,7,3],[0,-5,-2,3])],
- 'neon-sevens':[track('Electric Avenue',138,59,'sawtooth','house',[0,3,10,7,15,12,10,5],[0,3,5,-2]),track('Seven Star Swing',126,65,'triangle','swing',[4,7,9,12,16,14,9,7],[0,7,5,-3])],
- 'ruby-rush':[track('Scarlet Fever',136,60,'square','breaks',[7,12,10,15,7,5,3,10],[0,-2,5,3]),track('Ruby Boulevard',122,64,'triangle','swing',[0,4,11,9,7,14,12,9],[0,5,7,-3])],
- 'sapphire-crown':[track('Crown Jewels',130,62,'sine','house',[12,14,19,16,11,9,7,4],[0,-3,5,2]),track('Blue Velvet',120,60,'triangle','swing',[7,11,14,12,9,7,4,2],[0,5,-2,7])],
- 'solar-fortune':[track('Sunburst',142,64,'square','house',[0,7,10,12,17,15,10,7],[0,-2,3,5]),track('Golden Orbit',128,67,'triangle','breaks',[12,9,7,4,11,14,12,7],[0,5,2,-3])],
- 'jade-fortune':[track('Lantern Festival',132,60,'sine','house',[12,9,7,4,2,7,9,14],[0,5,7,2]),track('Emerald Rhythm',120,65,'triangle','swing',[4,9,12,14,9,7,2,4],[0,7,-3,5])],
- 'coin-carnival':[track('Brass & Gold',126,62,'triangle','swing',[7,9,4,12,14,16,12,7],[0,5,2,7]),track('Coin Machine',140,59,'square','breaks',[0,7,3,10,12,7,15,10],[0,3,-2,5])],
- 'temple-lights':[track('Moonlit Parade',128,62,'sine','house',[7,10,12,15,14,10,5,3],[0,-2,5,3]),track('Sanctuary Swing',118,60,'triangle','swing',[0,3,7,9,10,7,5,2],[0,5,-2,-5])],
- 'aurora-vault':[track('Prism Nights',134,65,'sine','house',[12,16,14,19,11,7,9,4],[0,-3,2,5]),track('Northern Groove',122,62,'triangle','breaks',[7,12,14,9,16,12,7,2],[0,5,-3,7])],
- 'ember-relics':[track('Molten Gold',144,60,'sawtooth','breaks',[0,5,3,12,10,15,7,3],[0,3,-5,-2]),track('Firelight Club',132,64,'square','house',[12,7,10,5,15,12,3,7],[0,-2,5,3])],
- 'orchard-numbers':[track('Lucky Clover',122,62,'triangle','swing',[4,7,12,9,14,11,7,2],[0,5,2,7]),track('Harvest Hop',130,67,'sine','house',[12,7,4,9,11,14,9,5],[0,-3,5,7])],
- 'reef-party':[track('Coral Carnival',136,65,'triangle','swing',[0,9,7,12,16,14,7,4],[0,5,7,-3]),track('Tidal Lights',128,60,'sine','house',[12,10,7,15,14,7,3,5],[0,-2,3,5])],
- 'abyss-legends':[track('Deep Current',142,62,'square','breaks',[0,3,12,10,17,15,7,5],[0,-5,3,-2]),track('Midnight Leviathan',130,57,'sine','house',[12,15,10,7,14,12,5,3],[0,3,5,-2])]
+import type {GameId} from '@new-game/contracts';
+export type MusicScene=GameId|'lobby';
+export type Instrument='keys'|'brass'|'pluck'|'strings'|'bass'|'mallet'|'kick'|'snare'|'clap'|'hat'|'openhat'|'shaker'|'conga'|'crash';
+type Style='disco'|'house'|'jazz'|'tropical'|'cinematic';
+export type MusicScore={name:string;bpm:number;key:number;swing:number;style:Style;lead:Instrument;seed:number;progression:readonly number[];melody:readonly number[]};
+const scenes:Record<MusicScene,{titles:string[];bpm:number;key:number;style:Style}>={
+ lobby:{titles:['Grand Entrance','Champagne District','Last Dance at the Arcade'],bpm:124,key:60,style:'disco'},
+ 'royal-blackjack':{titles:['The High Roller Quartet','Satin & Spades','Penthouse After Midnight'],bpm:118,key:62,style:'jazz'},
+ 'reef-party':{titles:['Tropic Heat','Coral Club Radio','Island Fever'],bpm:128,key:65,style:'tropical'},
+ 'abyss-legends':{titles:['Pressure Drop','Leviathan Overdrive','Deepwater Afterburn'],bpm:132,key:57,style:'cinematic'},
+ 'sunken-dynasty':{titles:['Dragon Procession','Emperor of the Dancefloor','Jade Lantern District'],bpm:126,key:62,style:'tropical'},
+ 'polar-odyssey':{titles:['Arctic Velocity','Whiteout Club','Glacier Transmission'],bpm:130,key:64,style:'house'},
+ 'neon-numbers':{titles:['Laser Lounge','Eighty After Dark','Electric Counter'],bpm:132,key:59,style:'house'},
+ 'pearl-keno':{titles:['Pearl Coast Nights','Silver Terrace','Oceanfront Disco'],bpm:122,key:67,style:'disco'},
+ 'neon-sevens':{titles:['Seven on the Floor','Chrome Avenue','Jackpot Junction'],bpm:128,key:60,style:'house'},
+ 'ruby-rush':{titles:['Scarlet Nightclub','Red Carpet Hustle','Ruby Street Orchestra'],bpm:126,key:64,style:'disco'},
+ 'sapphire-crown':{titles:['Blue Palace Ballroom','The Sapphire Session','Crown at Dusk'],bpm:120,key:65,style:'jazz'},
+ 'solar-fortune':{titles:['Solaris Dance Unit','Gold Rush Highway','Sunset Accelerator'],bpm:134,key:62,style:'house'},
+ 'jade-fortune':{titles:['Lucky Dragon Club','Emerald Lantern Parade','Jade at Daybreak'],bpm:124,key:67,style:'tropical'},
+ 'coin-carnival':{titles:['Brass Coin Carnival','Parade of Gold','Confetti Casino'],bpm:128,key:62,style:'disco'},
+ 'temple-lights':{titles:['Sanctuary Afterhours','Temple of Rhythm','Moonstone Procession'],bpm:122,key:57,style:'cinematic'},
+ 'aurora-vault':{titles:['Northern Light District','Crystal Fever','Aurora in Stereo'],bpm:126,key:69,style:'house'},
+ 'ember-relics':{titles:['Volcanic Night Drive','Relic Breakout','Fireline Orchestra'],bpm:136,key:57,style:'cinematic'},
+ 'orchard-numbers':{titles:['Orchard Street Social','Lucky Harvest Club','Golden Hour Shuffle'],bpm:120,key:65,style:'tropical'},
+ 'disco-diamonds':{titles:['Mirrorball Millionaire','Diamond Dancefloor','Studio Twenty'],bpm:126,key:60,style:'disco'},
+ 'midnight-express':{titles:['Platform Nine After Dark','Midnight Connection','Velvet Railways'],bpm:122,key:59,style:'jazz'},
+ 'pirate-gold':{titles:['Buccaneer Brass Band','Treasure Island Club','Captain of the Night'],bpm:130,key:62,style:'tropical'}
 };
-export const musicPlaylists=(Object.keys(musicScores) as MusicScene[]).reduce((playlists,scene)=>{
- playlists[scene]=[musicScores[scene],...additions[scene]];return playlists;
-},{} as Record<MusicScene,readonly MusicScore[]>);
-export const TRACK_STEPS=256;
-export function musicTrack(scene:MusicScene,index=0):MusicScore{const playlist=musicPlaylists[scene];return playlist[((index%playlist.length)+playlist.length)%playlist.length];}
-export type ScoreEvent={kind:'lead'|'bass'|'chord'|'kick'|'snare'|'hat';note:number;duration:number;level:number};
-/** Thirty-two bars: opening, main phrase, breakdown, and final lift. */
+const phrases=[
+ [7,-1,9,12,-1,14,-1,12,7,-1,4,-1,9,7,-1,-1,12,-1,14,16,-1,14,12,-1,9,-1,7,4,-1,2,-1,-1],
+ [0,-1,7,-1,10,12,-1,7,-1,3,-1,5,7,-1,10,-1,12,-1,15,-1,10,7,-1,5,3,-1,0,3,-1,7,-1,-1],
+ [4,-1,7,9,-1,11,14,-1,12,-1,9,7,-1,4,2,-1,7,-1,11,14,-1,16,14,-1,11,-1,9,4,-1,2,-1,-1],
+ [0,-1,4,-1,7,9,-1,12,14,-1,12,-1,9,7,-1,-1,4,-1,7,12,-1,14,9,-1,7,-1,4,2,-1,0,-1,-1]
+];
+export const musicPlaylists=Object.fromEntries(Object.entries(scenes).map(([scene,s],index)=>[scene,s.titles.map((name,variant):MusicScore=>({
+ name,bpm:s.bpm+variant*2,key:s.key+(variant===2?-2:0),swing:s.style==='jazz'?.16:s.style==='tropical'?.045:0,
+ style:s.style,lead:s.style==='jazz'?'keys':s.style==='disco'?'brass':s.style==='tropical'?'mallet':'pluck',seed:index*3+variant,
+ progression:variant===0?[0,5,2,7]:variant===1?[0,-3,5,7]:[0,7,5,2],melody:phrases[(index+variant)%phrases.length]
+}))])) as unknown as Record<MusicScene,readonly MusicScore[]>;
+export const musicScores=Object.fromEntries(Object.entries(musicPlaylists).map(([id,tracks])=>[id,tracks[0]])) as Record<MusicScene,MusicScore>;
+export const TRACK_STEPS=512;
+export function musicTrack(scene:MusicScene,index=0){const p=musicPlaylists[scene];return p[((index%p.length)+p.length)%p.length];}
+export type ScoreEvent={kind:Instrument;note:number;duration:number;level:number;pan:number};
+/** Original 32-bar arrangements at sixteenth-note resolution: intro, groove, bridge and finale. */
 export function scoreStep(scene:MusicScene,step:number,trackIndex=0):ScoreEvent[]{
- const score=musicTrack(scene,trackIndex),bar=Math.floor(step/8)%32,beat=step%8,root=score.key+score.bass[bar%4],out:ScoreEvent[]=[];
- const breakdown=bar>=16&&bar<20,breaks=score.groove==='breaks',swing=score.groove==='swing';
- if(!breakdown&&(breaks?[0,3,4,7].includes(beat):beat%2===0))out.push({kind:'kick',note:36,duration:.2,level:.35});
- if(!breakdown&&(beat===2||beat===6||(breaks&&bar%8===7&&beat===7)))out.push({kind:'snare',note:0,duration:.13,level:.14});
- if(!breakdown||beat%2===1)out.push({kind:'hat',note:0,duration:beat===7?.12:.045,level:beat%2?.09:.045});
- if(beat%2===0||beat===7)out.push({kind:'bass',note:root-24+(beat===7?7:swing&&beat===4?4:0),duration:swing?.28:.22,level:.22});
- if(beat===1||beat===5)for(const interval of [0,score.motif.includes(3)?3:4,7])out.push({kind:'chord',note:root-12+interval,duration:breakdown?.55:swing?.3:.18,level:.036});
- if((bar%4!==3||beat<4)&&(!breakdown||beat%2===0)){const phrase=bar%8>=4?2:0;out.push({kind:'lead',note:score.key+score.motif[(beat+phrase)%8]+(bar>=24?12:0),duration:breakdown?.38:swing?.25:.19,level:.095});}
+ const s=musicTrack(scene,trackIndex),bar=Math.floor(step/16)%32,beat=step%16,root=s.key+s.progression[Math.floor(bar/2)%4],out:ScoreEvent[]=[];
+ const add=(kind:Instrument,note:number,duration:number,level:number,pan=0)=>out.push({kind,note,duration,level,pan});
+ const intro=bar<4,bridge=bar>=16&&bar<20,full=!intro&&!bridge,beatSeconds=60/s.bpm;
+ if(!bridge&&(beat%4===0||(s.style==='cinematic'&&[7,14].includes(beat))))add('kick',36,.5,.3);
+ if(!bridge&&[4,12].includes(beat)){add(s.style==='jazz'?'snare':'clap',60,.26,.19,.08);if(s.style==='disco')add('snare',60,.21,.09,-.1);}
+ if(beat%2===0&&!bridge)add(beat%4===2&&full?'openhat':'hat',60,beat%4===2?.16:.07,beat%4===2?.068:.042,.3);
+ if((full||s.style==='tropical')&&beat%2===1)add('shaker',60,.07,beat%4===3?.034:.02,-.35);
+ if(s.style==='tropical'&&[3,10,15].includes(beat)&&!bridge)add('conga',60+(beat===10?3:0),.2,.09,beat===3?-.3:.3);
+ if(beat===0&&[4,20,28].includes(bar))add('crash',60,1.3,.09,-.18);
+ const bassBeat=s.style==='jazz'?[0,4,8,12]:[0,3,6,8,11,14];
+ if(bassBeat.includes(beat)&&(!bridge||beat%8===0))add('bass',root-24+([6,14].includes(beat)?7:beat===11?12:0),beatSeconds*(s.style==='jazz'?.8:.38),.22);
+ const minor=s.style==='cinematic'||s.style==='house';
+ if((bridge?beat===0:[2,7,10,14].includes(beat)))for(const [i,n] of (minor?[0,3,7,10]:[0,4,7,11]).entries())
+  add(bridge?'strings':'keys',root-12+n+(bar%8>=4?12:0),bridge?beatSeconds*3:beatSeconds*.55,bridge?.052:.06,(i-1.5)*.15);
+ if(beat===0&&[0,8,16,20,28].includes(bar))for(const n of [0,7,12])add('strings',root+n,beatSeconds*3.2,.035,(n-6)/25);
+ const index=(beat+(bar%2)*16+s.seed*2)%32,n=s.melody[index];
+ if(n>=0&&(full||bar>=2&&beat%4===0)&&(!bridge||beat%4===0)&&!(bar%4===3&&beat>9))
+  add(s.lead,s.key+n+(bar>=28?12:0),beatSeconds*(beat%4===0?.7:.4),s.lead==='brass'?.15:.19,Math.sin(s.seed+bar)*.22);
+ if(full&&bar%4===3&&[11,13,14,15].includes(beat))add('snare',60,.12,.05+(beat-11)*.014,-.12);
  return out;
 }

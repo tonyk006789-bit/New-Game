@@ -1,11 +1,13 @@
 import {reactive,watch} from 'vue';
 import {musicScores,musicPlaylists,musicTrack,scoreStep,TRACK_STEPS,type MusicScene} from './music-score';
+import {loadMusicBank,sampledNote} from './music-sampler';
 export const audioPreferences=reactive({music:false,sound:true});
-export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length});
+export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length,status:'idle' as 'idle'|'loading'|'ready'|'unavailable'});
 const selectedTracks=new Map<MusicScene,number>();
 function trackInfo(index:number){musicNow.index=index;musicNow.title=musicTrack(musicNow.scene,index).name;musicNow.total=musicPlaylists[musicNow.scene].length;selectedTracks.set(musicNow.scene,index);}
 try{const saved=JSON.parse(localStorage.getItem('ng-audio')||'{}');if(typeof saved.music==='boolean')audioPreferences.music=saved.music;if(typeof saved.sound==='boolean')audioPreferences.sound=saved.sound;}catch{/* Optional settings. */}
-let context:AudioContext|undefined,musicGain:GainNode|undefined,soundGain:GainNode|undefined,noise:AudioBuffer|undefined;
+let context:AudioContext|undefined,musicGain:GainNode|undefined,soundGain:GainNode|undefined,echo:DelayNode|undefined;
+let bank:Awaited<ReturnType<typeof loadMusicBank>>|undefined,loadingBank:Promise<void>|undefined;
 let timer:ReturnType<typeof setInterval>|undefined,active=true,step=0,nextAt=0;
 const musicNodes=new Set<AudioScheduledSourceNode>();
 function tone(note:number,start:number,duration:number,gain:GainNode,volume=.1,type:OscillatorType='sine',music=false,kick=false){
@@ -16,23 +18,14 @@ function tone(note:number,start:number,duration:number,gain:GainNode,volume=.1,t
  oscillator.connect(filter);filter.connect(envelope);envelope.connect(gain);oscillator.start(start);oscillator.stop(start+duration+.02);if(music)musicNodes.add(oscillator);
  oscillator.onended=()=>{musicNodes.delete(oscillator);oscillator.disconnect();filter.disconnect();envelope.disconnect();};
 }
-function drum(start:number,duration:number,level:number,hat:boolean){
- if(!context||!musicGain||!noise)return;const source=context.createBufferSource(),filter=context.createBiquadFilter(),gain=context.createGain();source.buffer=noise;
- filter.type=hat?'highpass':'bandpass';filter.frequency.value=hat?7500:1800;filter.Q.value=.7;
- gain.gain.setValueAtTime(level,start);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
- source.connect(filter);filter.connect(gain);gain.connect(musicGain);source.start(start);source.stop(start+duration);musicNodes.add(source);
- source.onended=()=>{musicNodes.delete(source);source.disconnect();filter.disconnect();gain.disconnect();};
-}
 function scheduleMusic(){
- if(!context||!musicGain||!active||!audioPreferences.music||context.state!=='running')return;
+ if(!context||!musicGain||!bank||!echo||!active||!audioPreferences.music||context.state!=='running')return;
  if(nextAt<context.currentTime)nextAt=context.currentTime+.03;
  while(nextAt<context.currentTime+.18){
-  const score=musicTrack(musicNow.scene,musicNow.index),eighth=30/score.bpm;
-  for(const e of scoreStep(musicNow.scene,step,musicNow.index)){
-   if(e.kind==='hat'||e.kind==='snare')drum(nextAt,e.duration,e.level,e.kind==='hat');
-   else tone(e.note,nextAt,e.duration,musicGain,e.level,e.kind==='kick'?'sine':e.kind==='bass'?'triangle':e.kind==='chord'?'sawtooth':score.wave,true,e.kind==='kick');
-  }
-  nextAt+=eighth*(step%2?1-score.swing:1+score.swing);step++;
+  const score=musicTrack(musicNow.scene,musicNow.index),sixteenth=15/score.bpm;
+  echo.delayTime.setTargetAtTime(45/score.bpm,context.currentTime,.1);
+  for(const e of scoreStep(musicNow.scene,step,musicNow.index))sampledNote(context,bank,e,nextAt,musicGain,echo,musicNodes);
+  nextAt+=sixteenth*(step%2?1-score.swing:1+score.swing);step++;
   if(step===TRACK_STEPS){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
  }
 }
@@ -40,7 +33,7 @@ function stopMusic(){clearInterval(timer);timer=undefined;for(const node of musi
 function update(){
  if(!context)return;musicGain!.gain.setTargetAtTime(audioPreferences.music&&active?.34:0,context.currentTime,.03);soundGain!.gain.setTargetAtTime(audioPreferences.sound&&active?.28:0,context.currentTime,.015);
  if(!active||!audioPreferences.music){stopMusic();return;}
- if(context.state==='running'&&!timer){nextAt=context.currentTime+.03;scheduleMusic();timer=setInterval(scheduleMusic,50);}
+ if(context.state==='running'&&bank&&!timer){nextAt=context.currentTime+.03;scheduleMusic();timer=setInterval(scheduleMusic,50);}
 }
 export function setMusicScene(scene:string){const next=Object.hasOwn(musicScores,scene)?scene as MusicScene:'lobby';if(next===musicNow.scene)return;stopMusic();step=0;musicNow.scene=next;trackInfo(selectedTracks.get(next)||0);update();}
 export function selectMusicTrack(index:number){if(!Number.isInteger(index)||index<0||index>=musicNow.total)return;stopMusic();step=0;trackInfo(index);update();}
@@ -49,8 +42,11 @@ export async function unlockAudio(){
  if(!active)return;
  try{if(!context){context=new AudioContext();musicGain=context.createGain();soundGain=context.createGain();
  const limiter=context.createDynamicsCompressor();limiter.threshold.value=-12;limiter.ratio.value=8;musicGain.connect(limiter);soundGain.connect(limiter);limiter.connect(context.destination);
- noise=context.createBuffer(1,context.sampleRate,context.sampleRate);const data=noise.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;}
- if(context.state==='suspended')await context.resume();update();}catch{/* Unsupported audio never blocks play. */}
+ echo=context.createDelay(1);const feedback=context.createGain(),wet=context.createGain(),lowpass=context.createBiquadFilter();feedback.gain.value=.18;wet.gain.value=.16;lowpass.type='lowpass';lowpass.frequency.value=2800;
+ echo.connect(lowpass);lowpass.connect(wet);wet.connect(musicGain);lowpass.connect(feedback);feedback.connect(echo);}
+ if(context.state==='suspended')await context.resume();
+ if(audioPreferences.music&&!bank){loadingBank||= (async()=>{musicNow.status='loading';try{bank=await loadMusicBank(context!);musicNow.status='ready';}catch{musicNow.status='unavailable';}finally{loadingBank=undefined;}})();await loadingBank;}
+ update();}catch{musicNow.status='unavailable';/* Unsupported audio never blocks play. */}
 }
 export function setAudioActive(value:boolean){active=value;update();if(!value)void context?.suspend();else if(context)void context.resume().then(update).catch(()=>{});}
 export function playSound(kind:'click'|'shot'|'win'|'impact'|'reel-start'|'reel-stop'|'treasure'='click'){

@@ -70,7 +70,7 @@ const visibleGames = computed(() => catalog.filter(game =>
   (category.value !== 'Favorites' || favorites.value.includes(game.id)) &&
   `${game.name} ${game.category}`.toLowerCase().includes(query.value.toLowerCase())));
 const categories = [
-  { label:'Premium',title:'PREMIUM',subtitle:'THE ROYAL COLLECTION',icon:'star',theme:'gold' },
+  { label:'Premium',title:'PREMIUM',subtitle:'ROYAL BLACKJACK',icon:'star',theme:'gold' },
   { label:'Table',title:'TABLES',subtitle:'BLACKJACK',icon:'gem',theme:'green' },
   { label: 'All games', title: 'THE ARCADE', subtitle: 'ALL GAMES', icon: 'grid', theme: 'pink' },
   { label: 'Slots', title: 'SLOTS', subtitle: 'REELS & FEATURES', icon: 'gem', theme: 'gold' },
@@ -166,7 +166,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </main>
       <template v-else-if="page === 'lobby'">
         <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
-        <main class="arcade-lobby"><PremiumSpotlight v-if="category==='All games'||category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
+        <main class="arcade-lobby"><PremiumSpotlight :premium-only="category==='Premium'" v-if="category==='All games'||category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
           <div class="lobby-heading"><span class="heading-rule"></span><div><span>{{catalog.length}} ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : `${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
           <section class="collection-cabinet" aria-label="Game collection">
             <div class="neon-bar top"></div><div class="neon-bar bottom"></div>

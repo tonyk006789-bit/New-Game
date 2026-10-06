@@ -6,12 +6,12 @@ let base: string;
 beforeAll(async () => { app = await createApi(); await app.listen(0, '127.0.0.1'); base = await app.getUrl(); });
 afterAll(async () => { await app?.close(); });
 describe('actual HTTP boundaries', () => {
-  it('advertises all seventeen games as unavailable for production stakes', async () => {
+  it('advertises all twenty games as unavailable for production stakes', async () => {
     const response = await fetch(`${base}/v1/games`); const games = await response.json();
-    expect(response.status).toBe(200); expect(games).toHaveLength(17);
+    expect(response.status).toBe(200); expect(games).toHaveLength(20);
     expect(games.every((game: {creditStakedPlayEnabled:boolean;approved:boolean}) => !game.creditStakedPlayEnabled && !game.approved)).toBe(true);
   });
-  it.each(['temple-lights','orchard-numbers','reef-party','abyss-legends','aurora-vault','ember-relics','neon-sevens','jade-fortune','coin-carnival','ruby-rush','sapphire-crown','solar-fortune','unknown'])('rejects %s stakes even with forged authority or payout', async id => {
+  it.each(['temple-lights','orchard-numbers','reef-party','abyss-legends','aurora-vault','ember-relics','neon-sevens','jade-fortune','coin-carnival','ruby-rush','sapphire-crown','solar-fortune','disco-diamonds','midnight-express','pirate-gold','unknown'])('rejects %s stakes even with forged authority or payout', async id => {
     const response = await fetch(`${base}/v1/games/${id}/rounds`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:'MAIN_ADMIN',costUnits:'100',payoutUnits:'5000'})});
     expect(response.status).toBe(409); expect((await response.json()).code).toBe('GAME_MATH_NOT_APPROVED');
   });

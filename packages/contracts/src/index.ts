@@ -9,7 +9,7 @@ export const credentialPattern='(?=.*[A-Za-z])(?=.*[0-9]).{6,256}';
 export const NewPassword=z.string().min(6,credentialHint).max(256).regex(/[A-Za-z]/,credentialHint).regex(/[0-9]/,credentialHint);
 export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
  z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));
-export const GameId = z.enum(['sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
+export const GameId = z.enum(['disco-diamonds','midnight-express','pirate-gold','sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -52,9 +52,12 @@ export const FishCommand = z.object({
 }).strict();
 export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SERVICE_NOT_READY', 'FORBIDDEN', 'STALE_WALLET', 'INSUFFICIENT_AVAILABLE', 'IDEMPOTENCY_CONFLICT']);
 
-export const premiumGames=['royal-blackjack','sunken-dynasty','polar-odyssey','neon-numbers','pearl-keno','reef-party','abyss-legends'] as const;
+export const premiumGames=['royal-blackjack'] as const;
 export const isPremiumGame=(id:string)=>(premiumGames as readonly string[]).includes(id);
 export const catalog = [
+  { id: 'disco-diamonds', name: 'Disco Diamonds', category: 'Slots', tagline: 'Turn up the lights.', description: 'Three chrome reels, mirror diamonds and disco sevens across five active lines.', detail: '3 reels · 5 lines', color: '#ff65e2' },
+  { id: 'midnight-express', name: 'Midnight Express', category: 'Slots', tagline: 'Your ticket to the midnight line.', description: 'A portrait railway cabinet with nine lines and a substituting locomotive wild.', detail: 'Portrait · 5 reels · Wilds', color: '#e9bb69' },
+  { id: 'pirate-gold', name: 'Pirate Gold', category: 'Slots', tagline: 'Hold the doubloons. Claim the treasure.', description: 'Five reels with doubloon locks and up to three included respins. Collect all five center coins.', detail: '5 reels · Hold & respin', color: '#ffc65e' },
   { id: 'royal-blackjack', name: 'Royal Blackjack', category: 'Table', tagline: 'Take your seat at the velvet table.', description: 'Six decks, a dealer, and decisions that matter. Hit, stand, double or split.', detail: '6 decks · Blackjack pays 3:2', color: '#edd298' },
   { id: 'sunken-dynasty', name: 'Sunken Dynasty', category: 'Fish', tagline: 'Wake the golden dragon.', description: 'Jade cannons guard a sunken palace of koi, armored turtles and the sea empress.', detail: '4 seats · Jade palace', color: '#5ee3b0' },
   { id: 'polar-odyssey', name: 'Polar Odyssey', category: 'Fish', tagline: 'Discover a world below the ice.', description: 'Crystal cannons, narwhals, snow crabs and glacial sea legends.', detail: '4 seats · Frozen frontier', color: '#a7dfff' },

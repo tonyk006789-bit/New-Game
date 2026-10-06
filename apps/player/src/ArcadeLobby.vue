@@ -42,7 +42,7 @@ onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnim
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
     <button class="hall-cabinet-button" :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
      <span class="machine-crown">{{game.detail}}</span>
-     <span v-if="['abyss-legends','ruby-rush','sapphire-crown','solar-fortune'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
+     <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
      <span class="machine-deck"><i></i><b>{{game.name}}</b><i></i></span>
      <span class="machine-pedestal"><em>PLAY</em><span>✦</span><em>ENTER</em></span>
     </button>

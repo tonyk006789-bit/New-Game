@@ -3,23 +3,23 @@ import {catalog} from '@new-game/contracts';
 import {fishGuide,reefTarget,reefTier,reefTierProfile,reefOutcome,stagingMultiplier,reefFlight,reefLeadAngle,isFishGame} from '@new-game/game-math';
 import {musicScores,musicPlaylists,scoreStep,TRACK_STEPS,type MusicScene} from '../../apps/player/src/music-score';
 describe('distinct music and fish worlds',()=>{
- it('provides 54 distinct complete tracks with bounded levels and changing arrangements',()=>{
+ it('provides 63 distinct complete tracks with bounded levels and changing arrangements',()=>{
   const names=new Set<string>(),signatures=new Set<string>();
   for(const scene of Object.keys(musicPlaylists) as MusicScene[]) {
    expect(musicPlaylists[scene]).toHaveLength(3);
    musicPlaylists[scene].forEach((track,index)=>{
     names.add(track.name);const events=Array.from({length:TRACK_STEPS},(_,step)=>scoreStep(scene,step,index));
-    signatures.add(JSON.stringify(events));expect(new Set(events.flat().map(e=>e.kind)).size).toBe(6);
+    signatures.add(JSON.stringify(events));expect(new Set(events.flat().map(e=>e.kind)).size).toBeGreaterThanOrEqual(7);
     expect(events.flat().every(e=>Number.isFinite(e.note)&&e.note>=0&&e.note<128&&e.duration>0&&e.level>0&&e.level<=.35)).toBe(true);
     expect(events.slice(0,32)).not.toEqual(events.slice(128,160));
    });
   }
-  expect(names.size).toBe(54);expect(signatures.size).toBe(54);
+  expect(names.size).toBe(63);expect(signatures.size).toBe(63);
  });
  it('gives every catalog game its own complete original rhythm arrangement',()=>{
   const signatures=new Set<string>();
   for(const game of catalog){const score=musicScores[game.id];expect(score.bpm).toBeGreaterThanOrEqual(116);const events=Array.from({length:128},(_,s)=>scoreStep(game.id,s)).flat();
-   expect(new Set(events.map(e=>e.kind)).size).toBe(6);expect(events.every(e=>e.duration>0&&Number.isFinite(e.note)&&e.level<=.35)).toBe(true);signatures.add(JSON.stringify({bpm:score.bpm,events}));
+   expect(new Set(events.map(e=>e.kind)).size).toBeGreaterThanOrEqual(7);expect(events.every(e=>e.duration>0&&Number.isFinite(e.note)&&e.level<=.35)).toBe(true);signatures.add(JSON.stringify({bpm:score.bpm,events}));
   }expect(signatures.size).toBe(catalog.length);
  });
  it('both games expose varied sizes, treasure targets, and a bounded shared population',()=>{

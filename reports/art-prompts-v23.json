@@ -1,0 +1,15 @@
+{
+  "createdAt": "2026-10-07",
+  "tool": "Built-in ImageGen",
+  "original": true,
+  "assets": [
+    {
+      "path": "apps/player/public/art/cabinet-posters-v23.png",
+      "prompt": "Create one original casino game poster atlas for a private arcade, three precisely equal vertical panels side by side in one 1536 by 1024 landscape image. Each panel fills exactly one third; no gutters or overlaps between panels. Left panel: vivid magenta and electric violet 1970s disco dance floor with a large faceted mirrored diamond sphere, radiant diamond gems, chrome seven shapes and stage spotlights. Middle panel: luxurious art deco midnight passenger train, polished gold and deep navy, steam engine coming toward camera, luminous carriage windows, pocket watch and brass railway details, mysterious moonlit station. Right panel: warm amber pirate treasure island, playful richly painted pirate captain with tricorn hat, wooden sailing ship, overflowing doubloon chest, emerald ocean and parchment map. Original stylized commercial slot-machine graphics, dimensional painted illustrations, strong bold readable focal objects, warm rim lights, jewel highlights, slight illustrated texture, clear silhouettes. Keep the upper and lower 15% of each panel relatively dark to leave room for separately rendered interface titles. Do not include words, letters, logos or watermarks. No external casino brands. Three coherent but visually distinct cabinet artworks, production-quality polished original game art."
+    },
+    {
+      "path": "apps/player/public/art/cabinet-symbols-v23.png",
+      "prompt": "An original transparent PNG sprite atlas for three illustrated casino slot games. EXACT layout: 5 equal columns by 4 equal rows, all twenty cells equally sized. One isolated, centered icon per cell, each entirely inside the middle 75 percent of its cell; generous transparent margins. No shadows crossing cell boundaries. No background, no labels or captions. Bold dimensional slot-machine artwork with polished metallic edges, jewel reflections and readable silhouettes. Row 1 left-to-right: a chrome magenta numeral 7, pair of purple cherries, chrome disco bell, magenta metallic BAR plaque, faceted mirrored disco diamond. Row 2: elegant midnight-blue steam locomotive with gold trim (wild symbol), gold railway ticket, ornate gold pocket watch, sapphire jewel, brass steam whistle. Row 3: vintage travel suitcase, luminous antique station lantern, gold pirate doubloon, nautical compass, cheerful ivory pirate skull. Row 4: miniature wooden sailing ship, rolled treasure map with red X, emerald jewel, ruby jewel, gold anchor. Same orthographic near-front presentation, no external branding. Crisp colorful original game graphics, transparent background."
+    }
+  ]
+}

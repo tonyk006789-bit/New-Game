@@ -1,13 +1,13 @@
 import {randomInt,randomUUID} from 'node:crypto';
 import {z} from 'zod';
-import {blackjackProfile,stagingProfile,stagingRules,premiumKenoProfile,isKenoGame,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,reefAssistedOutcome,reefAssistProfile,reefTierProfile,reefFlight,reefBallistics,isFishGame,validStake,type StagingGame} from '@new-game/game-math';
+import {newCabinetsProfile,blackjackProfile,stagingProfile,stagingRules,premiumKenoProfile,isKenoGame,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,stagingOutcome,stagingMultiplier,reefAssistedOutcome,reefAssistProfile,reefTierProfile,reefFlight,reefBallistics,isFishGame,validStake,type StagingGame} from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import {actorFor,parse,type Request} from './auth.js';
 import {transaction,fail,idempotent} from './store.js';
 import {lockWallets,posting,beginLedger} from './ledger.js';
 import {canonical,digest} from './security.js';
 export const profileHash=digest(canonical(stagingProfile));
-export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null,additionalProfiles:stagingEnabled()?[cabinetExpansionProfile,classicReelsProfile,premiumKenoProfile,blackjackProfile].map(profile=>({...profile,hash:digest(canonical(profile))})):[]};}
+export function environment(){return {staging:stagingEnabled(),productionApproved:false,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null,additionalProfiles:stagingEnabled()?[newCabinetsProfile,cabinetExpansionProfile,classicReelsProfile,premiumKenoProfile,blackjackProfile].map(profile=>({...profile,hash:digest(canonical(profile))})):[]};}
 function gate(){if(!stagingEnabled())fail(404,'STAGING_DISABLED');}
 const schema=z.object({requestKey:z.string().min(8).max(128),stake:z.string().refine(validStake),profileId:z.string().min(1).max(80),picks:z.array(z.number().int().min(1).max(80)).min(4).max(10).optional(),trajectoryVersion:z.string().max(60).optional(),roomId:z.uuid().optional(),targetId:z.number().int().min(1).max(80).optional(),aimX:z.number().min(0).max(1200).optional(),aimY:z.number().min(0).max(600).optional(),observedAt:z.number().int().optional(),firedAt:z.number().int().optional(),angle:z.number().min(-Math.PI).max(Math.PI).optional()}).strict();
 export async function stagingRound(req:Request,id:string,body:unknown){
@@ -20,7 +20,7 @@ export async function stagingRound(req:Request,id:string,body:unknown){
   const result=await idempotent<Record<string,unknown>>(db,actor,'ROUND',data.requestKey,{game,...data},async()=>{
    // Accepted historical receipts replay before checking the profile for new plays.
    const profileId=stagingGameProfileId(game);
-   const roundProfileHash=profileId===premiumKenoProfile.id?digest(canonical(premiumKenoProfile)):isFishGame(game)?digest(canonical({profile:reefAssistProfile,tiers:reefTierProfile,ballistics:reefBallistics.version})):profileId===classicReelsProfile.id?digest(canonical(classicReelsProfile)):profileId===cabinetExpansionProfile.id?digest(canonical(cabinetExpansionProfile)):profileHash;
+   const roundProfileHash=profileId===newCabinetsProfile.id?digest(canonical(newCabinetsProfile)):profileId===premiumKenoProfile.id?digest(canonical(premiumKenoProfile)):isFishGame(game)?digest(canonical({profile:reefAssistProfile,tiers:reefTierProfile,ballistics:reefBallistics.version})):profileId===classicReelsProfile.id?digest(canonical(classicReelsProfile)):profileId===cabinetExpansionProfile.id?digest(canonical(cabinetExpansionProfile)):profileHash;
    if(data.profileId!==profileId)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
    if(isFishGame(game)&&data.trajectoryVersion!==reefBallistics.version)fail(400,'PROFILE_CHANGED','Refresh the arcade before firing.');
  if(isFishGame(game)&&[data.roomId,data.targetId,data.aimX,data.aimY,data.observedAt,data.firedAt,data.angle].some(v=>v===undefined))fail(400,'TARGET_REQUIRED');

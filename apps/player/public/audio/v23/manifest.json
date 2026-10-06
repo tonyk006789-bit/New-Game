@@ -1,0 +1,105 @@
+{
+  "version": "original-bank-v23",
+  "sampleRate": 32000,
+  "provenance": "Original additive/FM/noise synthesis; render-music-bank.py; seed 2307",
+  "samples": [
+    {
+      "id": "keys",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.86,
+      "rms": 0.2103
+    },
+    {
+      "id": "brass",
+      "root": 60,
+      "seconds": 2.0,
+      "peak": 0.86,
+      "rms": 0.1894
+    },
+    {
+      "id": "pluck",
+      "root": 60,
+      "seconds": 2.4,
+      "peak": 0.86,
+      "rms": 0.1638
+    },
+    {
+      "id": "strings",
+      "root": 60,
+      "seconds": 4.0,
+      "peak": 0.86,
+      "rms": 0.1916
+    },
+    {
+      "id": "bass",
+      "root": 36,
+      "seconds": 2.0,
+      "peak": 0.86,
+      "rms": 0.171
+    },
+    {
+      "id": "mallet",
+      "root": 72,
+      "seconds": 2.5,
+      "peak": 0.86,
+      "rms": 0.1069
+    },
+    {
+      "id": "kick",
+      "root": null,
+      "seconds": 0.65,
+      "peak": 0.86,
+      "rms": 0.1897
+    },
+    {
+      "id": "snare",
+      "root": null,
+      "seconds": 0.38,
+      "peak": 0.86,
+      "rms": 0.0982
+    },
+    {
+      "id": "clap",
+      "root": null,
+      "seconds": 0.32,
+      "peak": 0.86,
+      "rms": 0.0877
+    },
+    {
+      "id": "hat",
+      "root": null,
+      "seconds": 0.12,
+      "peak": 0.86,
+      "rms": 0.0951
+    },
+    {
+      "id": "openhat",
+      "root": null,
+      "seconds": 0.42,
+      "peak": 0.86,
+      "rms": 0.0927
+    },
+    {
+      "id": "shaker",
+      "root": null,
+      "seconds": 0.16,
+      "peak": 0.86,
+      "rms": 0.1076
+    },
+    {
+      "id": "conga",
+      "root": null,
+      "seconds": 0.3,
+      "peak": 0.86,
+      "rms": 0.2016
+    },
+    {
+      "id": "crash",
+      "root": null,
+      "seconds": 1.6,
+      "peak": 0.86,
+      "rms": 0.0796
+    }
+  ]
+}

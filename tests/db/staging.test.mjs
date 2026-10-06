@@ -84,7 +84,7 @@ test('isolated staging accounting and outcomes',async t=>{
   assert.ok(wins>0,'Positive awards must exercise the two-update wallet reconciliation');
  });
  await t.test('new cabinets settle exact awards, use their own profile, and replay without double charging',async()=>{
-  for(const game of ['ruby-rush','sapphire-crown','solar-fortune']){
+  for(const game of ['ruby-rush','sapphire-crown','solar-fortune','disco-diamonds','midnight-express','pirate-gold']){
    await sleep();const before=await wallet(player),data=body({profileId:stagingGameProfileId(game),stake:'75'});
    assert.equal((await call(`staging/${game}/rounds`,{...data,profileId:'stage-paying30-v2'},playerAuth)).status,400);
    assert.deepEqual(await wallet(player),before);

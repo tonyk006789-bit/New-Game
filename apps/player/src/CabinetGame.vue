@@ -16,6 +16,7 @@ const props = defineProps<{ game: CabinetGameId; running: boolean; reducedMotion
 const profile = cabinetGames[props.game], game = catalog.find(item => item.id === props.game)!;
 const baseGame=cabinetBase(props.game),coinGame = baseGame === 'coin-carnival';
 const crownGame=props.game==='sapphire-crown';
+const newTheme=['disco-diamonds','midnight-express','pirate-gold'].indexOf(props.game);
 const singleRow=props.game==='solar-fortune';
 const reelGrid=(grid:string[][])=>displayedReelGrid(props.game,grid);
 const initialGrid = Array.from({length:3}, (_, r) => Array.from({length:profile.columns}, (_, c) => profile.symbols[(r + c) % profile.symbols.length]));
@@ -94,10 +95,10 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
 
 <template>
   <section class="slot-cabinet" :class="[game.id, {'cabinet-active':active, 'stage-paused':!running,'classic-three':renderProfile.columns===3,'single-row-cabinet':singleRow}]" :data-phase="phase" :style="{'--game-color':game.color}">
-    <div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
+    <div v-if="newTheme>=0" class="cabinet-v23-backdrop" :style="{backgroundPosition:`${newTheme*50}% center`}" aria-hidden="true"></div><div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
     <header class="slot-marquee"><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span><div><small>NEW GAME ORIGINAL</small><h2>{{ game.name }}</h2><p>{{legacyReceipt?'SAVED 5-REEL RESULT':game.detail}}</p></div><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span></header>
     <p v-if="legacyReceipt" class="legacy-layout-note">Previous five-reel round · New spins use three reels</p>
-    <div v-if="crownGame" class="portrait-crown-feature" aria-hidden="true"><span>THE ROYAL COLLECTION</span><ArcadeSymbol symbol="dragon" :theme="game.id"/><b>CROWN WILD</b></div>
+    <div v-if="game.id==='midnight-express'" class="express-feature" aria-hidden="true"><span>MIDNIGHT DEPARTURE</span><ArcadeSymbol symbol="dragon" theme="midnight-express"/><b>LOCOMOTIVE WILD</b></div><div v-if="crownGame" class="portrait-crown-feature" aria-hidden="true"><span>THE ROYAL COLLECTION</span><ArcadeSymbol symbol="dragon" :theme="game.id"/><b>CROWN WILD</b></div>
     <div class="cabinet-game-body">
       <aside class="cabinet-side left"><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span><div class="cabinet-readout"><small>{{ coinGame ? 'HELD' : 'MATCHES' }}</small><strong>{{ coinGame ? locked.length : phase === 'complete' ? result?.matches.length || 0 : '—' }}<em v-if="coinGame"> / 5</em></strong></div><b>{{ coinGame ? 'COLLECT' : baseGame === 'jade-fortune' ? 'WILD' : 'SEVENS' }}</b></aside>
       <div class="slot-reel-surround">

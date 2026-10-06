@@ -13,11 +13,11 @@ async function change(){
  error.value='';if(password.value!==confirm.value){error.value='The new passwords do not match.';return;}
  busy.value=true;try{await api('auth/password',{currentPassword:current.value,newPassword:password.value});emit('passwordChanged');}catch(e){error.value=(e as Error).message;}finally{current.value='';password.value='';confirm.value='';busy.value=false;}
 }
-async function toggle(kind:'music'|'sound'){await unlockAudio();audioPreferences[kind]=!audioPreferences[kind];if(kind==='sound')playSound();}
+async function toggle(kind:'music'|'sound'){audioPreferences[kind]=!audioPreferences[kind];await unlockAudio();if(kind==='sound')playSound();}
 </script>
 <template><section class="arcade-panel settings-panel simple-settings">
  <div><span><strong>Music</strong><p>Original casino tracks · Changes with each game</p></span><button class="toggle" :class="{on:audioPreferences.music}" role="switch" :aria-checked="audioPreferences.music" aria-label="Music" @click="toggle('music')"><i></i></button></div>
- <div class="music-library"><span><strong>Casino playlist</strong><p>Three tracks per game · Automatically rotates</p></span><select aria-label="Music track" :value="musicNow.index" @change="chooseTrack"><option v-for="(track,index) in playlist" :key="track.name" :value="index">{{track.name}}</option></select></div>
+ <p v-if="musicNow.status==='loading'" class="music-load-status" role="status">Loading instruments…</p><p v-if="musicNow.status==='unavailable'" class="music-load-status" role="status">Music could not load. Toggle Music to retry.</p><div class="music-library"><span><strong>Casino playlist</strong><p>Original casino band · Three tracks per game</p></span><select aria-label="Music track" :value="musicNow.index" @change="chooseTrack"><option v-for="(track,index) in playlist" :key="track.name" :value="index">{{track.name}}</option></select></div>
  <div><span><strong>Sound</strong><p>Buttons, cannons and wins</p></span><button class="toggle" :class="{on:audioPreferences.sound}" role="switch" :aria-checked="audioPreferences.sound" aria-label="Sound effects" @click="toggle('sound')"><i></i></button></div>
  <div><span><strong>Reduced motion</strong><p>Shorter reveals and calmer effects</p></span><button class="toggle" :class="{on:reducedMotion}" role="switch" :aria-checked="reducedMotion" aria-label="Reduced motion" @click="emit('update:reducedMotion',!props.reducedMotion)"><i></i></button></div>
  <div v-if="account"><span><strong>{{account.displayName}}</strong><p>{{account.username}}</p></span><button class="secondary" :aria-expanded="changing" @click="changing=!changing">Change password</button></div>
