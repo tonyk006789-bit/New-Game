@@ -32,3 +32,12 @@ Executed on Windows with the bundled Node 24 runtime and pnpm 11:
 No database migration, account provisioning, refill or credential change is required. Existing profile objects/hashes remain unchanged. Keep a V23-compatible API for accepted new-cabinet receipts if the UI is rolled back. Never delete settled rounds or modify balances as a rollback. Previous profiles and fish outcomes retain their existing versions.
 
 Android/iPhone hardware rendering, native builds/signing and production payout approval are not certified by these browser/local tests. Public release verification is recorded below after deployment.
+
+## Published release
+
+- Source commit `44da4e4` pushed to GitHub `tonyk006789-bit/New-Game` main.
+- Player deployment `dpl_9Ee5n8XFPFfTnvvgwUaCbj1zGkX3` is READY at https://new-game-test-topaz.vercel.app/ with entry `index-BKN8D4pv.js`.
+- Operator deployment `dpl_AHy3bgBSw9LLjctJFpVq7rYXAMCa` is READY at https://new-game-operator.vercel.app/ with entry `index-CT1MaUjW.js`.
+- Public HTTP checks passed for both health endpoints, the test environment, all twenty catalog games, restricted unauthenticated blackjack/operator routes, both original atlases and sampled instrument files. Evidence: local `reports/screenshots/v23/live-route-checks.json`. No hosted tester account or balance was altered during acceptance.
+- Live Guest UI verified twenty walking-floor directory entries, correct new cabinet names/labels, Blackjack-only Premium, music status ready, and labeled independent Sunken Dynasty bot activity (three bots, increasing shot counter with no player shot). All four fish worlds were also exercised locally with increasing independent bot shot counters. The live fish scene emitted no browser errors; prior V22 Pixi cleanup warnings remain outside this release's claimed fixes.
+- Screenshots include `live-independent-bots.png`, `premium-only-blackjack.png`, `disco-diamonds.png`, `midnight-express.png`, `pirate-gold.png` in the ignored local evidence directory. Temporary desktop viewport override was reset.
