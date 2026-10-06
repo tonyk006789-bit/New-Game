@@ -21,3 +21,4 @@ import './arcade-v17.css';
 import './arcade-v18.css';
 import './arcade-v19.css';
 import './arcade-v20.css';
+import './premium-v22.css';

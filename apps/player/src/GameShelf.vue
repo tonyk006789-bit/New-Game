@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed,ref,watch} from 'vue';
-import {catalog,type GameId} from '@new-game/contracts';
+import {catalog,isPremiumGame,type GameId} from '@new-game/contracts';
 import GamePoster from './GamePoster.vue';
 const props=defineProps<{games:readonly (typeof catalog)[number][];favorites:string[];running:boolean}>();
 const emit=defineEmits<{open:[id:GameId];favorite:[id:GameId]}>();
@@ -20,7 +20,7 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
    <article v-for="game in visible" :key="game.id" class="shelf-game" :style="{'--tile-color':game.color}">
     <button class="shelf-play" :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
      <GamePoster :game="game.id" :name="game.name"/>
-     <span v-if="['abyss-legends','ruby-rush','sapphire-crown','solar-fortune'].includes(game.id)" class="new-ribbon">NEW</span>
+     <span v-if="isPremiumGame(game.id)" class="new-ribbon">PREMIUM</span>
      <span class="shelf-game-caption"><b>{{game.name}}</b><small>{{game.detail}}</small></span>
      <span class="shelf-enter">PLAY <span>▶</span></span>
     </button>

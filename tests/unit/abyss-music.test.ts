@@ -3,7 +3,7 @@ import {catalog} from '@new-game/contracts';
 import {fishGuide,reefTarget,reefTier,reefTierProfile,reefOutcome,stagingMultiplier,reefFlight,reefLeadAngle,isFishGame} from '@new-game/game-math';
 import {musicScores,musicPlaylists,scoreStep,TRACK_STEPS,type MusicScene} from '../../apps/player/src/music-score';
 describe('distinct music and fish worlds',()=>{
- it('provides 39 distinct complete tracks with bounded levels and changing arrangements',()=>{
+ it('provides 54 distinct complete tracks with bounded levels and changing arrangements',()=>{
   const names=new Set<string>(),signatures=new Set<string>();
   for(const scene of Object.keys(musicPlaylists) as MusicScene[]) {
    expect(musicPlaylists[scene]).toHaveLength(3);
@@ -14,7 +14,7 @@ describe('distinct music and fish worlds',()=>{
     expect(events.slice(0,32)).not.toEqual(events.slice(128,160));
    });
   }
-  expect(names.size).toBe(39);expect(signatures.size).toBe(39);
+  expect(names.size).toBe(54);expect(signatures.size).toBe(54);
  });
  it('gives every catalog game its own complete original rhythm arrangement',()=>{
   const signatures=new Set<string>();

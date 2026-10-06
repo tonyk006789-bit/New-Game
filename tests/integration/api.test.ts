@@ -6,9 +6,9 @@ let base: string;
 beforeAll(async () => { app = await createApi(); await app.listen(0, '127.0.0.1'); base = await app.getUrl(); });
 afterAll(async () => { await app?.close(); });
 describe('actual HTTP boundaries', () => {
-  it('advertises all twelve games as unavailable for production stakes', async () => {
+  it('advertises all seventeen games as unavailable for production stakes', async () => {
     const response = await fetch(`${base}/v1/games`); const games = await response.json();
-    expect(response.status).toBe(200); expect(games).toHaveLength(12);
+    expect(response.status).toBe(200); expect(games).toHaveLength(17);
     expect(games.every((game: {creditStakedPlayEnabled:boolean;approved:boolean}) => !game.creditStakedPlayEnabled && !game.approved)).toBe(true);
   });
   it.each(['temple-lights','orchard-numbers','reef-party','abyss-legends','aurora-vault','ember-relics','neon-sevens','jade-fortune','coin-carnival','ruby-rush','sapphire-crown','solar-fortune','unknown'])('rejects %s stakes even with forged authority or payout', async id => {

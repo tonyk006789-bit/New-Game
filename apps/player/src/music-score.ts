@@ -1,4 +1,9 @@
 export const musicScores={
+ 'royal-blackjack':{name:'Velvet Aces',bpm:120,key:60,wave:'triangle',swing:.2,motif:[0,7,11,14,9,4,12,7],bass:[0,5,2,7]},
+ 'sunken-dynasty':{name:'Jade Armada',bpm:130,key:62,wave:'triangle',swing:.04,motif:[7,12,14,9,4,2,9,7],bass:[0,7,2,5]},
+ 'polar-odyssey':{name:'Aurora Expedition',bpm:136,key:65,wave:'sine',swing:0,motif:[12,7,14,16,9,12,4,7],bass:[0,-3,5,2]},
+ 'neon-numbers':{name:'Electric Eighty',bpm:134,key:59,wave:'square',swing:0,motif:[0,12,3,10,7,15,5,10],bass:[0,3,-2,5]},
+ 'pearl-keno':{name:'Pearl Promenade',bpm:124,key:67,wave:'sine',swing:.12,motif:[4,12,9,7,14,16,11,7],bass:[0,5,-3,7]},
  lobby:{name:'Midnight Casino',bpm:118,key:60,wave:'triangle',swing:.16,motif:[0,4,7,11,9,7,4,2],bass:[0,-3,5,7]},
  'neon-sevens':{name:'Neon Jackpot',bpm:134,key:64,wave:'square',swing:0,motif:[0,7,12,7,10,7,3,5],bass:[0,0,-2,3]},
  'ruby-rush':{name:'Ruby Disco',bpm:128,key:62,wave:'sawtooth',swing:.08,motif:[0,3,7,10,12,10,7,5],bass:[0,-2,-4,-5]},
@@ -18,6 +23,11 @@ export type MusicScore={name:string;bpm:number;key:number;wave:OscillatorType;sw
 const track=(name:string,bpm:number,key:number,wave:OscillatorType,groove:'house'|'swing'|'breaks',motif:number[],bass:number[]):MusicScore=>({name,bpm,key,wave,groove,swing:groove==='swing'?.18:0,motif,bass});
 // Original compositions: each scene gets two additional melodies and progressions.
 const additions:Record<MusicScene,readonly MusicScore[]>={
+ 'royal-blackjack':[track('Ace of Nights',128,62,'triangle','swing',[11,7,4,9,14,12,16,7],[0,5,7,-3]),track('Green Felt Groove',122,57,'sine','house',[0,7,3,12,14,10,5,7],[0,-2,5,3])],
+ 'sunken-dynasty':[track('Imperial Tide',136,65,'sine','house',[0,4,9,14,12,7,2,9],[0,5,2,7]),track('Dragon Lanterns',126,60,'triangle','breaks',[7,2,12,9,14,4,7,12],[0,7,5,2])],
+ 'polar-odyssey':[track('Icebound Pulse',140,62,'sawtooth','breaks',[12,17,10,7,15,3,10,5],[0,-5,-2,3]),track('Crystal Voyage',128,69,'sine','house',[4,7,14,19,16,9,12,2],[0,-3,5,7])],
+ 'neon-numbers':[track('Number Runner',142,64,'square','house',[3,12,7,15,10,5,0,7],[0,3,5,-2]),track('Lucky Voltage',130,60,'sawtooth','breaks',[10,7,12,3,17,15,5,7],[0,-2,3,-5])],
+ 'pearl-keno':[track('Moon Pearl',128,65,'triangle','swing',[9,4,12,16,14,7,11,2],[0,5,7,2]),track('Ocean Gems',132,62,'sine','house',[14,12,7,4,9,16,7,2],[0,-3,2,5])],
  lobby:[track('Velvet Roulette',124,62,'triangle','swing',[7,9,12,16,14,9,5,2],[0,5,-2,7]),track('After Hours',128,57,'sine','house',[12,7,10,14,15,10,7,3],[0,-5,-2,3])],
  'neon-sevens':[track('Electric Avenue',138,59,'sawtooth','house',[0,3,10,7,15,12,10,5],[0,3,5,-2]),track('Seven Star Swing',126,65,'triangle','swing',[4,7,9,12,16,14,9,7],[0,7,5,-3])],
  'ruby-rush':[track('Scarlet Fever',136,60,'square','breaks',[7,12,10,15,7,5,3,10],[0,-2,5,3]),track('Ruby Boulevard',122,64,'triangle','swing',[0,4,11,9,7,14,12,9],[0,5,7,-3])],

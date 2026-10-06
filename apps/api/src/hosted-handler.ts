@@ -7,12 +7,13 @@ import {reefRoom, reefTables, reefLeave} from './practice.js';
 import {transaction, fail} from './store.js';
 import {hostedTest, validateHostedTest} from './environment.js';
 import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
+import {blackjackCurrent,blackjackAction,settleExpiredBlackjack} from './blackjack.js';
 import {changePassword} from './password.js';
 
 export const testAudience = new Set(['tester.one','tester.two','tester.three','tester.four','tester.five']);
-const reads = new Set(['/v1/environment','/v1/health','/v1/games','/v1/me','/v1/history','/v1/staging/history','/v1/staging/stats','/v1/practice/reef/room','/v1/practice/reef/tables','/v1/daily-wheel']);
-const writes = new Set(['/v1/auth/login','/v1/auth/logout','/v1/auth/password','/v1/daily-wheel/spin','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
-const rounds = /^\/v1\/staging\/(neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party|abyss-legends|ruby-rush|sapphire-crown|solar-fortune)\/rounds$/;
+const reads = new Set(['/v1/blackjack','/v1/environment','/v1/health','/v1/games','/v1/me','/v1/history','/v1/staging/history','/v1/staging/stats','/v1/practice/reef/room','/v1/practice/reef/tables','/v1/daily-wheel']);
+const writes = new Set(['/v1/blackjack','/v1/auth/login','/v1/auth/logout','/v1/auth/password','/v1/daily-wheel/spin','/v1/staging/recover','/v1/practice/reef/join','/v1/practice/reef/leave']);
+const rounds = /^\/v1\/staging\/(sunken-dynasty|polar-odyssey|neon-numbers|pearl-keno|neon-sevens|jade-fortune|coin-carnival|aurora-vault|ember-relics|temple-lights|orchard-numbers|reef-party|abyss-legends|ruby-rush|sapphire-crown|solar-fortune)\/rounds$/;
 export function playerRoute(method:string, path:string){return method==='GET'?reads.has(path):method==='POST'&&(writes.has(path)||rounds.test(path));}
 const json=(body:unknown,status=200,extra:Record<string,string|string[]>={})=>{
  const headers=new Headers({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
@@ -42,15 +43,17 @@ export async function hostedHandler(request:Request, context:{ip?:string}={}){
   const headers:Record<string,string|string[]>={};
   const res={setHeader:(name:string,value:string|string[])=>{headers[name]=value;}};
   if(path==='/v1/environment')return json(environment());
-  if(path==='/v1/health'){await transaction(db=>db.query('SELECT 1'));return json({status:'ok',mode:'private-test'});}
+  if(path==='/v1/health'){await settleExpiredBlackjack();await transaction(db=>db.query('SELECT 1'));return json({status:'ok',mode:'private-test'});}
   if(path==='/v1/games')return json(catalog);
   if(path==='/v1/auth/login'){
    if(typeof body?.username!=='string'||(process.env.HOSTED_PLAYER_ADMISSION!=='managed'&&!testAudience.has(body.username.toLowerCase())))return json({code:'INVALID_CREDENTIALS',message:'Player ID or password is incorrect.'},401);
    return json(await login(req,res,body,'player'),201,headers);
   }
   await transaction(async db=>{const actor=await actorFor(db,req,request.method==='POST');if(actor.role!=='PLAYER'||(process.env.HOSTED_PLAYER_ADMISSION!=='managed'&&!testAudience.has(actor.username)))fail(403,'TEST_ACCOUNT_REQUIRED');});
+  if(path==='/v1/me'||path==='/v1/blackjack')await settleExpiredBlackjack();
   let result:unknown;
-  if(path==='/v1/me')result=await me(req);
+  if(path==='/v1/blackjack')result=request.method==='POST'?await blackjackAction(req,body):await blackjackCurrent(req);
+  else if(path==='/v1/me')result=await me(req);
   else if(path==='/v1/daily-wheel')result=await dailyWheelStatus(req);
   else if(path==='/v1/daily-wheel/spin')result=await spinDailyWheel(req,body);
   else if(path==='/v1/auth/password')result=await changePassword(req,res,body);

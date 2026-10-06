@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-01T04:36:52.460Z",
+  "generatedAt": "2026-10-06T18:26:47.405Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -87,6 +87,20 @@
       "sha256": "b91c55aa4f617903cab373f043eae9da3e9cfebd114c12f0a4ad9410706f1000"
     },
     {
+      "path": "apps/player/public/art/dynasty-atlas-v22.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v22.json",
+      "license": "Project original; owner review pending",
+      "sha256": "28837816eb196a652da00d39b48cbfa6abc349698fc465304282f8bd5a3d488c"
+    },
+    {
+      "path": "apps/player/public/art/dynasty-background-v22.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v22.json",
+      "license": "Project original; owner review pending",
+      "sha256": "dc5c114a0b7a02b939ddefee0a1cbfb88068fe773bc8abfaf6de4a1a9d635cd6"
+    },
+    {
       "path": "apps/player/public/art/ember-relics.png",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v3.json",
@@ -113,6 +127,20 @@
       "source": "Repository-native SVG; no third-party assets",
       "license": "Project original; owner review pending",
       "sha256": "3b2aaf6f301211b2ba411e85e8f912a1906e9e167252aba57aec48f09f5146e3"
+    },
+    {
+      "path": "apps/player/public/art/polar-atlas-v22.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v22.json",
+      "license": "Project original; owner review pending",
+      "sha256": "9ccb95650c888c62ab2485d14c33fb6567ecd2e8f667c15990af8a80d71b1184"
+    },
+    {
+      "path": "apps/player/public/art/polar-background-v22.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v22.json",
+      "license": "Project original; owner review pending",
+      "sha256": "aae2953ff5fdadf9e8f1bdf6d961cc96dec79546496080ad2fd36face2832343"
     },
     {
       "path": "apps/player/public/art/reef-cannons-v6.png",
@@ -196,7 +224,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "d96aa45fcb5d744334bf7dd76fe9cd3ad08181e15230dfb5a7f9d8e81cae2fc4"
+      "sha256": "5d781f479ce59335c91f29bc683412b8bd0baed6a15e5bbbd4a50f1768637ed9"
     },
     {
       "path": "apps/player/src/arcade-v4.css",
@@ -210,7 +238,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "5c54f8243e873d3325f6f399b66bb4c0ff946437ba5cbe7eba74d813146dee0c"
+      "sha256": "4b341b296fff6fa84f6a710b1db3bf583de92ffd0a266540b979e0f003c09cac"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -238,7 +266,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "9c0ebbb2b1c4ca6fff5139b2d302ea663e1ef0de4e32062da6ca6ffb99c27133"
+      "sha256": "b6bde991b6757ceb0ac977b7e0288e609d77e9a59a7d8ca6191faff459a5b0e7"
     },
     {
       "path": "apps/player/src/arcade-v8.css",
@@ -252,7 +280,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "dda664719063b04c9c8013397f14895a7322427ddb9582c6884fb36cc739224c"
+      "sha256": "496edcea2038d35f4aac6cd6b185031f383e7abec2a7ea4d10b6e51a628e6552"
     },
     {
       "path": "apps/player/src/arcade-v15.css",
@@ -280,7 +308,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "1744dfb8c869a4beb0df6d337757242e3ab5ec5e56fde7e97a2dd07ff5c9153a"
+      "sha256": "47e051a40b19f964eb962004716e7ee1673e52b027057e46b65e0a39be9a2aa5"
     },
     {
       "path": "apps/player/src/FishRewardReveal.vue",
@@ -301,7 +329,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "712b5711a17c3dcd747f05652682bbfa25f6fd228a8257d73d77e850caaeffaa"
+      "sha256": "3fe621446fd5427952ae618bffe565f5b02343361cd4b60eb738540a7c683b93"
     },
     {
       "path": "apps/player/src/abyss-cannons.ts",

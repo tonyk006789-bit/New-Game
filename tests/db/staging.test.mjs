@@ -217,7 +217,7 @@ test('isolated staging accounting and outcomes',async t=>{
  });
  await t.test('solo assistants give up to three free attempts, leave real seats available and replay one committed award',async()=>{
   const random=crypto.randomInt;
-  try{for(const game of ['reef-party','abyss-legends']){
+  try{for(const game of ['reef-party','abyss-legends','sunken-dynasty','polar-odyssey']){
    const room=(await call('practice/reef/join',{game,newTable:true,seat:1},playerAuth)).data;
    assert.equal(room.seats.length,1);assert.deepEqual(room.bots.map(b=>b.seat),[2,3,4]);assert.ok(room.bots.every(b=>b.kind==='BOT'));
    const targetId=game==='reef-party'?25:24,p=reefTarget(targetId,0,game),time=p.spawnAt+15;

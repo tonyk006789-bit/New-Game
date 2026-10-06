@@ -1,4 +1,11 @@
+export * from './blackjack.ts';
 export const mathStatus = Object.freeze({
+  'sunken-dynasty': {approved:false,profileId:null,mathHash:null},
+  'polar-odyssey': {approved:false,profileId:null,mathHash:null},
+  'royal-blackjack': {approved:false,profileId:null,mathHash:null},
+  'neon-numbers': {approved:false,profileId:null,mathHash:null},
+  'pearl-keno': {approved:false,profileId:null,mathHash:null},
+
   'abyss-legends': { approved: false, profileId: null, mathHash: null },
   'ruby-rush': { approved: false, profileId: null, mathHash: null },
   'sapphire-crown': { approved: false, profileId: null, mathHash: null },
@@ -199,8 +206,8 @@ export const reefTierProfile={id:'reef-tiers-v1',tiers:{
  boss:{label:'Boss',multiplier:20,captureTickets:400}
 }} as const;
 export function reefTier(species:number){
- if(!Number.isInteger(species)||species<0||species>23)throw new Error('Invalid reef species');
- return [7,8,9,19,23].includes(species)?'boss':[3,5,10,11,18,21].includes(species)?'large':[2,4,6,13,17,22].includes(species)?'medium':'small';
+ if(!Number.isInteger(species)||species<0||species>39)throw new Error('Invalid reef species');
+ return [7,8,9,19,23,30,31,38,39].includes(species)?'boss':[3,5,10,11,18,21,28,29,36,37].includes(species)?'large':[2,4,6,13,17,22,26,27,34,35].includes(species)?'medium':'small';
 }
 export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame='reef-party'):StagingVisual{
  const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
@@ -253,9 +260,10 @@ export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagi
  'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
 } as const;
 const currentFishRules=`${stagingProfile.rules['reef-party']} Solo tables add up to three free bot attempts after a resisted paid hit, stopping at the first capture. At most one tier award; bots stop when another human joins. Profile: ${reefAssistProfile.id}.`;
-export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'reef-party':currentFishRules,'abyss-legends':currentFishRules};
+export const stagingRules={...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
 export type StagingGame=keyof typeof stagingRules;
-export function stagingGameProfileId(game:string){return isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export const premiumKenoProfile={id:'stage-keno-cabinets-v1',baseProfile:stagingProfile.id,aliases:{'neon-numbers':'orchard-numbers','pearl-keno':'orchard-numbers'}} as const;
+export function stagingGameProfileId(game:string){return Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
 export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
@@ -266,7 +274,7 @@ export function stagingMultiplier(outcome:StagingVisual):number {
  if(game==='temple-lights')return outcome.grid!.reduce((n,row)=>{let count=1;while(count<5&&row[count]===row[0])count++;return n+({3:2,4:3,5:5}[count]||0);},0);
  if(game==='aurora-vault')return Math.max(0,(outcome.sequence as VaultSequence).frames.at(-1)!.cells.filter(Boolean).length-7);
  if(game==='ember-relics')return Math.floor((outcome.sequence as CascadeSequence).frames.reduce((sum,frame)=>sum+frame.removed.length,0)/12);
- if(game==='orchard-numbers')return Math.max(0,outcome.picks!.filter(n=>outcome.drawn!.includes(n)).length-(outcome.picks!.length<=6?1:2));
+ if(isKenoGame(game))return Math.max(0,outcome.picks!.filter(n=>outcome.drawn!.includes(n)).length-(outcome.picks!.length<=6?1:2));
  return outcome.captured?(outcome.fish?reefTierProfile.tiers[reefTier(outcome.fish.species)].multiplier:3):0;
 }
 export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[]):StagingVisual {
@@ -291,14 +299,20 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
  throw new Error('Experimental sampler exhausted; no round accepted.');
 }
 
-export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan'] as const;
-export type FishGame='reef-party'|'abyss-legends';
-export function isFishGame(game:unknown):game is FishGame{return game==='reef-party'||game==='abyss-legends';}
+export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan','Ruby koi','Jade shrimp','Imperial lionfish','Pearl cuttlefish','Jade turtle','Golden sentinel crab','Dynasty dragon','Jade sea empress','Silver icefish','Crystal shrimp','Spotted seal','Aurora squid','Royal narwhal','Snow crab','Glacial serpent','Crystal orca'] as const;
+export const fishGames=['reef-party','abyss-legends','sunken-dynasty','polar-odyssey'] as const;
+export type FishGame=typeof fishGames[number];
+export const kenoGames=['orchard-numbers','neon-numbers','pearl-keno'] as const;
+export function isKenoGame(game:unknown):game is typeof kenoGames[number]{return typeof game==='string'&&(kenoGames as readonly string[]).includes(game);}
+export function isFishGame(game:unknown):game is FishGame{return typeof game==='string'&&(fishGames as readonly string[]).includes(game);}
 export const fishSpeciesPools={
  'reef-party':[14,15,0,2,1,4,12,3,16,6,20,13,17,5,10,22,11],
+ 'sunken-dynasty':[24,25,24,26,25,27,24,28,25,26,24,29,27,25,24,28],
+ 'polar-odyssey':[32,33,32,34,33,35,32,36,33,34,32,37,35,33,32,36],
  'abyss-legends':[16,20,17,18,16,22,20,21,6,17,16,20,18,22,21,5]
 } as const;
-export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...(game==='abyss-legends'?[19,23]:[7,8,9])])];}
+export const fishBosses:Record<FishGame,readonly number[]>={'reef-party':[8,9,7,8],'abyss-legends':[19,23],'sunken-dynasty':[30,31],'polar-odyssey':[38,39]};
+export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...fishBosses[game]])];}
 export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v5'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
@@ -337,9 +351,9 @@ export function reefTarget(id:number,time:number,game:FishGame='reef-party'){
  if(!Number.isInteger(id)||id<1||id>80||!Number.isFinite(time))throw new Error('Invalid reef target');
  // Staggered two-second arrivals: about 16 targets, bounded to 20 and one boss.
  // Captured IDs remain unavailable for the lifetime of the shared room.
- const pattern=fishSpeciesPools[game],bosses=game==='abyss-legends'?[19,23]:[8,9,7,8];
+ const pattern=fishSpeciesPools[game],bosses=fishBosses[game];
  const species=id%20===5?bosses[Math.floor(id/20)%bosses.length]:pattern[(id-1)%pattern.length];
- const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98][species];
+ const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88][species];
  const duration={small:28,medium:32,large:36,boss:38}[tier],spawnAt=(id-1)*2-28;
  const age=((time-spawnAt)%160+160)%160,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;

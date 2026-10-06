@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen",
+  "source": "Original dynasty-atlas-v22.png generated in this workspace",
+  "output": "apps/player/public/art/dynasty-atlas-v22.png",
+  "prompt": "Refine this original transparent game sprite atlas for production use. Preserve the exact same twelve designs, palette, illustrated glossy casino sprite style, orientations and order. Place them in an EXACT regular 4-column by 3-row grid. Each sprite must fit wholly inside the central 75 percent of its own cell, leaving generous TRANSPARENT gutters on all four sides. No portion including tails, horns, tentacles, glows or cannon barrels may approach a neighboring cell. Do not let any creature overlap another. Canvas aspect ratio 4:3. Row 1: koi facing right, shrimp facing right, lionfish facing right, pearl cuttlefish facing right. Row 2: jade turtle facing right, golden crab, curled jade dragon facing right, jade sea empress facing right. Row 3: the same four jade cannons all facing vertically UP. Keep complete silhouette of every character, all isolated against full transparent alpha. No labels, gridlines, panels or shadows outside each sprite. The purpose is perfect cropping in 12 equal-sized cells."
+}

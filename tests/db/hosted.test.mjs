@@ -81,6 +81,15 @@ test('Netlify player transport uses authoritative accounting and four real seats
   const missing={...body,requestKey:randomUUID()};assert.equal((await call('/v1/staging/recover',{...missing,game:'neon-sevens'},sessions[0])).data.status,'NOT_PLAYED');
   assert.equal((await call('/v1/staging/neon-sevens/rounds',missing,sessions[0])).status,409);
  });
+ await t.test('hosted blackjack resumes, settles and replays only for its owner',async()=>{
+  const command={action:'DEAL',stake:'50',profileId:'stage-blackjack-v1',requestKey:randomUUID()};
+  assert.equal((await call('/v1/blackjack')).status,401);
+  const first=await call('/v1/blackjack',command,sessions[1]);assert.equal(first.status,201,JSON.stringify(first.data));
+  assert.deepEqual((await call('/v1/blackjack',command,sessions[1])).data,first.data);
+  const resumed=(await call('/v1/blackjack',undefined,sessions[1])).data.hand;assert.equal(resumed.id,first.data.id);assert.equal(resumed.shoe,undefined);
+  assert.equal((await call('/v1/blackjack',undefined,sessions[2])).data.hand,null);
+  if(!resumed.settled){const action={action:'STAND',id:resumed.id,revision:resumed.revision,profileId:'stage-blackjack-v1',requestKey:randomUUID()};assert.equal((await call('/v1/blackjack',action,sessions[2])).status,404);const end=await call('/v1/blackjack',action,sessions[1]);assert.equal(end.status,201);assert.equal(end.data.settled,true);assert.equal(end.data.wallet.reserved,'0');assert.deepEqual((await call('/v1/blackjack',action,sessions[1])).data,end.data);}
+ });
  await t.test('four people join one table and the fifth cannot occupy an existing seat',async()=>{
   const first=await call('/v1/practice/reef/join',{newTable:true,seat:1},sessions[0]);assert.equal(first.status,201,JSON.stringify(first.data));
   const roomId=first.data.id;

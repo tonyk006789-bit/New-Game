@@ -9,7 +9,7 @@ export const credentialPattern='(?=.*[A-Za-z])(?=.*[0-9]).{6,256}';
 export const NewPassword=z.string().min(6,credentialHint).max(256).regex(/[A-Za-z]/,credentialHint).regex(/[0-9]/,credentialHint);
 export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
  z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));
-export const GameId = z.enum(['temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
+export const GameId = z.enum(['sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -40,10 +40,10 @@ export const RoundRequest = z.object({
   gameId: GameId, ruleVersion: z.string().min(1).max(80), costUnits: PositiveUnits,
   clientRequestId: z.uuid(), selections: z.array(z.number().int().min(1).max(80)).min(4).max(10).optional()
 }).strict().superRefine((round, ctx) => {
-  if (round.gameId === 'orchard-numbers' && (!round.selections || new Set(round.selections).size !== round.selections.length)) {
+  if (['orchard-numbers','neon-numbers','pearl-keno'].includes(round.gameId) && (!round.selections || new Set(round.selections).size !== round.selections.length)) {
     ctx.addIssue({ code: 'custom', message: 'Keno requires 4–10 unique selections' });
   }
-  if (round.gameId !== 'orchard-numbers' && round.selections) ctx.addIssue({ code: 'custom', message: 'Selections are only valid for keno' });
+  if (!['orchard-numbers','neon-numbers','pearl-keno'].includes(round.gameId) && round.selections) ctx.addIssue({ code: 'custom', message: 'Selections are only valid for keno' });
 });
 export const CursorQuery = z.object({ cursor: z.string().max(256).optional(), limit: z.coerce.number().int().min(1).max(100).default(25) }).strict();
 export const FishCommand = z.object({
@@ -52,7 +52,14 @@ export const FishCommand = z.object({
 }).strict();
 export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SERVICE_NOT_READY', 'FORBIDDEN', 'STALE_WALLET', 'INSUFFICIENT_AVAILABLE', 'IDEMPOTENCY_CONFLICT']);
 
+export const premiumGames=['royal-blackjack','sunken-dynasty','polar-odyssey','neon-numbers','pearl-keno','reef-party','abyss-legends'] as const;
+export const isPremiumGame=(id:string)=>(premiumGames as readonly string[]).includes(id);
 export const catalog = [
+  { id: 'royal-blackjack', name: 'Royal Blackjack', category: 'Table', tagline: 'Take your seat at the velvet table.', description: 'Six decks, a dealer, and decisions that matter. Hit, stand, double or split.', detail: '6 decks · Blackjack pays 3:2', color: '#edd298' },
+  { id: 'sunken-dynasty', name: 'Sunken Dynasty', category: 'Fish', tagline: 'Wake the golden dragon.', description: 'Jade cannons guard a sunken palace of koi, armored turtles and the sea empress.', detail: '4 seats · Jade palace', color: '#5ee3b0' },
+  { id: 'polar-odyssey', name: 'Polar Odyssey', category: 'Fish', tagline: 'Discover a world below the ice.', description: 'Crystal cannons, narwhals, snow crabs and glacial sea legends.', detail: '4 seats · Frozen frontier', color: '#a7dfff' },
+  { id: 'neon-numbers', name: 'Neon Numbers', category: 'Keno', tagline: 'Light up your lucky numbers.', description: 'An electric violet number cabinet with illuminated balls and a paced twenty-number reveal.', detail: '80 numbers · Neon cabinet', color: '#f886ff' },
+  { id: 'pearl-keno', name: 'Pearl Keno', category: 'Keno', tagline: 'Uncover your ocean pearls.', description: 'Pick numbered pearls and watch twenty reveal in a luminous underwater cabinet.', detail: '80 numbers · Pearl collection', color: '#8df5ed' },
   { id: 'abyss-legends', name: 'Abyss Legends', category: 'Fish', tagline: 'Enter the deep. Discover the legends.', description: 'Four cannons share a sunken kingdom with krakens, leviathans, armored sharks and treasure chests.', detail: '4 seats · Treasure & legends', color: '#60e1db' },
   { id: 'ruby-rush', name: 'Ruby Rush', category: 'Slots', tagline: 'Classic reels. Radiant rubies.', description: 'Three mechanical reels with ruby sevens, cherries, bells, BARs and red diamonds. Five lines pay matching triples.', detail: '3 reels · 5 lines', color: '#ff4569' },
   { id: 'sapphire-crown', name: 'Sapphire Crown', category: 'Slots', tagline: 'Every crown holds a possibility.', description: 'A royal blue cabinet with nine paylines and substituting crown wilds. Uses the Jade Fortune test rules.', detail: 'Portrait · 5 reels', color: '#67b8ff' },

@@ -14,6 +14,7 @@ import {operatorDashboard,operatorAccounts,operatorRecords,operatorReceipt,opera
 import {operatorRounds,operatorTotals} from './operator-reports.js';
 import {operatorDevices,manageDevice} from './device.js';
 import {operatorApiSettings,updateOperatorApi,operatorApiDocumentation,operatorIntegration} from './operator-api.js';
+import {blackjackCurrent,blackjackAction,settleExpiredBlackjack} from './blackjack.js';
 import {changePassword} from './password.js';
 @Catch()
 class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost){
@@ -23,6 +24,8 @@ class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost
 } }
 @Controller('v1')
 class ArcadeController {
+ @Get('blackjack') blackjack(@Req() req:Request){return blackjackCurrent(req);}
+ @Post('blackjack') blackjackPlay(@Req() req:Request,@Body() body:unknown){return blackjackAction(req,body);}
  @Get('daily-wheel') wheel(@Req() req:Request){return dailyWheelStatus(req);}
  @Post('daily-wheel/spin') wheelSpin(@Req() req:Request,@Body() body:unknown){return spinDailyWheel(req,body);}
  @Post('auth/password') password(@Req() req:Request,@Res({passthrough:true}) res:Response,@Body() body:unknown){return changePassword(req,res,body);}
@@ -70,4 +73,4 @@ class ArcadeController {
  @Post('practice/reef/shots') shot(@Req() req:Request,@Body() body:unknown){return reefShot(req,body);}
 }
 @Module({controllers:[ArcadeController]}) class ArcadeModule {}
-export async function createApi(){const app=await NestFactory.create(ArcadeModule,{logger:false});app.useGlobalFilters(new Errors());app.use((_req:unknown,res:Response,next:()=>void)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');next();});return app;}
+export async function createApi(){const app=await NestFactory.create(ArcadeModule,{logger:false});app.useGlobalFilters(new Errors());app.use(async (req:{path?:string},_res:unknown,next:()=>void)=>{try{if(['/v1/me','/v1/blackjack','/v1/health'].includes(req.path||''))await settleExpiredBlackjack();}catch{/* The authenticated action still reports database failures. */}next();});app.use((_req:unknown,res:Response,next:()=>void)=>{res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');next();});return app;}

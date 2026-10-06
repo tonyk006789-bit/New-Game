@@ -25,6 +25,7 @@ Private group; non-purchasable, nonredeemable play credits; no money, prizes of 
 - No per-player odds, adaptive loss recovery, budget-based suppression, guaranteed 3 wins per 10 spins, fake occupancy or hidden bots.
 - Owner-approved exception (3 October): test fish tables with exactly one human have three explicitly labeled bot teammates. After each valid paid hit fails its normal capture attempt, up to three free bot attempts use the existing tier chance, stopping on capture. At most one tier award belongs to the human. Bots stop when a second human joins, never hold wallets or count as human occupants, and do not independently grant credits. Use versioned `reef-assist-v1`; preserve all prior receipts.
 - The server owns outcomes; clients present committed results. Every slot grid must evaluate to its persisted award. Retries cannot resample an accepted round.
+- Owner-approved test expansion (6 October): `stage-blackjack-v1` uses the explicitly approved six-deck rules and reserved stakes in `docs/OWNER_UPDATES.md`. Sunken Dynasty/Polar Odyssey reuse fish tiers and solo assists; Neon Numbers/Pearl Keno reuse Orchard rules through `stage-keno-cabinets-v1`. Premium is featured for every tester; jackpot offers reveal existing awards. Production targets remain null.
 
 ## Mobile implementation
 

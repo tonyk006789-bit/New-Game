@@ -3,8 +3,11 @@ import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, r
 import { App as NativeApp } from '@capacitor/app';
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import Icon from '@new-game/ui/Icon.vue';
-import { catalog, type GameId } from '@new-game/contracts';
+import { catalog, isPremiumGame, type GameId } from '@new-game/contracts';
 import GamePreview from './GamePreview.vue';
+import BlackjackGame from './BlackjackGame.vue';
+import BlackjackRules from './BlackjackRules.vue';
+import PremiumSpotlight from './PremiumSpotlight.vue';
 import GameRules from './GameRules.vue';
 import FeatureGame from './FeatureGame.vue';
 import CabinetGame from './CabinetGame.vue';
@@ -63,13 +66,15 @@ const portraitMedia=window.matchMedia(portraitRotationQuery),rotatePortrait=ref(
 const onPortraitOrientation=()=>{rotatePortrait.value=portraitMedia.matches;};
 const cabinetReady=computed(()=>ready.value&&!(portraitGame.value&&rotatePortrait.value));
 const visibleGames = computed(() => catalog.filter(game =>
-  (category.value === 'All games' || category.value === 'Favorites' || game.category === category.value) &&
+  (category.value === 'All games' || category.value === 'Favorites' || category.value==='Premium'&&isPremiumGame(game.id) || game.category === category.value) &&
   (category.value !== 'Favorites' || favorites.value.includes(game.id)) &&
   `${game.name} ${game.category}`.toLowerCase().includes(query.value.toLowerCase())));
 const categories = [
+  { label:'Premium',title:'PREMIUM',subtitle:'THE ROYAL COLLECTION',icon:'star',theme:'gold' },
+  { label:'Table',title:'TABLES',subtitle:'BLACKJACK',icon:'gem',theme:'green' },
   { label: 'All games', title: 'THE ARCADE', subtitle: 'ALL GAMES', icon: 'grid', theme: 'pink' },
   { label: 'Slots', title: 'SLOTS', subtitle: 'REELS & FEATURES', icon: 'gem', theme: 'gold' },
-  { label: 'Keno', title: 'ORCHARD', subtitle: 'KENO', icon: 'leaf', theme: 'green' },
+  { label: 'Keno', title: 'KENO', subtitle: 'KENO', icon: 'leaf', theme: 'green' },
   { label: 'Fish', title: 'REEF', subtitle: 'FISHING', icon: 'fish', theme: 'blue' },
   { label: 'Favorites', title: 'FAVORITES', subtitle: 'YOUR COLLECTION', icon: 'star', theme: 'violet' }
 ];
@@ -153,7 +158,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       <main v-if="currentGame" class="immersive-game" :class="{'portrait-cabinet':portraitGame,'portrait-blocked':portraitGame&&rotatePortrait}" :data-layout="portraitGame?'portrait':'wide'">
         <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
-        <FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <BlackjackGame v-else-if="activeGame==='royal-blackjack'" :running="ready&&!modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits"/><FeatureGame v-else-if="activeGame === 'aurora-vault' || activeGame === 'ember-relics'" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <section v-if="portraitGame&&rotatePortrait" class="portrait-rotation" role="status"><i aria-hidden="true"></i><h2>Turn to portrait</h2><p>{{currentGame.name}} plays in an upright cabinet.</p><button @click="backFromGame">BACK TO LOBBY</button></section>
@@ -161,7 +166,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </main>
       <template v-else-if="page === 'lobby'">
         <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
-        <main class="arcade-lobby">
+        <main class="arcade-lobby"><PremiumSpotlight v-if="category==='All games'||category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
           <div class="lobby-heading"><span class="heading-rule"></span><div><span>{{catalog.length}} ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : `${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
           <section class="collection-cabinet" aria-label="Game collection">
             <div class="neon-bar top"></div><div class="neon-bar bottom"></div>
@@ -169,7 +174,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
             <div class="lobby-view-switch" role="group" aria-label="Lobby view"><button :aria-pressed="lobbyView==='shelf'" @click="lobbyView='shelf'">GAME SHELF</button><button :aria-pressed="lobbyView==='floor'" @click="lobbyView='floor'">WALK THE FLOOR</button></div>
             <GameShelf v-if="lobbyView==='shelf'" :games="visibleGames" :favorites="favorites" :running="ready && !modal" @open="openGame" @favorite="toggleFavorite"/>
             <ArcadeLobby v-else :games="visibleGames" :favorites="favorites" :running="ready && !modal" :reduced-motion="reducedMotion" :player-name="account?.displayName || 'YOU'" @open="openGame" @favorite="toggleFavorite" />
-            <div class="shelf-bottom"><i></i><span>SLOTS • KENO • FISHING</span><i></i></div>
+            <div class="shelf-bottom"><i></i><span>BLACKJACK • SLOTS • KENO • FISHING</span><i></i></div>
           </section>
           <div class="lobby-extras"><button class="daily-wheel-entry" @click="modal='wheel'"><span aria-hidden="true">✺</span><b>DAILY SPIN</b><small>A little luck, every day</small></button><button class="share-entry" @click="modal='share'"><span aria-hidden="true">▦</span><b>SHARE ARCADE</b><small>Invite your friends</small></button></div><div class="credit-note"><Icon name="info" :size="15" /><p>{{ credits === '0.00' ? 'No credits available. Contact your administrator.' : stage.enabled ? 'Choose your game. Make your next play.' : 'Your current play-credit balance.' }}</p><button @click="modal = 'about'">How credits work <Icon name="chevron" :size="13" /></button></div>
         </main>
@@ -184,7 +189,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
     </template>
     <div v-if="modal" class="player-modal-backdrop" @click.self="modal=null"><section class="player-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" @keydown="trapFocus">
       <header><h2 id="modal-title">{{modal==='support'?'NEED A HAND?':modal==='share'?'SHARE NEW GAME':modal==='wheel'?'DAILY SPIN':modal==='rules'?`${currentGame?.name} · RULES`:'WELCOME TO NEW GAME'}}</h2><button class="round-control" aria-label="Close dialog" @click="modal=null"><Icon name="close"/></button></header>
-      <GameRules v-if="modal==='rules' && activeGame" :game="activeGame" :staked="stage.enabled && !!account"/><SharePanel v-else-if="modal==='share'"/><DailyWheel v-else-if="modal==='wheel'" :authenticated="!!account" :ready="ready" :reduced-motion="reducedMotion" @settled="syncAccount"/><template v-else-if="modal==='support'"><p>For your player ID, an invitation, a password reset, or help with credits, contact your group’s Main Admin through your usual contact method.</p><p>Sign in with the player ID and password provided by your administrator. Guest previews are also available.</p></template>
+      <BlackjackRules v-if="modal==='rules'&&activeGame==='royal-blackjack'"/><GameRules v-else-if="modal==='rules' && activeGame && activeGame!=='royal-blackjack'" :game="activeGame" :staked="stage.enabled && !!account"/><SharePanel v-else-if="modal==='share'"/><DailyWheel v-else-if="modal==='wheel'" :authenticated="!!account" :ready="ready" :reduced-motion="reducedMotion" @settled="syncAccount"/><template v-else-if="modal==='support'"><p>For your player ID, an invitation, a password reset, or help with credits, contact your group’s Main Admin through your usual contact method.</p><p>Sign in with the player ID and password provided by your administrator. Guest previews are also available.</p></template>
       <template v-else><p>An invitation-only arcade for your circle. Play credits cannot be purchased, cashed out, or redeemed for prizes of value.</p><p>Your administrator manages your play credits.</p></template>
       <button v-if="modal==='support'||modal==='about'" class="gold-button" @click="modal=null">GOT IT <Icon name="check" :size="17"/></button>
     </section></div>

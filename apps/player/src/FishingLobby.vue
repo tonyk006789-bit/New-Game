@@ -4,6 +4,7 @@ import {fishGuide,type FishGame} from '@new-game/game-math';
 import {catalog} from '@new-game/contracts';
 import Icon from '@new-game/ui/Icon.vue';
 import AquaticSprite from './AquaticSprite.vue';
+import {fishWorlds} from './fish-worlds';
 import {api} from './api';
 import type {ReefRoom,ReefTable} from './reef-room';
 const props=defineProps<{running:boolean;authenticated:boolean;game:FishGame}>();
@@ -34,14 +35,14 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);});
 </script>
 <template>
  <section class="fishing-lobby" :class="[game,{'stage-paused':!running}]" aria-label="Fishing table lobby">
-  <header class="fishing-lobby-title"><span>{{game==='abyss-legends'?'THE ABYSS LOUNGE':'THE OCEAN LOUNGE'}}</span><h2>Choose your table</h2><p>Four seats. Solo players get three bot teammates.</p></header>
+  <header class="fishing-lobby-title"><span>{{gameInfo.name.toUpperCase()}} LOUNGE</span><h2>Choose your table</h2><p>Four seats. Solo players get three bot teammates.</p></header>
   <p v-if="error" class="fishing-lobby-error" role="alert">{{error}}</p>
   <p v-if="loading" class="fishing-loading" role="status">Finding open tables…</p>
   <div v-else class="fishing-tables">
    <article v-for="table in cards" :key="table.id" class="fish-table-card" :data-table-id="table.id">
     <header><div><small>{{gameInfo.name}}</small><h3>{{table.id==='new'?'OPEN A TABLE':`TABLE ${String(table.number).padStart(2,'0')}`}}</h3></div><span class="table-occupancy">{{table.seats.length}} / 4 <Icon name="user" :size="14"/></span></header>
     <div class="lounge-table">
-     <div class="table-water" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in fishGuide(game).slice(0,6)" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">{{gameInfo.name.split(' ')[0]}} <b>{{gameInfo.name.split(' ')[1]}}</b></div></div>
+     <div class="table-water" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in fishGuide(game).slice(0,6)" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">{{gameInfo.name.split(' ')[0]}} <b>{{gameInfo.name.split(' ')[1]}}</b></div></div>
      <div class="table-machine-front" aria-hidden="true"><i></i><span>NEW GAME<br><b>OCEAN SERIES</b></span><i></i></div>
      <AquaticSprite v-for="seat in 4" :key="`cannon-${seat}`" :cannon="seat-1" :game="game" class="table-cannon" :class="`position-${seat}`"/>
      <button v-for="seat in 4" :key="seat" class="lounge-seat" :class="[`position-${seat}`,{occupied:table.seats.some(s=>s.seat===seat),yours:table.seats.some(s=>s.seat===seat&&s.yours)}]" :disabled="busy||!running||table.seats.some(s=>s.seat===seat&&!s.yours)" :aria-label="`${table.id==='new'?'New table':`Table ${table.number}`} seat ${seat}${table.seats.some(s=>s.seat===seat)?' occupied':' open'}`" @click="join(table,seat)">
