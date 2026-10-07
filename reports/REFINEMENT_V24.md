@@ -43,3 +43,12 @@ Browser checks used the actual local UI through the in-app browser:
 No migration, account creation, balance adjustment, hosted game play, payout-profile change, new service or operator deployment is required. Existing API and operator release remain in place. Rollback is a player-UI redeploy of V23 with its compatible API; preserve accepted requests, ledger rows and wallet balances. Guest would return on that UI rollback.
 
 Android/iPhone device testing and native authentication remain previously documented unfinished work. Full authenticated JUWA inspection and live external-game animation observation were not available. Public release verification follows below.
+
+## Published release
+
+- Source commit `c32b777` pushed to GitHub `tonyk006789-bit/New-Game` main.
+- Player deployment `dpl_8Y656CP4jcdaewHwTGZzptLXtaSM` is READY and aliased to https://new-game-test-topaz.vercel.app/. Public entry is the expected `index-DwVYxIgl.js`.
+- Initial deployment attempts failed because `api.vercel.com` timed out, including the CLI's routine token refresh. A process-local fetch adapter used Vercel's reachable official `https://vercel.com/api` gateway; TLS verification remained enabled and credentials were never logged. The ordinary prebuilt deployment then completed. No permanent network configuration was changed.
+- `node .local/verify-v24-live.mjs` — twelve public route/asset checks passed: both sites' health, test environment, twenty-game catalog, unauthenticated blackjack rejection, privileged-route exclusion from the player site, original art/audio and both HTML entries. Operator entry remains `index-CT1MaUjW.js`; operator was not redeployed. JSON evidence: ignored local `reports/screenshots/v24/live-route-checks.json`.
+- Public login visibly contains Player ID, Password and Login, with no Guest option. Existing hosted Sample Player successfully signed in. The generated Jackpot celebration left its 2,000.00 balance unchanged. No paid round, daily wheel, account provisioning or balance adjustment was performed. The test session was signed out after verification.
+- Live screenshot evidence: `live-login.png`, `live-lobby.png`, `live-lobby-full.png`, `live-demo-win.png`; local `local-lobby.png` and `fish-fast-bots.png`, all under ignored `reports/screenshots/v24/`. The current narrow browser viewport also has no horizontal page overflow. All twenty games appear in the walking-floor directory.
