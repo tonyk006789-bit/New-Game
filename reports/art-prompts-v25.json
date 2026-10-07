@@ -1,0 +1,12 @@
+{
+  "tool": "Built-in ImageGen",
+  "asset": "apps/player/public/art/reef-expansion-v25.png",
+  "prompt": "Use case: stylized-concept. Asset type: production game sprite atlas for a polished 3D-look fishing arcade. Generate one transparent RGBA landscape atlas, EXACTLY 4 columns by 2 rows, eight separate isolated creatures centered in equal cells, generous transparent gutters at least 12% of each cell, no overlap, no props spanning cells. Consistent right-facing side / slight overhead three-quarter angle, camera from above looking down 25 degrees; whole bodies visible. Volumetric sculpted 3D surfaces, glossy scales, subsurface fins, soft cool rim light and warm highlights, rich saturated color, clear readable silhouettes at tiny game sizes. Not flat cartoons, no outlines, no water, no scenery, no ground shadows, no text, no borders. Row 1 left to right: (1) tiny brilliant orange/blue striped mandarin fish with flowing fan fins; (2) long turquoise ribbon eel with undulating golden-tipped fin; (3) small ruby vampire squid with webbed velvet fins and cyan eye; (4) substantial copper horseshoe crab with articulated legs and segmented tail. Row 2 left to right: (5) small pearlescent pink axolotl with jade external gills and graceful tail; (6) ornate medium golden arowana with red fins and detailed metallic scales; (7) tiny translucent cyan sea angel with wing-like fins and luminous orange core; (8) medium elegant icy blue beluga whale, rounded head, flippers and curled tail. All eight original characters with distinct anatomy, no reused fish shapes. Each sprite entirely isolated on genuine transparent background, facing RIGHT, no logos or words. Wide 1536x1024 atlas if possible.",
+  "edit": "Remove every backdrop; preserve all eight original creatures and their arrangement. Deliver genuinely transparent RGBA background.",
+  "output": {
+    "width": 1536,
+    "height": 1024,
+    "transparent": true
+  },
+  "usage": "Original aquatic sprite atlas. Eight species, two per fish world. No reference artwork copied."
+}

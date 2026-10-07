@@ -8,4 +8,5 @@ export const fishWorlds:Partial<Record<FishGame,World>>={
  'sunken-dynasty':{background:'/art/dynasty-background-v22.png',atlas:'/art/dynasty-atlas-v22.png',width:1448,height:1086,first:24,regions:dynastyRegions},
  'polar-odyssey':{background:'/art/polar-background-v22.png',atlas:'/art/polar-atlas-v22.png',width:1448,height:1086,first:32,regions:polarRegions}
 };
-export const speciesWorld=(species:number)=>Object.values(fishWorlds).find(w=>species>=w.first&&species<w.first+8);
+export const extraFishAtlas={atlas:'/art/reef-expansion-v25.png',width:1536,height:1024,first:40,regions:[[29,135,323,267],[394,141,369,246],[800,127,348,275],[1128,135,384,296],[15,655,351,202],[381,649,422,202],[853,597,269,290],[1150,582,373,304]]};
+export const speciesWorld=(species:number)=>Object.values(fishWorlds).find(w=>species>=w.first&&species<w.first+8)||(species>=40&&species<48?extraFishAtlas:undefined);

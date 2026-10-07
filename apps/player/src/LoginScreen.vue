@@ -22,7 +22,7 @@ async function submit() {
 </script>
 <template>
  <section class="simple-login" aria-label="Player login">
-  <div class="simple-login-card"><span class="login-monogram">NG</span><p class="login-name">NEW GAME</p><h1>WELCOME</h1>
+  <div class="simple-login-card" data-depth-card><span class="login-monogram">NG</span><p class="login-name">NEW GAME</p><h1>WELCOME</h1>
    <form @submit.prevent="submit">
     <label class="sr-only" for="player-account">Player ID</label><input id="player-account" v-model="account" autocomplete="username" placeholder="Player ID" required maxlength="256" autocapitalize="none" spellcheck="false">
     <label class="sr-only" for="player-password">Password</label><div class="simple-password"><input id="player-password" v-model="password" :type="showPassword?'text':'password'" autocomplete="current-password" placeholder="Password" required maxlength="256"><button type="button" :aria-label="showPassword?'Hide password':'Show password'" :aria-pressed="showPassword" @click="showPassword=!showPassword">{{showPassword?'HIDE':'SHOW'}}</button></div>

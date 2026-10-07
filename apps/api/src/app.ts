@@ -8,7 +8,7 @@ import { transaction, fail } from './store.js';
 import { accounts, createAccount, history, me, report, auditHistory, manageAccount } from './accounts.js';
 import { adjust, transfer, reverse, redeem } from './ledger.js';
 import { practiceHistory, practiceRound, reefRoom, reefShot, reefTables, reefLeave } from './practice.js';
-import { environment, stagingRound, stagingHistory, stagingStats, recoverStagingRound } from './staging.js';
+import { environment, stagingRound, stagingHistory, stagingStats, stagingWins, recoverStagingRound } from './staging.js';
 import {dailyWheelStatus,spinDailyWheel} from './daily-wheel.js';
 import {operatorDashboard,operatorAccounts,operatorRecords,operatorReceipt,operatorSettings} from './operator.js';
 import {operatorRounds,operatorTotals} from './operator-reports.js';
@@ -33,6 +33,7 @@ class ArcadeController {
  @Post('staging/:id/rounds') staging(@Req() req:Request,@Param('id') id:string,@Body() body:unknown){return stagingRound(req,id,body);}
  @Get('staging/history') stagingHistory(@Req() req:Request){return stagingHistory(req);}
  @Get('staging/stats') stagingStats(@Req() req:Request){return stagingStats(req);}
+ @Get('staging/wins') stagingWins(@Req() req:Request){return stagingWins(req);}
  @Post('staging/recover') recover(@Req() req:Request,@Body() body:unknown){return recoverStagingRound(req,body);}
  @Get('health') health(){return {status:'ok',stage:'accounts-ledger-practice',creditStakedPlayEnabled:false};}
  @Get('games') games(){return catalog.map(game=>({...game,...mathStatus[game.id],creditStakedPlayEnabled:false}));}

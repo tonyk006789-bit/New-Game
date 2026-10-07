@@ -1,6 +1,6 @@
 import {abyssCannons} from './abyss-cannons';
 import {abyssRegions} from './abyss-atlas';
-import {fishWorlds} from './fish-worlds';
+import {fishWorlds,extraFishAtlas} from './fish-worlds';
 import type {FishGame} from '@new-game/game-math';
 import {Assets,Filter,GlProgram,Rectangle,RenderTexture,Sprite,Texture,type Application} from 'pixi.js';
 const vertex=`in vec2 aPosition;out vec2 vTextureCoord;uniform vec4 uInputSize;uniform vec4 uOutputFrame;uniform vec4 uOutputTexture;void main(){vec2 p=aPosition*uOutputFrame.zw+uOutputFrame.xy;p.x=p.x*(2.0/uOutputTexture.x)-1.0;p.y=p.y*(2.0*uOutputTexture.z/uOutputTexture.y)-uOutputTexture.z;gl_Position=vec4(p,0.0,1.0);vTextureCoord=aPosition*(uOutputFrame.zw*uInputSize.zw);}`;
@@ -22,6 +22,8 @@ export async function reefTextures(app:Application,game:FishGame='reef-party'){
  for(const [x,y,w,h] of abyssRegions)creatures.push(crop(sources[3],x,y,w,h,false));
  const premium=world?await Assets.load<Texture>(world.atlas):null;
  if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];creatures[world.first+i]=crop(premium,x,y,w,h,false);}
+ const expansion=await Assets.load<Texture>(extraFishAtlas.atlas);
+ for(let i=0;i<8;i++){const [x,y,w,h]=extraFishAtlas.regions[i];creatures[extraFishAtlas.first+i]=crop(expansion,x,y,w,h,false);}
  const cannons=world&&premium?world.regions.slice(8).map(([x,y,w,h])=>crop(premium,x,y,w,h,false)):abyss?abyssCannons.regions.map(([x,y,w,h])=>crop(sources[1],x,y,w,h,false)):Array.from({length:4},(_,i)=>crop(sources[1],i%2*768,Math.floor(i/2)*512,768,512));
  filter.destroy();return {creatures,cannons};
 }

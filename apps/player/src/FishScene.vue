@@ -77,7 +77,8 @@ function toggleAuto(){if(autoOn.value){stopAuto('Auto fire stopped.');return;}if
 function selectTarget(x=600,y=300){const time=(Date.now()+clockOffset-epoch)/1000;lockedTarget.value=alive().filter(id=>{const p=targetAt(id,time);return p.x>20&&p.x<1180;}).sort((a,b)=>{const p=targetAt(a,time),q=targetAt(b,time);return Math.hypot(p.x-x,p.y-y)-Math.hypot(q.x-x,q.y-y);})[0]??null;}
 function toggleLock(){lockOn.value=!lockOn.value;if(lockOn.value){selectTarget();notice.value='Target lock on. Tap a creature to change target.';}else{lockedTarget.value=null;notice.value='Free aim.';}}
 let app:Application|undefined,world:Container,art:Awaited<ReturnType<typeof reefTextures>>,disposed=false,polling=false,clockOffset=0,epoch=Date.now(),poll:ReturnType<typeof setInterval>|undefined,observer:ResizeObserver|undefined;
-const creatures:{id:number;view:Container;sprite:MeshPlane;vertices:Float32Array;hit:number;captured:boolean}[]=[],cannons:{view:Container;barrel:Sprite;recoil:number;angle:number;visualAngle:number}[]=[],effects:{view:Container;age:number;life:number;kind:string;vx:number;vy:number;x:number;y:number}[]=[];
+const creatures:{id:number;view:Container;sprite:MeshPlane;shadow:Sprite;vertices:Float32Array;hit:number;captured:boolean}[]=[],cannons:{view:Container;barrel:Sprite;recoil:number;angle:number;visualAngle:number}[]=[],effects:{view:Container;age:number;life:number;kind:string;vx:number;vy:number;x:number;y:number}[]=[];
+const bubbles:Graphics[]=[];let waterLight:Container;
 type Projectile={view:Graphics;flight:Flight;firedAt:number;roomId?:string;requestKey:string;age:number;stake:string};
 const projectiles:Projectile[]=[];
 function alive(){const caught=new Set(creatures.filter(f=>f.captured).map(f=>f.id));return room.value?room.value.targets.filter(t=>!t.captured&&!caught.has(t.target_id)).map(t=>t.target_id):creatures.filter(f=>!f.captured).map(f=>f.id);}
@@ -153,10 +154,13 @@ onMounted(async()=>{
   app=new Application();await app.init({width:1200,height:600,backgroundAlpha:0,antialias:true,resolution:Math.min(devicePixelRatio,2),autoDensity:true,preference:'webgl'});
   if(disposed){app.destroy(true);return;}art=await reefTextures(app,props.game);if(disposed){Object.values(art).flat().forEach(t=>t.destroy(true));app.destroy(true);return;}
   world=new Container();app.stage.addChild(world);host.value!.appendChild(app.canvas);app.canvas.setAttribute('aria-label',`${catalog.find(g=>g.id===props.game)?.name} four-cannon table with varied creatures and treasure chests`);app.canvas.setAttribute('role','img');
+  waterLight=new Container();waterLight.eventMode='none';world.addChild(waterLight);
+  for(let i=0;i<5;i++){const beam=new Graphics().poly([i*270-100,-40,i*270+10,-40,i*270+260,640,i*270+20,640]).fill({color:0xc8f8ff,alpha:.027});waterLight.addChild(beam);}
+  for(let i=0;i<18;i++){const bubble=new Graphics().circle(0,0,2+i%4).stroke({color:0xc8f4ff,width:.7,alpha:.3}).circle(-1,-1,1).fill({color:0xe8ffff,alpha:.4});bubble.eventMode='none';waterLight.addChild(bubble);bubbles.push(bubble);}
   for(let id=1;id<=80;id++){
    const p=targetAt(id,0),view=new Container(),texture=art.creatures[p.species],sprite=new MeshPlane({texture,verticesX:8,verticesY:3});sprite.pivot.set(texture.width/2,texture.height/2);sprite.scale.set(p.radius*2.8/texture.width);
    const vertices=new Float32Array(sprite.geometry.getAttribute('aPosition').buffer.data as Float32Array);
-   const shadow=new Sprite(art.creatures[p.species]);shadow.anchor.set(.5);shadow.scale.copyFrom(sprite.scale);shadow.tint=0x002641;shadow.alpha=.34;shadow.position.set(4,8);view.addChild(shadow,sprite);world.addChild(view);creatures.push({id,view,sprite,vertices,hit:0,captured:false});
+   const shadow=new Sprite(art.creatures[p.species]);shadow.anchor.set(.5);shadow.scale.copyFrom(sprite.scale);shadow.tint=0x001825;shadow.alpha=.29;shadow.position.set(7,12);view.addChild(shadow,sprite);world.addChild(view);creatures.push({id,view,sprite,shadow,vertices,hit:0,captured:false});
   }
   for(let seat=1;seat<=4;seat++){
    const view=new Container(),base=reefCannon(seat),barrel=new Sprite(art.cannons[seat-1]);
@@ -169,9 +173,10 @@ onMounted(async()=>{
   if(stage.enabled&&props.authenticated&&session.current){walletPresentation=new FishWalletPresentation(session.current.wallet);holdCredits(props.game,session.current.id,session.current.wallet.available);}
   app.ticker.add(ticker=>{
    if(!props.running)return;const dt=Math.min(ticker.deltaMS,50)/1000,time=(Date.now()+clockOffset-epoch)/1000;
+   waterLight.visible=!props.reducedMotion;if(waterLight.visible){waterLight.x=Math.sin(time*.09)*24;for(let i=0;i<bubbles.length;i++)bubbles[i].position.set(45+(i*67)%1120+Math.sin(time*.45+i)*9,610-((time*(8+i%5)+i*37)%640));}
    for(const fish of creatures){const p=targetAt(fish.id,time);fish.hit=Math.max(0,fish.hit-dt);fish.view.position.set(p.x+(props.reducedMotion?0:Math.sin(fish.hit*50)*fish.hit*14),p.y);fish.view.scale.set(p.direction,Math.min(1,world.scale.x/world.scale.y));fish.sprite.tint=fish.hit>.2?0xc6f5ff:0xffffff;
     fish.view.rotation=props.reducedMotion?0:Math.sin(time*2+fish.id)*.035;fish.view.visible=!fish.captured&&p.active&&p.x>-200&&p.x<1400;
-    if(fish.view.visible){const buffer=fish.sprite.geometry.getAttribute('aPosition').buffer,positions=buffer.data as Float32Array,width=fish.sprite.texture.width;
+    if(fish.view.visible){fish.shadow.position.set(7+(props.reducedMotion?0:Math.sin(time*.8+fish.id)*2),12+(props.reducedMotion?0:Math.cos(time*.8+fish.id)*3));const buffer=fish.sprite.geometry.getAttribute('aPosition').buffer,positions=buffer.data as Float32Array,width=fish.sprite.texture.width;
      for(let i=0;i<positions.length;i+=2){const along=fish.vertices[i]/width,tail=(1-along)**2;positions[i+1]=fish.vertices[i+1]+(props.reducedMotion?0:Math.sin(time*(p.radius<20?8:4.2)-along*5+fish.id)*width*.035*tail);}
      buffer.update();
     }

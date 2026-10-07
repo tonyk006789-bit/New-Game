@@ -39,7 +39,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);});
   <p v-if="error" class="fishing-lobby-error" role="alert">{{error}}</p>
   <p v-if="loading" class="fishing-loading" role="status">Finding open tables…</p>
   <div v-else class="fishing-tables">
-   <article v-for="table in cards" :key="table.id" class="fish-table-card" :data-table-id="table.id">
+   <article v-for="table in cards" :key="table.id" class="fish-table-card" data-depth-card :data-table-id="table.id">
     <header><div><small>{{gameInfo.name}}</small><h3>{{table.id==='new'?'OPEN A TABLE':`TABLE ${String(table.number).padStart(2,'0')}`}}</h3></div><span class="table-occupancy">{{table.seats.length}} / 4 <Icon name="user" :size="14"/></span></header>
     <div class="lounge-table">
      <div class="table-water" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}" aria-hidden="true"><span class="table-caustics"></span><AquaticSprite v-for="(species,index) in fishGuide(game).slice(0,6)" :key="index" :species="species" class="table-creature" :class="`creature-${index}`"/><div class="table-emblem">{{gameInfo.name.split(' ')[0]}} <b>{{gameInfo.name.split(' ')[1]}}</b></div></div>

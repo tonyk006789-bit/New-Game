@@ -213,8 +213,8 @@ export const reefTierProfile={id:'reef-tiers-v1',tiers:{
  boss:{label:'Boss',multiplier:20,captureTickets:400}
 }} as const;
 export function reefTier(species:number){
- if(!Number.isInteger(species)||species<0||species>39)throw new Error('Invalid reef species');
- return [7,8,9,19,23,30,31,38,39].includes(species)?'boss':[3,5,10,11,18,21,28,29,36,37].includes(species)?'large':[2,4,6,13,17,22,26,27,34,35].includes(species)?'medium':'small';
+ if(!Number.isInteger(species)||species<0||species>=reefSpecies.length)throw new Error('Invalid reef species');
+ return [7,8,9,19,23,30,31,38,39].includes(species)?'boss':[3,5,10,11,18,21,28,29,36,37,43,47].includes(species)?'large':[2,4,6,13,17,22,26,27,34,35,41,45].includes(species)?'medium':'small';
 }
 export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame='reef-party'):StagingVisual{
  const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
@@ -312,21 +312,21 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
  throw new Error('Experimental sampler exhausted; no round accepted.');
 }
 
-export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan','Ruby koi','Jade shrimp','Imperial lionfish','Pearl cuttlefish','Jade turtle','Golden sentinel crab','Dynasty dragon','Jade sea empress','Silver icefish','Crystal shrimp','Spotted seal','Aurora squid','Royal narwhal','Snow crab','Glacial serpent','Crystal orca'] as const;
+export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan','Ruby koi','Jade shrimp','Imperial lionfish','Pearl cuttlefish','Jade turtle','Golden sentinel crab','Dynasty dragon','Jade sea empress','Silver icefish','Crystal shrimp','Spotted seal','Aurora squid','Royal narwhal','Snow crab','Glacial serpent','Crystal orca','Mandarin fish','Ribbon eel','Vampire squid','Copper horseshoe crab','Jade axolotl','Golden arowana','Sea angel','Ice beluga'] as const;
 export const fishGames=['reef-party','abyss-legends','sunken-dynasty','polar-odyssey'] as const;
 export type FishGame=typeof fishGames[number];
 export const kenoGames=['orchard-numbers','neon-numbers','pearl-keno'] as const;
 export function isKenoGame(game:unknown):game is typeof kenoGames[number]{return typeof game==='string'&&(kenoGames as readonly string[]).includes(game);}
 export function isFishGame(game:unknown):game is FishGame{return typeof game==='string'&&(fishGames as readonly string[]).includes(game);}
 export const fishSpeciesPools={
- 'reef-party':[14,15,0,2,1,4,12,3,16,6,20,13,17,5,10,22,11],
- 'sunken-dynasty':[24,25,24,26,25,27,24,28,25,26,24,29,27,25,24,28],
- 'polar-odyssey':[32,33,32,34,33,35,32,36,33,34,32,37,35,33,32,36],
- 'abyss-legends':[16,20,17,18,16,22,20,21,6,17,16,20,18,22,21,5]
+ 'reef-party':[14,15,0,2,1,4,12,3,16,6,20,13,17,5,10,22,11,40,41],
+ 'sunken-dynasty':[24,25,24,26,25,27,24,28,25,26,24,29,27,25,24,28,44,45],
+ 'polar-odyssey':[32,33,32,34,33,35,32,36,33,34,32,37,35,33,32,36,46,47],
+ 'abyss-legends':[16,20,17,18,16,22,20,21,6,17,16,20,18,22,21,5,42,43]
 } as const;
 export const fishBosses:Record<FishGame,readonly number[]>={'reef-party':[8,9,7,8],'abyss-legends':[19,23],'sunken-dynasty':[30,31],'polar-odyssey':[38,39]};
 export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...fishBosses[game]])];}
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v5'} as const;
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v6'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
 export function reefLeadAngle(seat:number,targetId:number,time:number,game:FishGame='reef-party'){
@@ -362,13 +362,13 @@ export function reefFlight(seat:number,angle:number,roomTime:number,targetIds:re
 }
 export function reefTarget(id:number,time:number,game:FishGame='reef-party'){
  if(!Number.isInteger(id)||id<1||id>80||!Number.isFinite(time))throw new Error('Invalid reef target');
- // Staggered two-second arrivals: about 16 targets, bounded to 20 and one boss.
+ // Staggered 1.5-second arrivals: about 22 targets, bounded to 24 and one boss.
  // Captured IDs remain unavailable for the lifetime of the shared room.
  const pattern=fishSpeciesPools[game],bosses=fishBosses[game];
  const species=id%20===5?bosses[Math.floor(id/20)%bosses.length]:pattern[(id-1)%pattern.length];
- const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88][species];
- const duration={small:28,medium:32,large:36,boss:38}[tier],spawnAt=(id-1)*2-28;
- const age=((time-spawnAt)%160+160)%160,active=time>=spawnAt&&age<duration;
+ const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88,13,36,14,48,13,35,9,59][species];
+ const duration={small:32,medium:34,large:36,boss:29}[tier],spawnAt=(id-1)*1.5-32;
+ const age=((time-spawnAt)%120+120)%120,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
  const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;
  const y=125+((id*83)%340)+Math.sin(age*.32+id)*({small:15,medium:20,large:12,boss:8}[tier]);

@@ -75,3 +75,13 @@ export async function recoverStagingRound(req:Request,body:unknown){
 }
 export async function stagingHistory(req:Request){gate();return transaction(async db=>{const actor=await actorFor(db,req);return (await db.query('SELECT result,created_at FROM staging_rounds WHERE account_id=$1 ORDER BY created_at DESC LIMIT 50',[actor.id])).rows;});}
 export async function stagingStats(req:Request){gate();return transaction(async db=>{const actor=await actorFor(db,req);return (await db.query(`SELECT game_id,profile_id,count(*)::int rounds,count(*) FILTER(WHERE award_units>0)::int paying,count(*) FILTER(WHERE award_units>stake_units)::int net_wins,count(*) FILTER(WHERE award_units=stake_units)::int pushes,sum(stake_units)::text staked,sum(award_units)::text returned,(sum(award_units)-sum(stake_units))::text net FROM staging_rounds WHERE account_id=$1 GROUP BY game_id,profile_id ORDER BY game_id`,[actor.id])).rows;});}
+/** Read-only personal totals from settled receipts, never from projected pool values. */
+export async function stagingWins(req:Request){gate();return transaction(async db=>{
+ const actor=await actorFor(db,req);if(actor.role!=='PLAYER')fail(403,'PLAYER_REQUIRED');
+ const row=(await db.query(`SELECT count(*)::text rounds,coalesce(sum(stake_units),0)::text wagered,
+ coalesce(sum(award_units) FILTER(WHERE award_units>0 AND award_units<stake_units*5),0)::text minor,
+ coalesce(sum(award_units) FILTER(WHERE award_units>=stake_units*5 AND award_units<stake_units*20),0)::text major,
+ coalesce(sum(award_units) FILTER(WHERE award_units>=stake_units*20),0)::text jackpot
+ FROM staging_rounds WHERE account_id=$1`,[actor.id])).rows[0];
+ return {accountId:actor.id,rounds:row.rounds,wagered:row.wagered,totals:{minor:row.minor,major:row.major,jackpot:row.jackpot}};
+ });}

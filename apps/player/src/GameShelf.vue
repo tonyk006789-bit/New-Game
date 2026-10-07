@@ -17,7 +17,7 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
  <section class="casino-shelf" aria-label="Game shelf" :class="{'shelf-paused':!running}" @pointerdown="start" @pointerup="end" @keydown.left.prevent="change(-1)" @keydown.right.prevent="change(1)">
   <div class="shelf-lights" aria-hidden="true"><i v-for="n in 24" :key="n" :style="{'--bulb':n}"/></div>
   <div class="casino-shelf-grid">
-   <article v-for="game in visible" :key="game.id" class="shelf-game" :style="{'--tile-color':game.color}">
+   <article v-for="game in visible" :key="game.id" class="shelf-game" data-depth-card :style="{'--tile-color':game.color}">
     <button class="shelf-play" :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
      <GamePoster :game="game.id" :name="game.name"/>
      <span v-if="isPremiumGame(game.id)" class="new-ribbon">PREMIUM</span>

@@ -25,3 +25,4 @@ import './premium-v22.css';
 import './arcade-v23.css';
 
 import './arcade-v24.css';
+import './arcade-v25.css';

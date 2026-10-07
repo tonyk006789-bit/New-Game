@@ -9,6 +9,7 @@ import BlackjackGame from './BlackjackGame.vue';
 import BlackjackRules from './BlackjackRules.vue';
 import PremiumSpotlight from './PremiumSpotlight.vue';
 import WinShowcase from './WinShowcase.vue';
+import {useDepthMotion} from './depth-motion';
 import GameRules from './GameRules.vue';
 import FeatureGame from './FeatureGame.vue';
 import CabinetGame from './CabinetGame.vue';
@@ -61,6 +62,8 @@ const reducedMotion = ref(window.matchMedia('(prefers-reduced-motion: reduce)').
 const foreground = ref(!document.hidden);
 const online = ref(navigator.onLine);
 const ready = computed(() => foreground.value && online.value);
+const depthRoot=ref<HTMLElement>();
+useDepthMotion(depthRoot,computed(()=>ready.value&&!reducedMotion.value&&!modal.value));
 const currentGame = computed(() => catalog.find(game => game.id === activeGame.value));
 const portraitGame=computed(()=>!!activeGame.value&&isPortraitGame(activeGame.value));
 const portraitMedia=window.matchMedia(portraitRotationQuery),rotatePortrait=ref(portraitMedia.matches);
@@ -145,7 +148,7 @@ watch(activeGame,game=>setMusicScene(game||'lobby'),{immediate:true});
 watch(page,()=>{void syncAccount();void loadHistory();});
 </script>
 <template>
-  <div class="arcade-app" :class="{ 'reduce-motion': reducedMotion, 'in-game': currentGame, 'at-login': !entered }">
+  <div ref="depthRoot" class="arcade-app" :class="{ 'reduce-motion': reducedMotion, 'motion-paused':!ready, 'in-game': currentGame, 'at-login': !entered }">
     <LoginScreen v-if="!entered" :notice="loginNotice" @authenticated="authenticated" @help="modal = 'support'" />
     <template v-else>
       <header class="arcade-header">
@@ -166,7 +169,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </main>
       <template v-else-if="page === 'lobby'">
         <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
-        <main class="arcade-lobby"><div class="lobby-quick-actions"><span><i aria-hidden="true">✦</i> YOUR NEXT GREAT GAME</span><button @click="modal='wheel'"><b aria-hidden="true">✺</b> DAILY SPIN</button><button @click="modal='share'"><b aria-hidden="true">▦</b> SHARE</button></div><WinShowcase :running="ready&&!modal" :reduced-motion="reducedMotion"/><PremiumSpotlight premium-only v-if="category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
+        <main class="arcade-lobby"><div class="lobby-quick-actions"><span><i aria-hidden="true">✦</i> YOUR NEXT GREAT GAME</span><button @click="modal='wheel'"><b aria-hidden="true">✺</b> DAILY SPIN</button><button @click="modal='share'"><b aria-hidden="true">▦</b> SHARE</button></div><WinShowcase v-if="account&&stage.enabled" :account-id="account.id" :revision="stage.revision" :running="ready&&!modal" :reduced-motion="reducedMotion" @history="navigate('history')"/><PremiumSpotlight premium-only v-if="category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
           <div class="lobby-heading"><span class="heading-rule"></span><div><span>{{catalog.length}} ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : category==='New'?'NEW ARRIVALS':`${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
           <section class="collection-cabinet" aria-label="Game collection">
             <div class="neon-bar top"></div><div class="neon-bar bottom"></div>
