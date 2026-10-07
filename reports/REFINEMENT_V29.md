@@ -46,4 +46,9 @@ No database or operator deployment is required. Roll back by redeploying the pre
 
 ## Publication
 
-Pending final GitHub push, Vercel deployment and live verification.
+- Source commit `9dab654` pushed to GitHub main.
+- Vercel deployment `dpl_GJVVf9FKuFrEN7WFSNrxBktGhQGn` is READY and aliased to https://new-game-test-topaz.vercel.app/. Final entry `index-CN3Mwy_Q.js`, CSS `index-B1aAoJyM.css`.
+- Sixteen public route/asset checks passed: both health endpoints, staging flag, all 30 game IDs, original art assets, new V29 piano/steelpan audio, protected 401s, operator API 404 on player, and exact release entry files. Operator remains `index-CT1MaUjW.js`.
+- Fresh hosted browser session rendered the new catalog and “After the Marquee” lobby track. All music samples loaded to `ready`; music was switched off again. Outlaw displayed “Dust and Neon,” Auto Fit, and complete controls within 1280×720 (content bottom 712.1). No hosted play was submitted; the observed balance stayed 1,600.80 throughout this verification. Browser error log empty.
+- Saved hosted evidence: `reports/screenshots/v29/live-catalog.png`, `live-game.png`, `live-route-checks.json`. Temporary browser viewport override was reset. The published catalog tab remains available for the owner.
+- CLI publication reused the existing same-vendor process-local Vercel gateway with TLS enabled and existing configuration. No new credentials, access scope, database migration, grant or operator deployment.
