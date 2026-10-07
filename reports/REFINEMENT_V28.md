@@ -60,4 +60,8 @@ Rollback by redeploying V27's player build while preserving migration 018 and al
 
 ## Publication
 
-Release verification and deployment identity will be appended after the authorized Vercel publication completes.
+- Source commit `ca5038d` pushed to GitHub main.
+- Vercel deployment `dpl_2oVNNwuavYmN8ypdyTcx6m7dm2V3` is READY and aliased to https://new-game-test-topaz.vercel.app/. Final entry `index-DqNk2n2J.js`, CSS `index-DITbeXrw.css`.
+- Four deployment tests passed again against the final output. Sixteen public route/asset checks passed: both health endpoints, hosted-test flag, all thirty game IDs, five new art assets, audio availability, protected 401s, operator route 404 on player, and exact release entries. Operator stays on `index-CT1MaUjW.js`.
+- A fresh browser tab restored the existing hosted Player 1 session and rendered the thirty-game shelf plus three-game Premium collection. Hosted balance remained 1,601.80; no hosted round, funding, login submission or credential change occurred. Browser error log was empty; document width 1265 within viewport 1280.
+- Live evidence: `reports/screenshots/v28/live-lobby.png` and `live-route-checks.json`. The Vercel CLI used the existing same-vendor process-local gateway with TLS enabled, without new permissions or OS settings.
