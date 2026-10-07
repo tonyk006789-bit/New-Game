@@ -33,4 +33,8 @@ No migration, math/profile change, credential change, hosted round, credit grant
 
 ## Publication
 
-Release identifiers and public checks will be appended after deployment.
+- Source commit `9ab8c44` pushed to GitHub main.
+- Deployment `dpl_J1Jsc1hSY8nzkLEj8t76sPM7Ljh3` is READY at https://new-game-test-topaz.vercel.app/. Public entry is `index-AAm1131n.js`.
+- Thirteen public checks passed: both site health endpoints, test flag, twenty-game catalog, art/audio availability, expected unauthenticated 401s, operator-route 404 on the player site, and matching release entry. The operator remains on `index-CT1MaUjW.js`.
+- A fresh background browser tab restored the existing hosted login and rendered the violet header/magenta category selection. Credit display was 1,601.80, matching the user's supplied screenshot. No hosted round, login submission or logout occurred. Browser console had no errors; document width 1265 within viewport 1280.
+- Evidence: `reports/screenshots/v27/live-lobby.png`, `live-ui-checks.json`, `live-route-checks.json`. The existing Vercel same-vendor process-local gateway was used with TLS enabled; no credentials, permissions or OS security settings changed.
