@@ -9,5 +9,5 @@ defineProps<{id:string;game:string;species:number;award:string;reducedMotion:boo
  <WinBurst :game="game" :id="id" :award="award" stake="25" :running="running" :reduced-motion="reducedMotion" compact/>
  <AquaticSprite v-if="species===22" :species="22" class="reward-chest"/>
  <AquaticSprite v-else :species="species" class="reward-creature"/>
- <div><small>{{reefTier(species)==='boss'?'JACKPOT CATCH':species===22?'TREASURE WIN':reefTier(species)==='large'?'MAJOR WIN':'MINOR WIN'}}</small><strong>+{{formatCredits(award)}}</strong><span>{{reefSpecies[species]}}</span></div>
+ <div><small>{{reefTier(species)==='boss'?'JACKPOT CATCH':species===22?'TREASURE WIN':'CAUGHT'}}</small><strong>+{{formatCredits(award)}}</strong><span>{{reefSpecies[species]}}</span></div>
  </div></template>

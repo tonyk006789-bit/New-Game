@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T06:52:37.679Z",
+  "generatedAt": "2026-10-07T08:16:52.833Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -343,7 +343,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "dead5305732a92f8524b5c6bb10c6e2dee7f03ff55d8214366fa7e34265ab604"
+      "sha256": "5969d6f7134e9699df896a306a9656acd727cb4cb8b420c5746348ef89f3b42d"
     },
     {
       "path": "apps/player/src/arcade-v18.css",
@@ -374,18 +374,11 @@
       "sha256": "8d975dae866ac5471a8cb8b23b66b4cfd2bcb788e663105e8b9d38af886fd058"
     },
     {
-      "path": "apps/player/src/WinAward.vue",
-      "creator": "Original artwork authored for New Game in this workspace",
-      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
-      "license": "Project original; owner review pending",
-      "sha256": "503696cffeba88a7aa70c9986409abe34a2f8933812ab5a68d742495add907f4"
-    },
-    {
       "path": "apps/player/src/arcade-v24.css",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "dd9d219bde0d0a1ba44c716d27d551f4e79c3df84a6cab6f872e7974715704d7"
+      "sha256": "37917f6991970adcbcaa24aa25dac43799f411157994a975aea640b4c099a6d5"
     },
     {
       "path": "apps/player/src/arcade-v25.css",
@@ -421,6 +414,13 @@
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
       "sha256": "50839d5a8726086c1f285d0bbbe3d67329f61f0aacaa12794476f19572ee4ca0"
+    },
+    {
+      "path": "apps/player/src/neon-vegas.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "b134674187e5c1e981ffa3bd9468c3b5b819458035e64a26820977d3aced447b"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",

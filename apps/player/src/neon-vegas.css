@@ -1,0 +1,219 @@
+/* Player-only Vegas chrome. Individual game worlds retain their original art. */
+body { background:#080615; }
+.arcade-app {
+  --vegas-ink:#090617; --vegas-panel:#18102e; --vegas-line:#674585;
+  --vegas-pink:#ff52c8; --vegas-violet:#a683ff; --vegas-cyan:#71ecff;
+  --muted:#b7abcd; --surface:#18102e; --accent:#c299ff; --panel-deep:#090617;
+  color:#f6eeff;
+}
+.arcade-app:not(.in-game):not(.at-login) {
+  background:
+    radial-gradient(ellipse at 12% 12%,#bd15832e,transparent 45%),
+    radial-gradient(ellipse at 92% 24%,#326fff24,transparent 46%),
+    linear-gradient(120deg,#0b0619ed,#180c2cde 48%,#080b22f2),
+    url('/art/arcade-city.png') center/cover fixed;
+}
+.arcade-header {
+  background:linear-gradient(110deg,#2d133f,#130c25 48%,#121b38);
+  border-bottom:1px solid #b064ca;
+  box-shadow:inset 0 1px #e9baff40,inset 0 -3px #080617,0 1px 16px #d951ee25;
+}
+.arcade-header::after {
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#ff52c8 20%,#b98cff 50%,#71ecff 80%,transparent);
+  box-shadow:0 0 12px #bc76ff70;
+}
+.compact-brand>span:last-child { color:#fff4ff;text-shadow:0 0 18px #e253c860; }
+.compact-brand small,.guest-tag { color:#d1b3e2; }
+.compact-brand .brand-medallion,.login-monogram {
+  color:#361333;
+  background:conic-gradient(from 30deg,#614181,#f0c9ff,#fff5dc,#b275bd,#ffe2eb,#614181);
+  border-color:#efd3ff;box-shadow:inset 0 0 0 2px #ffe2f5,inset -4px -4px 9px #4a205d99,2px 4px 0 #432a5f,0 0 23px #f263ca33;
+}
+.credit-meter {
+  background:radial-gradient(ellipse at 50% 100%,#713b7930,#0d0920);
+  border-color:#b88bda;box-shadow:inset 0 2px 8px #000a,0 2px 0 #4a2860,0 0 14px #cb6cff18;
+}
+.credit-meter strong { color:#fff1c2; }
+.credit-meter small { color:#d5b5ec; }
+.header-controls .round-control,.game-topline .round-control,.round-control,.game-music-button {
+  background:linear-gradient(145deg,#3f2954,#171328);border-color:#a47ac8;color:#f4d9ff;
+  box-shadow:inset 0 1px #ead8ff60,0 3px 0 #080516,0 0 15px #b374d522;
+}
+.game-music-button[aria-pressed=true] { color:#80f0ff;border-color:#67d5eb;box-shadow:0 0 15px #50c6df33; }
+
+/* Raised category switches with a magenta selected face and cyan edge light. */
+.district-nav { scrollbar-color:#885aa3 #160d26; }
+.district-nav .green { --district:#71ecff; }
+.district-nav .gold { --district:#ffdf91; }
+.district-nav button {
+  border-color:#765493;background:linear-gradient(155deg,#39234d,#211332 48%,#120e25);
+  color:#ded0f5;box-shadow:inset 0 1px #ead5ff55,inset 1px 0 #a66aba33,0 4px 0 #080518,0 5px 0 #57366e,0 9px 16px #0007;
+}
+.district-nav button.selected {
+  background:linear-gradient(155deg,#e06bd7,#b330a0 32%,#752482 80%,#63308d);
+  color:#fff6ff;border-color:#ffc1f1;text-shadow:0 1px 2px #4c0a4c;
+  box-shadow:inset 0 1px #fff0ff,inset 0 -3px #4e155f,0 4px 0 #310f46,0 5px 0 #d66acb,0 0 22px #fa48c638;
+}
+.district-nav button.selected strong { color:#fff;text-shadow:0 0 9px #ffc5f5; }
+.district-nav button:active { box-shadow:inset 0 2px 6px #0008,0 2px 0 #57366e; }
+.lobby-quick-actions>span { color:#ceb9e2; }
+.lobby-quick-actions>span i { color:#75eaff;text-shadow:0 0 8px #58e3ff; }
+.lobby-quick-actions button,.game-rules-button,.win-showcase header button {
+  background:linear-gradient(150deg,#42234d,#221331 70%);border-color:#a267b9;color:#fbe9ff;
+  box-shadow:inset 0 1px #ffdfff55,0 3px 0 #10071e,0 4px 0 #6e417d,0 6px 15px #0005;
+}
+.lobby-quick-actions button b { color:#ffb6ed; }
+.lobby-quick-actions button:last-child { border-color:#557caf;background:linear-gradient(150deg,#223653,#111d34); }
+.lobby-quick-actions button:last-child b { color:#8beaff; }
+.lobby-heading h1 { color:#f9e7ff;text-shadow:0 0 20px #e67bdd35; }
+.heading-rule { background:linear-gradient(90deg,transparent,#b364db,#6ccede,transparent);opacity:.75; }
+
+/* Lobby totals stay in the lobby; game results use their existing WIN meter. */
+.win-showcase header b { color:#e9d9f8; }
+.win-showcase header small { color:#b8a9c8; }
+.personal-wins header small strong { color:#f3dbff; }
+.jackpot-meter {
+  --meter-neon:#69ddf4;--meter-dark:#0c132c;
+  background:radial-gradient(ellipse at 0 0,#39709a50,transparent 75%),linear-gradient(145deg,#16394f,#111b32 55%,#0c1025);
+  border-color:#77cddb;color:#caf5ff;
+  box-shadow:inset 0 1px #ccfaff88,inset 0 0 0 4px var(--meter-dark),0 4px 0 #101c37,0 5px 0 #43697d,0 0 22px #4cc8ff1c;
+}
+.jackpot-meter.major {
+  --meter-neon:#b398ff;--meter-dark:#17112f;
+  background:radial-gradient(ellipse at 0 0,#9863bf60,transparent 75%),linear-gradient(145deg,#402463,#25153f 55%,#140e2b);
+  border-color:#b398e9;color:#e3d6ff;
+  box-shadow:inset 0 1px #ebd4ff99,inset 0 0 0 4px var(--meter-dark),0 4px 0 #261236,0 5px 0 #8656a3,0 0 22px #aa69e61c;
+}
+.jackpot-meter.jackpot {
+  --meter-neon:#ff8dd9;--meter-dark:#2d102c;
+  background:radial-gradient(ellipse at 0 0,#b1448960,transparent 75%),linear-gradient(145deg,#63294f,#3d1236 55%,#210d28);
+  border-color:#f59bcf;color:#ffe1f4;
+  box-shadow:inset 0 1px #ffd5f099,inset 0 0 0 4px var(--meter-dark),0 4px 0 #401134,0 5px 0 #a8598d,0 0 24px #ec68be20;
+}
+.jackpot-meter>i {
+  color:#fff0c2;background:radial-gradient(circle at 25% 20%,#70558b,#24182e 60%,#120b21);
+  border:1px solid var(--meter-neon);text-shadow:0 0 12px var(--meter-neon);
+  box-shadow:inset 0 0 0 3px #251935,0 3px 0 #10071c,0 0 20px color-mix(in srgb,var(--meter-neon) 25%,transparent);
+}
+.jackpot-meter strong { color:#fff3cf;text-shadow:0 2px #382046,0 0 16px color-mix(in srgb,var(--meter-neon) 35%,transparent); }
+.jackpot-meter small { color:#d8ccdf; }
+.jackpot-meter.featured { outline:1px solid var(--meter-neon);outline-offset:3px; }
+.win-tier-details { background:linear-gradient(#352247,#170f29);border-color:#9169a9;color:#dac9e8;box-shadow:inset 0 1px #e2aaff55,0 4px #0c0718; }
+.win-tier-details>b { color:#f3d9ff; }
+.win-totals-error button { background:#321b49;border-color:#976bad; }
+
+/* Cabinet shelf and walking floor use the same neon trim. */
+.arcade-lobby .collection-cabinet {
+  background:linear-gradient(125deg,#3d254b,#1a102b 3%,#100c23 75%,#2b2046);
+  border-color:#8d67a5;box-shadow:inset 0 0 0 4px #130b24,inset 0 0 0 5px #bc89cf33,0 8px 0 #0a0617,0 9px 0 #50305f,0 20px 36px #0008;
+}
+.shelf-toolbar>span { color:#c6b1df; }
+.search-games { background:#0c091b;border-color:#6c507f;box-shadow:inset 0 2px 8px #0006; }
+.search-games input { color:#f2eaff; }
+.search-games input::placeholder { color:#a797ba; }
+.search-games svg { color:#bfa7dd; }
+.search-games:focus-within { border-color:#76d5e9;box-shadow:0 0 0 2px #76d5e922; }
+.lobby-view-switch button {
+  background:linear-gradient(#332340,#1a112d);border-color:#6c507e;color:#cbb9df;
+  box-shadow:inset 0 1px #ead4ff33,0 3px 0 #0d071b;
+}
+.lobby-view-switch button[aria-pressed=true] {
+  color:#fff5ff;background:linear-gradient(135deg,#a946af,#653292);border-color:#d596ec;
+  box-shadow:inset 0 1px #fbd5ff99,0 3px #36114f,0 0 14px #c757d324;
+}
+.arcade-lobby .casino-shelf {
+  background:radial-gradient(ellipse at 45% 0,#66307b24,transparent 65%),#0b081c;
+  border-color:#76548e;box-shadow:inset 0 6px 15px #0009,inset 0 0 0 3px #20102e;
+}
+.shelf-game::before { background:linear-gradient(105deg,#71528b,#190f27 25%,#3f2c61 80%,#8f62a9); }
+.arcade-lobby .shelf-play { border-color:#ba91d0;box-shadow:inset 0 0 0 2px #2c143c,0 0 0 1px #4b315d; }
+.arcade-lobby .shelf-play:hover,.arcade-lobby .shelf-play:focus-visible { box-shadow:0 0 0 2px #f3b5ef,0 0 28px #be49cb55; }
+.arcade-lobby .shelf-game-caption {
+  background:linear-gradient(#674077,#352041 12%,#1b102b 85%,#503365)!important;
+  border-top-color:#b17acb;box-shadow:inset 0 1px #eabbf188,inset 0 -3px #10071e;color:#fff0fd;
+}
+.arcade-lobby .shelf-game-caption small { color:#d3bddd; }
+.shelf-enter { color:#ffe4fb!important;background:linear-gradient(transparent,#190a29ee)!important; }
+.hall-marquee,.hall-guide,.floor-directory { background:linear-gradient(#33203e,#160c27);border-color:#9461aa; }
+.hall-floor { box-shadow:inset 0 -40px 60px #15082599,inset 0 8px 20px #0009,0 0 25px #af51d21a; }
+.floor-directory button { background:#231433;border-color:#67417f;color:#e1c9ef; }
+.hall-machine .hall-cabinet-button { box-shadow:6px 8px #251536,7px 9px #9b68bd,12px 17px 24px #0009; }
+.avatar-ring { box-shadow:0 0 22px #d87dff80,0 15px 8px #0008; }
+
+/* Login, settings and dialogs: the same theme, not a separate green skin. */
+.simple-login {
+  background:radial-gradient(ellipse at 22% 20%,#c83f983b,transparent 55%),radial-gradient(ellipse at 85% 75%,#444cec33,transparent 55%),linear-gradient(#140823cc,#080b20e8),url('/art/arcade-hall-v7.png') center/cover;
+  color:#ebdff7;
+}
+.simple-login-card[data-depth-card] {
+  background:linear-gradient(135deg,#513059c9,#231331f2 30%,#100c25f5);
+  border-color:#c089d3;box-shadow:inset 0 1px #fac9ff99,inset 0 0 0 5px #140c24,0 7px #1e0a32,0 8px #794790,0 0 60px #e23fb52b,0 30px 65px #0009;
+}
+.login-name { color:#e7b9e9;text-shadow:0 0 15px #e472ce66; }
+.simple-login h1 { color:#fff0ff;text-shadow:0 2px #612875,0 0 24px #f180e680; }
+.simple-login form>input,.simple-password,.password-form input,.share-panel>input {
+  background:#100a22;border-color:#785090;color:#f8eeff;
+}
+.simple-login input::placeholder { color:#bba5cc; }
+.simple-login input:-webkit-autofill { -webkit-text-fill-color:#f8eeff;caret-color:#f8eeff;box-shadow:inset 0 0 0 1000px #100a22; }
+.simple-password input { background:transparent; }
+.simple-password button,.login-options button { color:#d3b0ee; }
+.login-options input { accent-color:#c566d2; }
+.simple-login form input:focus-visible { outline-color:#8ce6ff; }
+.login-footnote,.simple-sample { color:#bc9fcb; }
+.simple-sample button { color:#9deaff; }
+.arcade-app .login-button,.arcade-app .gold-button,.arcade-app .primary,
+.arcade-app .cabinet-spin,.arcade-app .classic-spin,.arcade-app .feature-play {
+  background:linear-gradient(165deg,#fa93e2,#cc4ac2 35%,#92278f 55%,#792c9e);
+  border-color:#f9b5f0;color:#fff5ff;text-shadow:0 2px #591365;
+  box-shadow:inset 0 1px #ffe1ff,inset 0 -3px #632278,0 4px 0 #2a0b43,0 0 19px #e959c233;
+}
+.arcade-app .cabinet-spin small,.arcade-app .classic-spin small { color:#f5dbff;text-shadow:0 1px #57116b; }
+.arcade-panel,.simple-settings,.player-modal,
+.player-modal:has(.share-panel),.player-modal:has(.daily-wheel-panel) {
+  background:linear-gradient(140deg,#352041,#1b102e 50%,#100c23);border-color:#9f6abc;color:#eadcf5;
+  box-shadow:inset 0 1px #e7b6ff66,0 20px 70px #000b,0 0 28px #b45adc18;
+}
+.player-modal-backdrop { background:#080315c9; }
+.player-modal h2,.utility-page h1,.arcade-panel h2 { color:#f6d9ff; }
+.player-modal p,.password-form p,.utility-lead { color:#c9b7da; }
+.simple-settings>div,.player-history-row { border-color:#68407966; }
+.settings-panel .toggle { background:#241832;border-color:#805295; }
+.settings-panel .toggle.on { background:linear-gradient(#ad4bbc,#603488);border-color:#e498f1; }
+.settings-panel .toggle.on i { background:#f8e7ff; }
+.balance-breakdown>span { background:#100c21;border-color:#5b3a78; }
+.player-history-row b { color:#ddbaee; }
+.wheel-tagline { color:#e5c9f1; }
+.wheel-surround { box-shadow:0 0 0 6px #341746,0 0 32px #ed70d44a;border-color:#f7c0ed; }
+.daily-wheel { background:conic-gradient(#b72494 0deg 40deg,#7736b6 40deg 80deg,#136b9b 80deg 120deg,#3c469f 120deg 160deg,#a743aa 160deg 200deg,#8b348b 200deg 240deg,#aa286b 240deg 280deg,#524ac0 280deg 320deg,#196789 320deg 360deg); }
+.wheel-hub { background:radial-gradient(at 30% 20%,#f9c0fa,#b959c9 70%,#673786);border-color:#fce0fc;color:#fff8ff;text-shadow:0 2px #6b3275; }
+.wheel-pointer { border-top-color:#ffbbec; }
+
+/* Shared game controls, fishing lounge and footer. */
+.game-topline { background:linear-gradient(110deg,#291136,#100b23 60%,#121b32); }
+.game-topline h1 { color:#fff0fb;text-shadow:0 0 15px #be74d13b; }
+.game-topline small { color:#d4acd9; }
+.fish-table-card { background:linear-gradient(#35214ae8,#180f2cf7);border-color:#a77abd; }
+.fish-table-card>header { background:linear-gradient(90deg,#1b0d2b,#44315e,#190e2b);border-color:#7d4f91; }
+.fish-table-card>footer { background:#150d2ae8;border-color:#78478f; }
+.reef-console,.cabinet-controls,.feature-console,.preview-controls {
+  background-image:linear-gradient(175deg,#564563,#30233e 12%,#191426 65%,#0c0a19)!important;
+  box-shadow:inset 0 1px #e9cbff88,inset 0 -4px #050310,0 -3px 0 #78518b,0 -4px 0 #c994e2,0 -9px 22px #0007;border-top-color:#d7a2e7;
+}
+.reef-seat-plaque { background:linear-gradient(155deg,#42314fed,#161229f5)!important; }
+.reef-field-guide { background:#171027f5!important;border-color:#785090; }
+.fish-actions button[aria-pressed=true] { background:linear-gradient(#634186,#34204e);border-color:#b787e1;color:#f6dbff; }
+.arcade-bottom {
+  background:linear-gradient(#50315c,#261533 6%,#150d25 65%,#0c081c);
+  border-top-color:#9655ad;box-shadow:inset 0 1px #fac5ff44,0 -1px 15px #d655c818,0 -8px 24px #0006;
+}
+.arcade-bottom button { color:#cfb8dc; }
+.arcade-bottom button.active { color:#ffe2fb;background:#a93aa02b;border-radius:8px;text-shadow:0 0 12px #e765dc55; }
+.footer-motto,.credit-note { color:#ba9ccb; }
+.footer-motto i { color:#d686df; }
+.arcade-app button:focus-visible,.arcade-app a:focus-visible,.arcade-app input:focus-visible,.arcade-app select:focus-visible { outline-color:#8ce6ff; }
+@media(max-width:700px) {
+  .arcade-app:not(.in-game):not(.at-login) { background-attachment:scroll; }
+  .jackpot-meter { box-shadow:inset 0 0 0 3px var(--meter-dark),0 3px 0 #4b3260,0 0 14px #ad5ba422; }
+}
