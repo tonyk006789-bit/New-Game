@@ -40,4 +40,10 @@ Retain migration 021 and all accepted receipts if reverting presentation. Never 
 
 ## Publication
 
-Pending final hosted migration verification and publication to both existing Vercel test sites.
+- Source commit `0954104` pushed to GitHub main.
+- Player deployment `dpl_7QG1ziQmyRL8wjh3mP3zSoUtngeG` is READY at https://new-game-test-topaz.vercel.app/.
+- Operator deployment `dpl_3b3oEHgKQFLR6SjGGoXAYjRA6bV2` is READY at https://new-game-operator.vercel.app/.
+- Eighteen read-only live checks passed for both health endpoints, exact bundle hashes, the complete 30-game catalog, all fifteen lower-stake IDs, existing policy (revision 1, 20%), asset availability and authenticated/audience-separated API routes. Evidence: `reports/screenshots/v32/live-route-checks.json`.
+- Hosted browser restored the player session and displayed Meteor Keno in a 693.33×390 frame at 844×390 viewport (16:9). Selecting 0.10 showed the new choice; no spin/draw/stake was submitted. Screenshot: `reports/screenshots/v32/meteor-live-landscape.png`.
+- Backend account creation is covered by the local authenticated UI and PostgreSQL tests, plus the exact deployed operator bundle; hosted operator sign-in is not claimed if its session is expired. No credentials were reset for release verification.
+- Final `git diff --check` passed. Physical-device orientation locking and native compilation remain unverified for the toolchain reasons above.
