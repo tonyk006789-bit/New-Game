@@ -3,12 +3,12 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { cabinetGames, legacyCabinetGames, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
 import { catalog } from '@new-game/contracts';
 import ReelStage from './ReelStage.vue';
+import WinAward from './WinAward.vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 import { api } from './api';
 import BetControls from './BetControls.vue';
 import {stage} from './staging-state';
 import {creditPresentation} from './credit-presentation';
-import {formatCredits} from '@new-game/domain';
 import {displayedReelGrid} from './cabinet-layout';
 
 const staked=computed(()=>stage.enabled&&props.authenticated);
@@ -113,7 +113,7 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
       <aside class="cabinet-side right"><strong>{{ coinGame ? remaining : profile.lines.length }}</strong><b>{{ coinGame ? 'RESPINS' : 'LINES' }}</b><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span></aside>
     </div>
     <div class="cabinet-controls"><BetControls :game="game.id" :ready="running" :authenticated="!!authenticated" :busy="active||saving" :reduced-motion="reducedMotion"/><div class="led-meter"><small>PLAY CREDITS</small><strong>{{balance}}</strong></div><button v-if="!coinGame" :disabled="active || saving" :aria-pressed="showLines" class="line-map-button" @click="showLines=!showLines">{{ showLines ? 'HIDE LINES' : 'LINE MAP' }}</button><button class="cabinet-speed" :aria-pressed="fast" aria-label="Fast animations" :disabled="active || saving" @click="fast=!fast">»<small>{{fast?'FAST':'NORMAL'}}</small></button><button v-if="active" class="cabinet-spin" @click="finish">STOP<small>SHOW RESULT</small></button><button v-else class="cabinet-spin" :disabled="creditPresentation.held!==null || !running || saving || loading" @click="play">{{ loading ? 'WAIT' : saving ? 'WAIT' : pendingKey ? 'RETRY' : 'SPIN' }}<small>{{ loading ? 'LOADING' : saving ? 'SAVING' : (staked ? 'PLAY' : 'FREE PRACTICE') }}</small></button></div>
-    <div v-if="celebrating" :key="result?.id" class="cabinet-award-ribbon" role="status"><small>{{BigInt(returnAmount)>=BigInt(stage.last?.stake||'25')*5n?'BIG WIN':'WIN'}}</small><strong>{{formatCredits(returnAmount)}}</strong></div>
+    <WinAward v-if="celebrating" :award="returnAmount" :stake="stage.last?.stake||'25'"/>
     <p class="cabinet-notice" role="status">{{crownGame?notice.replaceAll('dragon','crown'):notice}}</p>
   </section>
 </template>

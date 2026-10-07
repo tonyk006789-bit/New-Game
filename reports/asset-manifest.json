@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-06T22:45:20.720Z",
+  "generatedAt": "2026-10-07T02:35:09.768Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -329,7 +329,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "980acdd6134f933d345898bb4146ee799c70c6b532bc778890b6716d65f3cb4a"
+      "sha256": "79885fd36d47c126c01c1cbeb05d0e54c77367e8252479105ea7ca5d43f69319"
     },
     {
       "path": "apps/player/src/arcade-v18.css",
@@ -351,6 +351,27 @@
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
       "sha256": "4ad4a4ba977c55eedadaa475e78263acf693fb899cd1c840fa67d2f8acd3ec71"
+    },
+    {
+      "path": "apps/player/src/WinShowcase.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "aaae79caa325558180d51086ec812fbc61927908b794d51b8c757cee0deab21b"
+    },
+    {
+      "path": "apps/player/src/WinAward.vue",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "503696cffeba88a7aa70c9986409abe34a2f8933812ab5a68d742495add907f4"
+    },
+    {
+      "path": "apps/player/src/arcade-v24.css",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "dd9d219bde0d0a1ba44c716d27d551f4e79c3df84a6cab6f872e7974715704d7"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",

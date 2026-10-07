@@ -6,7 +6,7 @@ export interface Account {id:string;username:string;displayName:string;role:stri
 export const session: {current:Account|null} = {current:null};
 export const expiredSession=(error:unknown):boolean=>error instanceof Error && 'status' in error && error.status===401;
 async function request<T>(path:string,body?:unknown):Promise<T>{
- if(Capacitor.isNativePlatform())throw new Error('Account play is not available in this device build yet. You can explore the guest preview.');
+ if(Capacitor.isNativePlatform())throw new Error('Account play is not available in this device build yet. Use the hosted player website.');
  const response=await fetch(`/v1/${path}`,{method:body===undefined?'GET':'POST',credentials:'include',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/json',...(session.current?{'X-CSRF-Token':session.current.csrf}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
  const result=await response.json();if(!response.ok)throw Object.assign(new Error(result.message||result.code||'The service is unavailable.'),{status:response.status,code:result.code});return result as T;
 }

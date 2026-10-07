@@ -51,11 +51,12 @@ function independentBots(time:number,now:number){
  const humans=humanTargets(),chosen=new Set<number>();
  for(let i=botBolts.length-1;i>=0;i--)if(!botSeats.value.includes(botBolts[i].seat)||humans.has(botBolts[i].targetId)){botBolts[i].view.destroy();botBolts.splice(i,1);}
  if(!error.value&&!disposed)for(const seat of botSeats.value){
-  if(botBolts.some(b=>b.seat===seat))continue;
-  if(!botDeadline.has(seat)){botDeadline.set(seat,now+seat*210);continue;}
+  const ownBolts=botBolts.filter(b=>b.seat===seat);
+  if(ownBolts.length>=4)continue;
+  if(!botDeadline.has(seat)){botDeadline.set(seat,now+seat*90);continue;}
   if(now<botDeadline.get(seat)!)continue;
-  botDeadline.set(seat,now+700+(seat*137+botSequence*53)%650);
-  const excluded=new Set([...humans,...chosen,...botBolts.map(b=>b.targetId)]),flight=chooseBotFlight(props.game,seat,time,alive(),excluded,botSequence++);
+  botDeadline.set(seat,now+(props.reducedMotion?700:220)+(seat*37+botSequence*13)%80);
+  const excluded=new Set([...humans,...chosen,...botBolts.filter(b=>b.seat!==seat).map(b=>b.targetId)]),flight=chooseBotFlight(props.game,seat,time,alive(),excluded,botSequence++,ownBolts[0]?.targetId);
   if(!flight||flight.targetId===null)continue;chosen.add(flight.targetId);
   const cannon=cannons[seat-1];cannon.angle=flight.angle;cannon.recoil=props.reducedMotion?0:.24;botShots.value++;
   if(props.reducedMotion){const fish=creatures.find(f=>f.id===flight.targetId);if(fish)fish.hit=.06;continue;}
@@ -182,7 +183,7 @@ onMounted(async()=>{
    for(let i=botBolts.length-1;i>=0;i--){const b=botBolts[i],age=performance.now()-b.start;if(age<0)continue;
     if(!b.launched){b.launched=true;const c=cannons[b.seat-1];c.angle=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);c.recoil=.24;botShots.value++;}
     const progress=Math.min(1,age/b.duration);b.view.visible=true;b.view.rotation=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);b.view.position.set(b.origin.x+(b.x-b.origin.x)*progress,b.origin.y+(b.y-b.origin.y)*progress);
-    if(progress>=1){impact(b.x,b.y);b.view.destroy();botBolts.splice(i,1);}
+    if(progress>=1){const spark=new Graphics().circle(0,0,9).stroke({color:0x85deef,width:1.5,alpha:.6});effect(spark,b.x,b.y,.22,'bot-impact');b.view.destroy();botBolts.splice(i,1);}
    }
    for(let i=projectiles.length-1;i>=0;i--){const s=projectiles[i];s.age=(Date.now()+clockOffset-s.firedAt)/1000;const t=Math.min(s.age,s.flight.time);s.view.position.set(s.flight.origin.x+s.flight.vx*t,s.flight.origin.y+s.flight.vy*t);
     if(s.age>=s.flight.time){s.view.destroy();projectiles.splice(i,1);void settleShot(s);}

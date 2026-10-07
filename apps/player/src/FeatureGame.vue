@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { featurePractice, storyboardRandom, type FeatureResult, type VaultFrame, type CascadeFrame } from '@new-game/game-math';
 import ArcadeSymbol from './ArcadeSymbol.vue';
+import WinAward from './WinAward.vue';
 import Icon from '@new-game/ui/Icon.vue';
 import { api } from './api';
 import BetControls from './BetControls.vue';
@@ -120,6 +121,6 @@ onBeforeUnmount(() => { disposed = true; generation++; clearTimeout(timer); canc
       <aside class="feature-guide"><strong>{{ phase === 'complete' ? 'SEQUENCE COMPLETE' : isVault ? 'LOCK & COLLECT' : 'CLUSTER CASCADES' }}</strong><span>{{ isVault ? '01' : '04' }}<small>{{ isVault ? 'CRYSTAL AT A TIME' : 'MATCH TO CLEAR' }}</small></span><p>{{ isVault ? 'Empty cells pulse with new possibilities.' : 'Relics drop into the spaces you clear.' }}</p><div class="no-award-tag">{{staked ? "WIN" : "NO STAKE"}}<br>{{staked ? "PLAY CREDITS" : "NO CREDIT AWARD"}}</div></aside>
     </div>
     <div class="feature-console"><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="active||saving" /><div class="console-value"><small>PLAY CREDITS</small><strong>{{ balance }}</strong></div><button class="speed-control" :aria-pressed="fast" :disabled="saving || active" aria-label="Fast animations" @click="fast = !fast"><Icon name="chevron" :size="17" />{{ fast ? 'FAST' : 'NORMAL' }}</button><button v-if="active" class="feature-play" @click="finish()"><Icon name="arrow" />SHOW RESULT</button><button v-else class="feature-play" :disabled="creditPresentation.held!==null || !running || saving || loading" @click="play"><Icon :name="saving ? 'clock' : 'gem'" />{{ loading ? 'LOADING' : saving ? 'SAVING' : pendingKey ? 'RETRY SEQUENCE' : isVault ? 'OPEN VAULT' : 'START CASCADE' }}</button><div class="console-value practice-tag"><small>{{ authenticated ? 'SAVED ON SERVER' : 'LOCAL STORYBOARD' }}</small><strong>{{staked ? "PLAY" : "FREE PRACTICE"}}</strong></div></div>
-    <p class="feature-notice" aria-live="polite">{{ notice }}</p>
+    <WinAward v-if="staked&&phase==='complete'&&result&&stage.last?.id===result.id" :award="stage.last.award" :stake="stage.last.stake"/><p class="feature-notice" aria-live="polite">{{ notice }}</p>
   </section>
 </template>
