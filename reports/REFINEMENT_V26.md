@@ -38,4 +38,8 @@ No migration, hosted account/wallet change, operator change or new paid service.
 
 ## Publication
 
-Release identifiers and public verification will be appended after deployment.
+- Source commit `72d18b4` pushed to GitHub main.
+- Deployment `dpl_BaqXc9nGyVj45HG8LAVM2RNJkoZs` is READY at https://new-game-test-topaz.vercel.app/. Public entry matches `index-DLD1IDCn.js`.
+- Thirteen public checks passed: both site health responses, test-environment flag, twenty-game catalog, new wheel SVG and existing art/audio, 401 on unauthenticated blackjack/win totals, 404 on operator account routes at the player domain, matching player entry and unchanged operator entry `index-CT1MaUjW.js`.
+- Existing hosted session restored without entering credentials. Opened an Abyss table without firing; three AI CREW plaques accumulated 880/880/820 points, player shots remained zero, and the balance stayed 1,601.55 throughout this hosted check. This differs from the earlier V25 balance because the account had subsequent activity outside this check; no cause or change by this release is inferred. Console errors: none. Returned to the lobby without logging the user out.
+- Evidence: `reports/screenshots/v26/live-route-checks.json`, `live-ui-checks.json`, `live-fish.png`. Deployment used the established process-local same-vendor Vercel web API gateway; TLS remained enabled, with no OS or networking security changes.
