@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T10:16:39.440Z",
+  "generatedAt": "2026-10-07T15:30:28.124Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -287,7 +287,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "997403393a920c5bf8f01dafad4f1f3cdc3bb2dfd63da70a17f6aaf5ebf25545"
+      "sha256": "5ccb3f459cc12c3280edc9bf49d7146fe7551eca6dae6ed540e1dbf7f1f6caaf"
     },
     {
       "path": "apps/player/src/arcade-v4.css",
@@ -371,7 +371,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "349848f33d562c821850a9eba07bb8c52bfdb2f3dd14c5e9432e9e1e24853c02"
+      "sha256": "62fbe54b13cfcd9de5bbb878e2746ad598b6913694748b51dec1e3edb758b6aa"
     },
     {
       "path": "apps/player/src/FishRewardReveal.vue",
@@ -479,6 +479,20 @@
       "sha256": "45606ea97d0863e65c2e24cd6c4dcef2ff2bd3c8010c751846c1b95d67ac5ca4"
     },
     {
+      "path": "apps/player/src/screen-v29.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "43fb1a5043a1f696f89bdf4b6d9396a2daa9e5b7cfa1d65bf8cd0f6a0cadab3c"
+    },
+    {
+      "path": "apps/player/src/GameViewport.vue",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "52cce104739c0eea4c34db3120980724da872815db43d72003d68ede8118da15"
+    },
+    {
       "path": "apps/player/public/audio/v23/bass.wav",
       "creator": "Original synthesized instruments for New Game",
       "source": "scripts/render-music-bank.py; no third-party recordings or soundfonts",
@@ -575,6 +589,230 @@
       "source": "scripts/render-music-bank.py; no third-party recordings or soundfonts",
       "license": "Project original",
       "sha256": "5e303aa7d12d28e3f7d877287b1b0e53ba91e011fb5a84c9af8db7775a536ee1"
+    },
+    {
+      "path": "apps/player/public/audio/v29/accordion.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "a58337aeebeb12446e625400ed1ddd543850819e3b2e2ef947d9b7087c0aa013"
+    },
+    {
+      "path": "apps/player/public/audio/v29/arp.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "b8c437d5e84884614ccde6de8d6ae444e9575aafb44cf07e17991b1ccc1a37bf"
+    },
+    {
+      "path": "apps/player/public/audio/v29/bass.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "834436beee2286a51a213d059097f103d3f735b485a85b7262ca55f874112657"
+    },
+    {
+      "path": "apps/player/public/audio/v29/bell.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "3ef77c275f099fac47658a906b94cfe66548caafeb681d771e97f587651712db"
+    },
+    {
+      "path": "apps/player/public/audio/v29/celeste.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "73d93a7666f80315519a1465abeaa70ffeb8b1c140b476bf7695ca121840be35"
+    },
+    {
+      "path": "apps/player/public/audio/v29/choir.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "66c76fe2b28cb766d3537b0823ddd050ac932bf34886d626dbfb50e9c158beb6"
+    },
+    {
+      "path": "apps/player/public/audio/v29/clap.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "364d8a91ea705439bccc922a4eb2c5bbc98778b57ee3b80444b8adbe1c556cff"
+    },
+    {
+      "path": "apps/player/public/audio/v29/conga.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "8b374eeab6e63b500658e8f99aef2462533ff94ede7176e062dcad2e275d243c"
+    },
+    {
+      "path": "apps/player/public/audio/v29/electric.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "5db772b63345897f32b3acda1cb6b663641bd7c850d2abdff0381ee11184caa0"
+    },
+    {
+      "path": "apps/player/public/audio/v29/flute.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "96abca9ac865b45c8e70b5fce186227c05d5869f75d8100e8270f82ea1ba5943"
+    },
+    {
+      "path": "apps/player/public/audio/v29/guitar.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "0a48cc1bf02789e163127fe9b37578ac936658624682c5e192774fead4619204"
+    },
+    {
+      "path": "apps/player/public/audio/v29/hat.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "5e995d7c33ae7faf0351256b75c2a5e89665dcd844ff3287f781a59a7d4803a7"
+    },
+    {
+      "path": "apps/player/public/audio/v29/kick.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "7fa064751a5f55d102371462e40fb494f76e43df1cd9304d9876012c67e52a85"
+    },
+    {
+      "path": "apps/player/public/audio/v29/koto.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "e244124aa4a1dee17c4727f4bc66528b3e9da9100f8f50716c55df5ebd076d14"
+    },
+    {
+      "path": "apps/player/public/audio/v29/marimba.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "414b3bd81062f52881806087836a16f2bd60c5b78ae3e74ce8fb8d31a953a24c"
+    },
+    {
+      "path": "apps/player/public/audio/v29/muteguitar.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "13c9f8b73a9e88f7ae2a39c85b3091cde792628c0b0af848e79ea6dcd13b1c25"
+    },
+    {
+      "path": "apps/player/public/audio/v29/organ.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "470264c76196cd8ecfeac516c48a7e62ea836d5e084251b3ee75f02cb721251b"
+    },
+    {
+      "path": "apps/player/public/audio/v29/piano.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "4e0cc0a5277be16e0ae9558aeab27233d4b8c5ce1ec351f2135a5948b742cdba"
+    },
+    {
+      "path": "apps/player/public/audio/v29/ride.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "1580501aa8a525c8591ec4bb3a7122993ff890a462e80e1355d688d3ac157f94"
+    },
+    {
+      "path": "apps/player/public/audio/v29/rim.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "552663979ef0cbe52da1c500596e3d751bd99dbd0ecffee30835c9a823215026"
+    },
+    {
+      "path": "apps/player/public/audio/v29/sax.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "14f78736fb49469c6269b978ebe6539ad1ec60b718461e6b543d840165737d34"
+    },
+    {
+      "path": "apps/player/public/audio/v29/shaker.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "922381c0565c39b2c4e7bded6c0ba5fdccf7d63497ebec5481a3017d24783be0"
+    },
+    {
+      "path": "apps/player/public/audio/v29/sitar.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "89860ac5f4427209faa89ae0ccf94a8f33de844db6356eb407efc8eb1ba2b15a"
+    },
+    {
+      "path": "apps/player/public/audio/v29/snare.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "a991cd4af29c981d2b8120c7d05fbca94f901d05c2259a61465386d06cefee6c"
+    },
+    {
+      "path": "apps/player/public/audio/v29/steelpan.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "8dab0220fe537f4df58f0c0669ca5d3683afbd79e7989d4a80ba00ea0e9e3e26"
+    },
+    {
+      "path": "apps/player/public/audio/v29/strings.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "d6343bd8b3690292e2b535728beed4f6905bb572d16ff35091f1d9c87623ae02"
+    },
+    {
+      "path": "apps/player/public/audio/v29/sub.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "834436beee2286a51a213d059097f103d3f735b485a85b7262ca55f874112657"
+    },
+    {
+      "path": "apps/player/public/audio/v29/synth.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "7cf66c3da3fab6b6959d796d8db6f2bdbfb2cee4e7b3d06e423f7f399aa6d53d"
+    },
+    {
+      "path": "apps/player/public/audio/v29/taiko.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "a606d12f02d3da15040799bb8c618ec3108a807c3e4e99dcdaad4a2965475f32"
+    },
+    {
+      "path": "apps/player/public/audio/v29/tambourine.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "0e3201ed1658fe42b75b46acf2c828de56324272c98c71c53fee0c52e74ba97e"
+    },
+    {
+      "path": "apps/player/public/audio/v29/trumpet.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "d8d18a05f206527b7dd71eb01344b340d2fd4664d1f244907d1fcc36d36b1a94"
+    },
+    {
+      "path": "apps/player/public/audio/v29/upright.wav",
+      "creator": "Original synthesized ensembles for New Game",
+      "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
+      "license": "Project original",
+      "sha256": "a7c1fb326a90909e73851ec097e6fb08a1cf6651b67a5e6e0586db48a00b70d6"
     }
   ]
 }

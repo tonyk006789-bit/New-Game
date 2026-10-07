@@ -1,5 +1,5 @@
 import {reactive,watch} from 'vue';
-import {musicScores,musicPlaylists,musicTrack,scoreStep,TRACK_STEPS,type MusicScene} from './music-score';
+import {musicScores,musicPlaylists,musicTrack,scoreStep,trackSteps,type MusicScene} from './music-score';
 import {loadMusicBank,sampledNote} from './music-sampler';
 export const audioPreferences=reactive({music:false,sound:true});
 export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length,status:'idle' as 'idle'|'loading'|'ready'|'unavailable'});
@@ -26,7 +26,7 @@ function scheduleMusic(){
   echo.delayTime.setTargetAtTime(45/score.bpm,context.currentTime,.1);
   for(const e of scoreStep(musicNow.scene,step,musicNow.index))sampledNote(context,bank,e,nextAt,musicGain,echo,musicNodes);
   nextAt+=sixteenth*(step%2?1-score.swing:1+score.swing);step++;
-  if(step===TRACK_STEPS){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
+  if(step===trackSteps(musicNow.scene,musicNow.index)){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
  }
 }
 function stopMusic(){clearInterval(timer);timer=undefined;for(const node of musicNodes){try{node.stop();}catch{/* Already ended. */}}musicNodes.clear();}

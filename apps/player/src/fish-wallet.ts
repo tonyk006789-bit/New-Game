@@ -1,28 +1,33 @@
 export type FishWallet={available:string;version:string};
-type Receipt={before:FishWallet;after:FishWallet;readyAt:number};
-// Present consecutive committed wallet versions only, after their catch was shown.
-// A later HTTP response must not reveal an earlier, still-unseen award.
+type Receipt={before:FishWallet;after:FishWallet;award:bigint;readyAt:number};
+// Costs of received shots show immediately, even with out-of-order responses.
+// Only awards wait for their catch reveal. Polls cannot leak an unseen award.
 export class FishWalletPresentation {
- private receipts:Receipt[]=[];
- constructor(public wallet:FishWallet){}
+ private receipts=new Map<string,Receipt>();
+ private base:FishWallet;
+ constructor(public wallet:FishWallet){this.base={...wallet};}
  accept(before:FishWallet,after:FishWallet,award:string,now:number){
-  if(BigInt(after.version)<=BigInt(this.wallet.version))return;
-  this.receipts.push({before,after,readyAt:now+(BigInt(award)>0n?900:0)});
+  if(BigInt(after.version)<=BigInt(this.base.version)||this.receipts.has(after.version))return;
+  this.receipts.set(after.version,{before,after,award:BigInt(award),readyAt:now+(BigInt(award)>0n?900:0)});
  }
  advance(now:number){
-  this.receipts.sort((a,b)=>BigInt(a.after.version)<BigInt(b.after.version)?-1:1);
-  while(this.receipts.length){const receipt=this.receipts[0];
-   if(BigInt(receipt.after.version)<=BigInt(this.wallet.version)){this.receipts.shift();continue;}
-   if(BigInt(receipt.before.version)>BigInt(this.wallet.version)||now<receipt.readyAt)break;
-   this.wallet=receipt.after;this.receipts.shift();
+  const ordered=[...this.receipts.values()].sort((a,b)=>BigInt(a.after.version)<BigInt(b.after.version)?-1:1);
+  for(const receipt of ordered){
+   if(BigInt(receipt.before.version)>BigInt(this.base.version)||now<receipt.readyAt)break;
+   this.base=receipt.after;this.receipts.delete(receipt.after.version);
   }
-  return this.wallet;
+  let available=BigInt(this.base.available),version=BigInt(this.base.version);
+  for(const r of this.receipts.values()){
+   available+=BigInt(r.after.available)-BigInt(r.before.available)-(now<r.readyAt?r.award:0n);
+   if(BigInt(r.after.version)>version)version=BigInt(r.after.version);
+  }
+  this.wallet={available:(available<0n?0n:available).toString(),version:version.toString()};return this.wallet;
  }
- // Account for manual transfers once no unknown shot receipts remain. All known
- // wins still finish first; this also bridges an external wallet-version gap.
  reconcile(wallet:FishWallet,now:number,idle:boolean){
   this.advance(now);
-  if(idle&&this.receipts.every(r=>r.readyAt<=now)&&BigInt(wallet.version)>=BigInt(this.wallet.version)){this.wallet=wallet;this.receipts=[];}
+  if(idle&&[...this.receipts.values()].every(r=>r.readyAt<=now)&&BigInt(wallet.version)>=BigInt(this.wallet.version)){
+   this.base={...wallet};this.wallet=wallet;this.receipts.clear();
+  }
   return this.wallet;
  }
 }

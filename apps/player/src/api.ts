@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import {reefAssistProfile,isFishGame,stagingGameProfileId} from '@new-game/game-math';
 import {stage,savePending,clearPending,restorePending,restoreFishPending,saveFishPending,clearFishPending,type Pending,type FishPending} from './staging-state';
-import {holdCredits,revealCredits} from './credit-presentation';
+import {holdStake,holdAward,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
 export const session: {current:Account|null} = {current:null};
 export const expiredSession=(error:unknown):boolean=>error instanceof Error && 'status' in error && error.status===401;
@@ -46,11 +46,11 @@ async function settleFish<T>(body:Record<string,unknown>):Promise<T>{
 async function settle<T>():Promise<T>{
  if(!stage.pending||!session.current||stage.pending.accountId!==session.current.id)throw new Error('Sign in to the account with the pending round.');
  const pending=stage.pending;stage.busy=true;
- holdCredits(pending.path.split('/')[1],session.current.id,session.current.wallet.available);
+ holdStake(pending.path.split('/')[1],session.current.id,session.current.wallet.available,String(pending.body.stake));
  try{
-  const result=await request<T&{game:string;stake:string;award:string;net:string}>(pending.path,pending.body);
-  if(stage.pending===pending&&session.current?.id===pending.accountId){applyWallet(result as WalletReceipt,pending.accountId);clearPending();stage.last=result;stage.revision++;}return result;
- }catch(error){revealCredits();if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status)))clearPending();else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
+  const result=await request<T&WalletReceipt&{game:string;stake:string;award:string;net:string}>(pending.path,pending.body);
+  if(stage.pending===pending&&session.current?.id===pending.accountId){applyWallet(result,pending.accountId);if(result.after)holdAward(result.game,pending.accountId,result.after.available,result.award);clearPending();stage.last=result;stage.revision++;}return result;
+ }catch(error){if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status))){clearPending();revealCredits();}else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
 }
 export async function recoverRound(){
  if(!navigator.onLine||document.hidden||stage.busy||!session.current)return;
@@ -65,7 +65,7 @@ export async function recoverRound(){
  try{
   const receipt=await request<{status:string;result:typeof stage.last}>('staging/recover',{...pending.body,game:pending.path.split('/')[1]});
   if(stage.pending!==pending||session.current?.id!==pending.accountId)return;
-  clearPending();if(receipt.result){applyWallet(receipt.result as WalletReceipt,pending.accountId);stage.last=receipt.result;}stage.revision++;stage.recovered++;
+  clearPending();if(receipt.result){applyWallet(receipt.result as WalletReceipt,pending.accountId);stage.last=receipt.result;}revealCredits(pending.path.split('/')[1]);stage.revision++;stage.recovered++;
  }finally{stage.busy=false;}
 }
 async function recoverFish(pending:Pending){

@@ -1,76 +1,66 @@
 import type {GameId} from '@new-game/contracts';
 export type MusicScene=GameId|'lobby';
-export type Instrument='keys'|'brass'|'pluck'|'strings'|'bass'|'mallet'|'kick'|'snare'|'clap'|'hat'|'openhat'|'shaker'|'conga'|'crash';
-type Style='disco'|'house'|'jazz'|'tropical'|'cinematic';
-export type MusicScore={name:string;bpm:number;key:number;swing:number;style:Style;lead:Instrument;seed:number;progression:readonly number[];melody:readonly number[]};
-const scenes:Record<MusicScene,{titles:string[];bpm:number;key:number;style:Style}>={
- 'corsair-cove':{titles:['Ghost Harbor Groove','The Copper Fleet','Moonlit Mutiny'],bpm:129,key:55,style:'cinematic'},
- 'cosmic-tides':{titles:['Plasma Current','Orbit Afterhours','Nebula Night Swim'],bpm:132,key:63,style:'house'},
- 'double-deck-blackjack':{titles:['Double Down Quartet','Pink Velvet Club','Two Deck Shuffle'],bpm:123,key:61,style:'jazz'},
- 'european-blackjack':{titles:['Riviera Nocturne','The Late Card','Midnight Promenade'],bpm:116,key:66,style:'jazz'},
- 'clockwork-vault':{titles:['Brass Pendulum','Owl at Midnight','Mechanical Waltz'],bpm:126,key:58,style:'cinematic'},
- 'phoenix-falls':{titles:['Rise in Flames','Ember Cascade','Wingbeat Overdrive'],bpm:136,key:60,style:'cinematic'},
- 'outlaw-sevens':{titles:['Neon Frontier','Saloon After Dark','Sheriff Shuffle'],bpm:128,key:57,style:'disco'},
- 'celestial-wilds':{titles:['Moonlight Frequency','Silver Constellation','Sorceress at Dawn'],bpm:124,key:69,style:'house'},
- 'meteor-keno':{titles:['Orbit Hustle','Meteor Radio','Star Map Session'],bpm:130,key:62,style:'house'},
- 'bamboo-keno':{titles:['Lantern Parade','Bamboo Social Club','Red Panda Rhythm'],bpm:122,key:64,style:'tropical'},
- lobby:{titles:['Grand Entrance','Champagne District','Last Dance at the Arcade'],bpm:124,key:60,style:'disco'},
- 'royal-blackjack':{titles:['The High Roller Quartet','Satin & Spades','Penthouse After Midnight'],bpm:118,key:62,style:'jazz'},
- 'reef-party':{titles:['Tropic Heat','Coral Club Radio','Island Fever'],bpm:128,key:65,style:'tropical'},
- 'abyss-legends':{titles:['Pressure Drop','Leviathan Overdrive','Deepwater Afterburn'],bpm:132,key:57,style:'cinematic'},
- 'sunken-dynasty':{titles:['Dragon Procession','Emperor of the Dancefloor','Jade Lantern District'],bpm:126,key:62,style:'tropical'},
- 'polar-odyssey':{titles:['Arctic Velocity','Whiteout Club','Glacier Transmission'],bpm:130,key:64,style:'house'},
- 'neon-numbers':{titles:['Laser Lounge','Eighty After Dark','Electric Counter'],bpm:132,key:59,style:'house'},
- 'pearl-keno':{titles:['Pearl Coast Nights','Silver Terrace','Oceanfront Disco'],bpm:122,key:67,style:'disco'},
- 'neon-sevens':{titles:['Seven on the Floor','Chrome Avenue','Jackpot Junction'],bpm:128,key:60,style:'house'},
- 'ruby-rush':{titles:['Scarlet Nightclub','Red Carpet Hustle','Ruby Street Orchestra'],bpm:126,key:64,style:'disco'},
- 'sapphire-crown':{titles:['Blue Palace Ballroom','The Sapphire Session','Crown at Dusk'],bpm:120,key:65,style:'jazz'},
- 'solar-fortune':{titles:['Solaris Dance Unit','Gold Rush Highway','Sunset Accelerator'],bpm:134,key:62,style:'house'},
- 'jade-fortune':{titles:['Lucky Dragon Club','Emerald Lantern Parade','Jade at Daybreak'],bpm:124,key:67,style:'tropical'},
- 'coin-carnival':{titles:['Brass Coin Carnival','Parade of Gold','Confetti Casino'],bpm:128,key:62,style:'disco'},
- 'temple-lights':{titles:['Sanctuary Afterhours','Temple of Rhythm','Moonstone Procession'],bpm:122,key:57,style:'cinematic'},
- 'aurora-vault':{titles:['Northern Light District','Crystal Fever','Aurora in Stereo'],bpm:126,key:69,style:'house'},
- 'ember-relics':{titles:['Volcanic Night Drive','Relic Breakout','Fireline Orchestra'],bpm:136,key:57,style:'cinematic'},
- 'orchard-numbers':{titles:['Orchard Street Social','Lucky Harvest Club','Golden Hour Shuffle'],bpm:120,key:65,style:'tropical'},
- 'disco-diamonds':{titles:['Mirrorball Millionaire','Diamond Dancefloor','Studio Twenty'],bpm:126,key:60,style:'disco'},
- 'midnight-express':{titles:['Platform Nine After Dark','Midnight Connection','Velvet Railways'],bpm:122,key:59,style:'jazz'},
- 'pirate-gold':{titles:['Buccaneer Brass Band','Treasure Island Club','Captain of the Night'],bpm:130,key:62,style:'tropical'}
-};
-const phrases=[
- [7,-1,9,12,-1,14,-1,12,7,-1,4,-1,9,7,-1,-1,12,-1,14,16,-1,14,12,-1,9,-1,7,4,-1,2,-1,-1],
- [0,-1,7,-1,10,12,-1,7,-1,3,-1,5,7,-1,10,-1,12,-1,15,-1,10,7,-1,5,3,-1,0,3,-1,7,-1,-1],
- [4,-1,7,9,-1,11,14,-1,12,-1,9,7,-1,4,2,-1,7,-1,11,14,-1,16,14,-1,11,-1,9,4,-1,2,-1,-1],
- [0,-1,4,-1,7,9,-1,12,14,-1,12,-1,9,7,-1,-1,4,-1,7,12,-1,14,9,-1,7,-1,4,2,-1,0,-1,-1]
+export type Instrument='piano'|'electric'|'organ'|'guitar'|'muteguitar'|'sax'|'trumpet'|'strings'|'choir'|'flute'|'koto'|'sitar'|'marimba'|'steelpan'|'celeste'|'bell'|'accordion'|'synth'|'arp'|'bass'|'upright'|'sub'|'kick'|'snare'|'rim'|'clap'|'hat'|'ride'|'shaker'|'conga'|'taiko'|'tambourine';
+export type MusicScore={name:string;genre:string;bpm:number;key:number;swing:number;barSteps:number;lead:Instrument;chords:Instrument;bass:Instrument;pad:Instrument;progression:number[];melody:number[];answer:number[];kick:number[];snare:number[];hat:number[];bassHits:number[];chordHits:number[];minor:boolean;percussion:Instrument};
+type Composition=[MusicScene,string,string,number,number,number,number,Instrument,Instrument,Instrument,Instrument,string,string,string,string,string,string,string,string,boolean,Instrument];
+const notes=(line:string)=>line.split(' ').map(n=>n==='.'?-1:Number(n));
+// Each scene is a separately written composition: its own meter, drum/bass
+// rhythm, two melodic phrases, harmonic movement, ensemble and musical form.
+// Positions are sixteenth notes; dots are intentional melodic rests.
+const compositions:Composition[]=[
+ ['lobby','After the Marquee','Vegas big band',124,60,16,.12,'trumpet','piano','upright','strings','0 5 2 7','7 . 9 10 . 9 7 . 4 . 2 4 . 7 . 12','14 . 12 9 7 . 4 . 5 7 . 9 7 4 . .','0 7 8 14','4 12','0 3 6 8 11 14','0 4 8 12','2 7 10 14',false,'ride'],
+ ['neon-sevens','Chrome Boulevard','Electro swing',126,62,16,.22,'sax','electric','upright','organ','0 3 5 7','0 . 3 5 . 6 7 . 10 7 . 6 5 . 3 .','12 10 . 7 . 6 5 3 . 0 . 3 5 6 . 7','0 6 10','4 12 15','2 5 8 11 14','0 3 7 8 11 15','1 6 9 14',true,'shaker'],
+ ['ruby-rush','Crimson Sprint','Drum and bass',172,57,16,0,'synth','electric','sub','choir','0 -2 -5 3','12 . 7 10 . 14 . 15 12 . . 10 7 . 5 .','3 . 5 7 10 . 12 . 19 17 . 15 14 12 . .','0 6 9 14','4 12','0 2 3 6 8 10 11 14','0 5 6 9 11 14','0 7 10',true,'ride'],
+ ['jade-fortune','Jade Silk Procession','Koto chamber groove',108,62,16,0,'koto','marimba','bass','flute','0 5 0 7','0 . 2 . 4 7 . 9 12 . 9 7 . 4 2 .','7 9 12 . 14 . 12 9 7 . 4 . 2 4 . 0','0 8 11','6 14','1 4 7 9 12 15','0 6 8 14','0 5 11',false,'taiko'],
+ ['coin-carnival','Brass Street Carnival','New Orleans second line',118,65,16,.1,'trumpet','organ','upright','sax','0 0 5 7','0 4 . 7 9 7 . 4 . 2 4 . 5 7 9 .','12 . 9 10 . 9 7 4 5 . 7 9 . 7 4 .','0 3 8 10','2 4 7 12 15','0 2 4 6 8 10 12 14','0 3 6 8 10 13','1 5 9 13',false,'tambourine'],
+ ['temple-lights','Obsidian Ritual','Cinematic hand drums',96,55,14,0,'flute','sitar','sub','choir','0 -2 3 0','0 . 1 5 . 7 . 8 7 . 5 . 1 .','12 . 8 7 5 . 1 . 0 1 5 . 7 .','0 6 10','4 12','0 2 5 7 9 12','0 6 10','0 7',true,'taiko'],
+ ['aurora-vault','Glass Horizon','Luminous downtempo',92,69,16,0,'celeste','electric','sub','choir','0 7 4 5','0 . . 7 . 11 12 . 16 . 14 . 11 7 . .','19 . 16 14 . . 12 . 11 7 . 4 . 7 . .','0 10','6 14','2 5 8 11 14','0 7 10','0 6 12',false,'shaker'],
+ ['ember-relics','Forge of Ash','Industrial percussion',138,50,16,0,'synth','organ','bass','choir','0 0 -1 3','0 0 . 3 0 . 6 5 0 3 . 7 6 . 5 .','12 . 12 10 7 . 6 . 5 3 0 . 3 5 . .','0 2 8 11 14','4 10 12','0 1 4 6 8 9 12 14','0 2 6 8 11 14','0 3 8 13',true,'taiko'],
+ ['orchard-numbers','Sunroom Shuffle','Acoustic bluegrass',112,67,16,.1,'guitar','piano','upright','flute','0 5 0 7','0 4 7 4 2 5 9 5 4 7 12 7 2 5 7 .','12 9 7 4 5 9 12 9 7 4 2 0 2 4 7 .','0 8','4 12','2 6 10 14','0 4 8 12','2 6 10 14',false,'tambourine'],
+ ['reef-party','Coral Calypso','Steelpan calypso',116,65,16,0,'steelpan','muteguitar','bass','flute','0 5 7 0','7 . 9 12 . 9 7 4 . 7 9 . 12 . 14 .','16 14 . 12 9 . 7 9 . 4 7 . 2 4 . .','0 6 8','4 10 14','0 2 4 6 8 10 12 14','0 3 6 10 13','2 6 10 14',false,'conga'],
+ ['abyss-legends','Blackwater Engine','Deep dub',74,48,16,.06,'organ','electric','sub','choir','0 -5 0 -2','0 . . 7 . . 10 . 5 . . 3 . 0 . .','12 . 10 . . 7 . 5 3 . . 5 . 7 . .','0 11','8','2 6 10 14','0 3 7 11','4 12',true,'rim'],
+ ['sunken-dynasty','Palace of Tides','Silk-road ensemble',102,60,12,0,'koto','sitar','bass','strings','0 7 5 3','0 . 2 3 . 7 10 . 7 3 . 2','12 10 . 7 5 . 3 2 . 0 2 .','0 6 9','3 10','0 2 4 6 8 10','0 5 6 10','0 4 8',true,'taiko'],
+ ['polar-odyssey','Icebreaker Radio','Nordic synthwave',106,59,16,0,'synth','electric','bass','strings','0 -5 3 -2','0 . 7 . 10 12 . 14 . 12 10 . 7 5 . .','15 . 14 12 10 . 7 . 5 3 . 2 0 . 7 .','0 4 8 12','4 12','2 6 10 14','0 2 4 7 8 10 12 15','0 8',true,'tambourine'],
+ ['neon-numbers','Binary Breakdance','Electro breakbeat',132,61,16,0,'arp','organ','sub','bell','0 -3 5 2','0 7 . 12 7 . 3 . 0 10 . 7 3 5 . .','12 15 . 19 15 12 . 10 7 . 5 3 . 2 . 0','0 3 10','4 12','0 2 5 6 8 10 13 14','0 3 6 10 14','1 7 11',true,'clap'],
+ ['pearl-keno','Pearl Terrace Bossa','Bossa nova',126,67,16,0,'flute','guitar','upright','electric','0 2 5 7','7 . 11 12 . 9 . 7 4 . 2 4 . 7 . .','14 . 12 11 9 . 7 . 5 . 4 2 . 0 . .','0 7 8 15','3 6 11 14','0 2 4 6 8 10 12 14','0 6 8 14','0 3 6 10 13',false,'shaker'],
+ ['sapphire-crown','Sapphire Waltz','Royal chamber waltz',114,65,12,.035,'strings','piano','upright','celeste','0 5 2 7','0 . 4 . 7 . 12 11 9 . 7 .','16 . 14 12 11 . 9 7 5 . 4 .','0 6','4 10','0 2 4 6 8 10','0 6','2 4 8 10',false,'ride'],
+ ['solar-fortune','Solar Pulse Array','Afro house',122,62,16,0,'marimba','organ','sub','choir','0 5 -2 0','0 . 3 . 7 10 . 12 . 7 5 . 3 5 7 .','15 . 12 . 10 7 . 5 3 . 0 . 3 7 10 .','0 4 8 12','6 14','1 3 5 7 9 11 13 15','0 3 7 10 14','2 7 11',true,'conga'],
+ ['disco-diamonds','Diamond Saturday','Live disco orchestra',120,60,16,0,'strings','muteguitar','bass','trumpet','0 2 5 7','12 . 9 7 . 9 12 16 . 14 12 . 9 7 . .','19 . 16 14 12 . 9 12 . 7 9 . 4 7 . .','0 4 8 12','4 12 14','0 2 4 6 8 10 12 14','0 2 3 6 8 10 11 14','1 3 5 7 9 11 13 15',false,'clap'],
+ ['midnight-express','Sleeper Car Quartet','Brushed jazz',94,58,16,.28,'sax','piano','upright','electric','0 5 2 7','0 . 3 7 . 10 . 9 7 . 5 3 . 2 . .','12 . 10 9 7 . 6 . 5 3 . 2 0 . . 7','0 9','4 12','0 6 8 14','0 4 8 12','3 7 10 15',true,'ride'],
+ ['pirate-gold','Doubloon Reel','Accordion sea reel',128,62,12,0,'accordion','guitar','upright','flute','0 -2 0 7','0 3 7 12 7 3 2 5 9 14 9 5','3 7 10 15 10 7 2 5 7 11 7 2','0 6','3 9','0 3 6 9','0 6','3 9',true,'tambourine'],
+ ['royal-blackjack','Velvet Table Trio','Piano lounge jazz',88,63,16,.18,'piano','electric','upright','strings','0 5 2 7','7 . . 10 . 12 14 . 15 14 . 12 . 10 7 .','5 . 7 10 . 9 7 . 3 . 5 7 . 2 0 .','0 10','4 12 15','0 3 6 8 11 14','0 4 8 12','2 6 11',true,'ride'],
+ ['corsair-cove','Phantom Fleet Jig','Pirate jig orchestra',138,57,12,.02,'accordion','strings','upright','choir','0 3 -2 7','0 3 7 0 3 7 10 7 3 10 7 3','12 10 7 14 12 10 7 5 3 2 3 5','0 5 6 11','3 9','0 2 3 6 8 9','0 5 6 10','0 3 6 9',true,'taiko'],
+ ['cosmic-tides','Quasar Current','Cosmic future garage',136,61,16,.12,'bell','electric','sub','choir','0 -5 3 7','0 . 7 . . 10 14 . 12 . . 7 5 . 3 .','19 . 17 . 14 . . 12 10 . 7 . . 5 . .','0 7 11','4 12','1 2 6 7 9 10 14 15','0 5 7 11 14','2 9 14',true,'shaker'],
+ ['double-deck-blackjack','Two Shoes Tango','Casino tango',122,62,16,0,'accordion','piano','upright','strings','0 -2 5 7','0 . 3 7 6 . 7 . 10 . 9 7 6 3 . 2','12 . 10 9 7 6 . 7 5 . 3 2 1 . 0 .','0 3 6 8 12','6 14','0 4 8 12','0 3 6 8 12','0 6 10 14',true,'rim'],
+ ['european-blackjack','Riviera Five','Five-beat cool jazz',112,64,20,.1,'flute','electric','upright','strings','0 5 -2 7','0 . 3 . 7 10 . 9 7 . 5 . 3 2 . 0 . 2 3 .','12 . 10 9 7 . 5 . 3 2 . 0 3 . 5 7 . 10 9 .','0 12','8 16','0 3 6 8 11 14 16 19','0 4 8 12 16','2 10 17',true,'ride'],
+ ['clockwork-vault','Clockmaker in Three','Mechanical celeste waltz',132,58,12,0,'celeste','muteguitar','bass','strings','0 3 7 5','0 7 12 7 3 7 2 9 14 9 5 9','15 12 7 12 14 10 5 10 12 9 3 9','0 8','4 10','1 3 5 7 9 11','0 6 9','2 4 8 10',true,'rim'],
+ ['phoenix-falls','Wings of Fire','Epic rock',146,57,16,0,'guitar','organ','bass','strings','0 3 5 -2','0 . 0 3 5 . 7 . 10 12 . 10 7 . 5 .','12 15 . 14 12 . 10 7 . 5 7 10 . 12 . .','0 2 6 8 10','4 12','0 2 4 6 8 10 12 14','0 2 6 8 10 14','0 6 8 14',true,'tambourine'],
+ ['outlaw-sevens','Dust and Neon','Surf western rock',154,52,16,.03,'guitar','organ','bass','trumpet','0 0 5 7','0 0 7 0 3 0 7 3 5 5 12 5 7 6 5 3','12 12 7 10 12 7 5 3 7 7 2 5 7 5 3 0','0 6 8 15','4 12','0 2 4 6 8 10 12 14','0 4 6 8 12 15','2 6 10 14',true,'rim'],
+ ['celestial-wilds','Lunar Arpeggios','Dream trance',134,69,16,0,'arp','synth','sub','choir','0 -2 -5 3','0 7 12 15 7 12 19 15 3 10 15 19 10 15 22 19','5 12 17 20 12 17 24 20 7 14 19 22 14 19 26 22','0 4 8 12','4 12','2 3 6 7 10 11 14 15','2 6 10 14','0 8',true,'clap'],
+ ['meteor-keno','Asteroid Arcade','Chiptune funk',142,60,16,0,'arp','electric','bass','bell','0 5 3 7','0 12 . 7 10 12 . 15 7 . 3 5 . 7 10 .','19 12 . 15 10 . 7 12 5 10 . 7 3 . 0 .','0 5 8 14','4 12','0 2 5 7 8 10 13 15','0 3 5 8 11 14','1 6 9 13',true,'conga'],
+ ['bamboo-keno','Lantern Garden Samba','Marimba samba',104,67,16,0,'marimba','guitar','upright','flute','0 2 5 0','0 2 . 4 7 . 9 7 4 . 2 0 . 4 7 .','12 9 . 7 9 12 . 14 12 . 9 7 4 2 . 0','0 7 8 14','3 11 15','0 1 3 4 6 8 9 11 12 14','0 6 8 13','0 3 7 10 14',false,'conga']
 ];
-export const musicPlaylists=Object.fromEntries(Object.entries(scenes).map(([scene,s],index)=>[scene,s.titles.map((name,variant):MusicScore=>({
- name,bpm:s.bpm+variant*2,key:s.key+(variant===2?-2:0),swing:s.style==='jazz'?.16:s.style==='tropical'?.045:0,
- style:s.style,lead:s.style==='jazz'?'keys':s.style==='disco'?'brass':s.style==='tropical'?'mallet':'pluck',seed:index*3+variant,
- progression:variant===0?[0,5,2,7]:variant===1?[0,-3,5,7]:[0,7,5,2],melody:phrases[(index+variant)%phrases.length]
-}))])) as unknown as Record<MusicScene,readonly MusicScore[]>;
-export const musicScores=Object.fromEntries(Object.entries(musicPlaylists).map(([id,tracks])=>[id,tracks[0]])) as Record<MusicScene,MusicScore>;
-export const TRACK_STEPS=512;
+export const musicPlaylists=Object.fromEntries(compositions.map(([id,name,genre,bpm,key,barSteps,swing,lead,chords,bass,pad,progression,melody,answer,kick,snare,hat,bassHits,chordHits,minor,percussion])=>[id,[{name,genre,bpm,key,barSteps,swing,lead,chords,bass,pad,progression:notes(progression),melody:notes(melody),answer:notes(answer),kick:notes(kick),snare:notes(snare),hat:notes(hat),bassHits:notes(bassHits),chordHits:notes(chordHits),minor,percussion}]])) as Record<MusicScene,MusicScore[]>;
+export const musicScores=Object.fromEntries(Object.entries(musicPlaylists).map(([id,p])=>[id,p[0]])) as Record<MusicScene,MusicScore>;
 export function musicTrack(scene:MusicScene,index=0){const p=musicPlaylists[scene];return p[((index%p.length)+p.length)%p.length];}
+export const trackSteps=(scene:MusicScene,index=0)=>musicTrack(scene,index).barSteps*64;
+export const TRACK_STEPS=1280;
 export type ScoreEvent={kind:Instrument;note:number;duration:number;level:number;pan:number};
-/** Original 32-bar arrangements at sixteenth-note resolution: intro, groove, bridge and finale. */
-export function scoreStep(scene:MusicScene,step:number,trackIndex=0):ScoreEvent[]{
- const s=musicTrack(scene,trackIndex),bar=Math.floor(step/16)%32,beat=step%16,root=s.key+s.progression[Math.floor(bar/2)%4],out:ScoreEvent[]=[];
+export function scoreStep(scene:MusicScene,step:number,index=0):ScoreEvent[]{
+ const s=musicTrack(scene,index),bar=Math.floor(step/s.barSteps)%64,tick=step%s.barSteps,seconds=60/s.bpm,root=s.key+s.progression[Math.floor(bar/2)%s.progression.length],out:ScoreEvent[]=[];
+ const section=Math.floor(bar/8),intro=section===0,breakdown=section===4,finale=section===7;
  const add=(kind:Instrument,note:number,duration:number,level:number,pan=0)=>out.push({kind,note,duration,level,pan});
- const intro=bar<4,bridge=bar>=16&&bar<20,full=!intro&&!bridge,beatSeconds=60/s.bpm;
- if(!bridge&&(beat%4===0||(s.style==='cinematic'&&[7,14].includes(beat))))add('kick',36,.5,.3);
- if(!bridge&&[4,12].includes(beat)){add(s.style==='jazz'?'snare':'clap',60,.26,.19,.08);if(s.style==='disco')add('snare',60,.21,.09,-.1);}
- if(beat%2===0&&!bridge)add(beat%4===2&&full?'openhat':'hat',60,beat%4===2?.16:.07,beat%4===2?.068:.042,.3);
- if((full||s.style==='tropical')&&beat%2===1)add('shaker',60,.07,beat%4===3?.034:.02,-.35);
- if(s.style==='tropical'&&[3,10,15].includes(beat)&&!bridge)add('conga',60+(beat===10?3:0),.2,.09,beat===3?-.3:.3);
- if(beat===0&&[4,20,28].includes(bar))add('crash',60,1.3,.09,-.18);
- const bassBeat=s.style==='jazz'?[0,4,8,12]:[0,3,6,8,11,14];
- if(bassBeat.includes(beat)&&(!bridge||beat%8===0))add('bass',root-24+([6,14].includes(beat)?7:beat===11?12:0),beatSeconds*(s.style==='jazz'?.8:.38),.22);
- const minor=s.style==='cinematic'||s.style==='house';
- if((bridge?beat===0:[2,7,10,14].includes(beat)))for(const [i,n] of (minor?[0,3,7,10]:[0,4,7,11]).entries())
-  add(bridge?'strings':'keys',root-12+n+(bar%8>=4?12:0),bridge?beatSeconds*3:beatSeconds*.55,bridge?.052:.06,(i-1.5)*.15);
- if(beat===0&&[0,8,16,20,28].includes(bar))for(const n of [0,7,12])add('strings',root+n,beatSeconds*3.2,.035,(n-6)/25);
- const index=(beat+(bar%2)*16+s.seed*2)%32,n=s.melody[index];
- if(n>=0&&(full||bar>=2&&beat%4===0)&&(!bridge||beat%4===0)&&!(bar%4===3&&beat>9))
-  add(s.lead,s.key+n+(bar>=28?12:0),beatSeconds*(beat%4===0?.7:.4),s.lead==='brass'?.15:.19,Math.sin(s.seed+bar)*.22);
- if(full&&bar%4===3&&[11,13,14,15].includes(beat))add('snare',60,.12,.05+(beat-11)*.014,-.12);
+ if(!breakdown){
+  if(s.kick.includes(tick))add('kick',36,.35,intro?.15:.23);
+  if(s.snare.includes(tick))add(s.genre.includes('jazz')||s.genre.includes('waltz')?'rim':'snare',60,.16,.1,.1);
+  if(s.hat.includes(tick)&&(!intro||bar>=4))add('hat',60,.05,tick%4===0?.045:.025,.3);
+  if((!intro||bar>=6)&&s.hat.includes((tick+3)%s.barSteps))add(s.percussion,60,.16,.048,-.28);
+ }
+ if(s.bassHits.includes(tick)&&(!breakdown||tick===0))add(s.bass,root-24+(tick>s.barSteps/2?7:0),seconds*.62,.17);
+ if(s.chordHits.includes(tick)&&(!breakdown||tick===s.chordHits[0]))for(const [i,n] of (s.minor?[0,3,7,10]:[0,4,7,11]).entries())add(s.chords,root-12+n,seconds*(breakdown?2:.65),.045,(i-1.5)*.22);
+ if(tick===0&&bar%4===0)for(const [i,n] of [0,7,12].entries())add(s.pad,root+n,seconds*Math.min(3,s.barSteps/4),.026,(i-1)*.35);
+ const melody=section===2||section===5||finale?s.answer:s.melody,note=melody[(tick+(bar%2)*s.barSteps)%melody.length];
+ if(note>=0&&(!intro||bar>=4)&&(!breakdown||tick%3===0))add(s.lead,s.key+note+(finale&&bar%4===3?12:0),seconds*(tick%4===0?.72:.42),.15,-.12);
+ if(!intro&&!breakdown&&bar%8===7&&tick>=s.barSteps-3)add(s.percussion,60+(tick%2)*3,.12,.055,.2);
  return out;
 }

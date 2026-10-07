@@ -3,24 +3,20 @@ import {catalog} from '@new-game/contracts';
 import {fishGuide,reefTarget,reefTier,reefTierProfile,reefOutcome,stagingMultiplier,reefFlight,reefLeadAngle,isFishGame} from '@new-game/game-math';
 import {musicScores,musicPlaylists,scoreStep,TRACK_STEPS,type MusicScene} from '../../apps/player/src/music-score';
 describe('distinct music and fish worlds',()=>{
- it('provides 93 distinct complete tracks with bounded levels and changing arrangements',()=>{
-  const names=new Set<string>(),signatures=new Set<string>();
-  for(const scene of Object.keys(musicPlaylists) as MusicScene[]) {
-   expect(musicPlaylists[scene]).toHaveLength(3);
-   musicPlaylists[scene].forEach((track,index)=>{
-    names.add(track.name);const events=Array.from({length:TRACK_STEPS},(_,step)=>scoreStep(scene,step,index));
-    signatures.add(JSON.stringify(events));expect(new Set(events.flat().map(e=>e.kind)).size).toBeGreaterThanOrEqual(7);
-    expect(events.flat().every(e=>Number.isFinite(e.note)&&e.note>=0&&e.note<128&&e.duration>0&&e.level>0&&e.level<=.35)).toBe(true);
-    expect(events.slice(0,32)).not.toEqual(events.slice(128,160));
-   });
+ it('provides an individually composed score for every game and lobby, including distinct rhythmic fingerprints',()=>{
+  const names=new Set<string>(),rhythms=new Set<string>(),melodies=new Set<string>();
+  for(const scene of Object.keys(musicPlaylists) as MusicScene[]){
+   expect(musicPlaylists[scene]).toHaveLength(1);const track=musicScores[scene];names.add(track.name);
+   rhythms.add(JSON.stringify([track.barSteps,track.kick,track.snare,track.hat,track.bassHits,track.chordHits]));melodies.add(JSON.stringify([track.melody,track.answer]));
+   const events=Array.from({length:TRACK_STEPS},(_,step)=>scoreStep(scene,step));
+   expect(new Set(events.flat().map(e=>e.kind)).size).toBeGreaterThanOrEqual(6);
+   expect(events.flat().every(e=>Number.isFinite(e.note)&&e.note>=0&&e.note<128&&e.duration>0&&e.level>0&&e.level<=.35)).toBe(true);
+   expect(events.slice(0,track.barSteps*4)).not.toEqual(events.slice(track.barSteps*8,track.barSteps*12));
+   expect(track.melody.length).toBe(track.barSteps);expect(track.answer.length).toBe(track.barSteps);
+   for(const ticks of [track.kick,track.snare,track.hat,track.bassHits,track.chordHits])expect(ticks.every(t=>t>=0&&t<track.barSteps)).toBe(true);
   }
-  expect(names.size).toBe(93);expect(signatures.size).toBe(93);
- });
- it('gives every catalog game its own complete original rhythm arrangement',()=>{
-  const signatures=new Set<string>();
-  for(const game of catalog){const score=musicScores[game.id];expect(score.bpm).toBeGreaterThanOrEqual(116);const events=Array.from({length:128},(_,s)=>scoreStep(game.id,s)).flat();
-   expect(new Set(events.map(e=>e.kind)).size).toBeGreaterThanOrEqual(7);expect(events.every(e=>e.duration>0&&Number.isFinite(e.note)&&e.level<=.35)).toBe(true);signatures.add(JSON.stringify({bpm:score.bpm,events}));
-  }expect(signatures.size).toBe(catalog.length);
+  expect(names.size).toBe(31);expect(rhythms.size).toBe(31);expect(melodies.size).toBe(31);
+  for(const game of catalog)expect(musicScores[game.id]).toBeDefined();
  });
  it('both games expose varied sizes, treasure targets, and a bounded shared population',()=>{
   for(const game of ['reef-party','abyss-legends'] as const){const species=new Set<number>();

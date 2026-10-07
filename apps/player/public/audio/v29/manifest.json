@@ -1,0 +1,231 @@
+{
+  "version": "original-ensembles-v29",
+  "sampleRate": 32000,
+  "provenance": "Original additive/FM/noise synthesis in scripts/render-music-v29.py, seed 2907. No third-party recordings.",
+  "samples": [
+    {
+      "id": "piano",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1923
+    },
+    {
+      "id": "electric",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2073
+    },
+    {
+      "id": "organ",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.3157
+    },
+    {
+      "id": "guitar",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1185
+    },
+    {
+      "id": "muteguitar",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.0666
+    },
+    {
+      "id": "sax",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2867
+    },
+    {
+      "id": "trumpet",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2669
+    },
+    {
+      "id": "strings",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.4225
+    },
+    {
+      "id": "choir",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2637
+    },
+    {
+      "id": "flute",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.3235
+    },
+    {
+      "id": "koto",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1109
+    },
+    {
+      "id": "sitar",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1156
+    },
+    {
+      "id": "marimba",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1074
+    },
+    {
+      "id": "steelpan",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1293
+    },
+    {
+      "id": "celeste",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1619
+    },
+    {
+      "id": "bell",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2097
+    },
+    {
+      "id": "accordion",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2609
+    },
+    {
+      "id": "synth",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.2313
+    },
+    {
+      "id": "arp",
+      "root": 60,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1216
+    },
+    {
+      "id": "bass",
+      "root": 36,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1942
+    },
+    {
+      "id": "upright",
+      "root": 36,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1268
+    },
+    {
+      "id": "sub",
+      "root": 36,
+      "seconds": 5.0,
+      "peak": 0.8,
+      "rms": 0.1942
+    },
+    {
+      "id": "kick",
+      "root": 36,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1935
+    },
+    {
+      "id": "snare",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1042
+    },
+    {
+      "id": "rim",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0677
+    },
+    {
+      "id": "clap",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1635
+    },
+    {
+      "id": "hat",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0597
+    },
+    {
+      "id": "ride",
+      "root": 60,
+      "seconds": 1.5,
+      "peak": 0.8,
+      "rms": 0.1221
+    },
+    {
+      "id": "shaker",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0679
+    },
+    {
+      "id": "conga",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1342
+    },
+    {
+      "id": "taiko",
+      "root": 60,
+      "seconds": 1.5,
+      "peak": 0.8,
+      "rms": 0.1449
+    },
+    {
+      "id": "tambourine",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1004
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
 import {blackjackCreditApproved,blackjackProfileFor,blackjackGameForProfile,type BlackjackGame,blackjackDeal,blackjackShoe,blackjackAct,blackjackPublic,handValue,type BlackjackState,type Card} from '@new-game/game-math';
 import {api,session} from './api';
 import {stage} from './staging-state';
-import {holdCredits,revealCredits,creditPresentation} from './credit-presentation';
+import {holdStake,holdAward,revealCredits,creditPresentation} from './credit-presentation';
 import {formatCredits} from '@new-game/domain';
 import {playSound} from './audio';
 const props=defineProps<{game:BlackjackGame;running:boolean;reducedMotion:boolean;authenticated:boolean;balance:string}>();
@@ -33,7 +33,7 @@ function finishReveal(){clearTimeout(revealTimer);clearMotion();revealing.value=
 function present(value:View,animate=true){
  if(value.game!==props.game){foreignHand.value=value.settled?null:value.game;return;}foreignHand.value=null;
  clearMotion();hand.value=value;now.value=Date.now();error.value='';showResult.value=false;dealerVisible.value=1;
- if(value.wallet&&session.current){if(creditPresentation.game!==props.game)holdCredits(props.game,session.current.id,session.current.wallet.available);if(BigInt(value.wallet.version)>=BigInt(session.current.wallet.version))session.current.wallet=value.wallet;stage.revision++;}
+ if(value.wallet&&session.current){if(BigInt(value.wallet.version)>=BigInt(session.current.wallet.version))session.current.wallet=value.wallet;holdAward(props.game,session.current.id,session.current.wallet.available,value.settled?value.award:'0');stage.revision++;}
  if(!animate||props.reducedMotion||!props.running){finishReveal();return;}
  revealing.value=true;playSound('click');clearTimeout(revealTimer);
  if(value.settled){
@@ -49,7 +49,9 @@ async function act(action:string){
  busy.value=true;error.value='';
  try{
   if(staked.value){
-   if(session.current&&creditPresentation.game!==props.game)holdCredits(props.game,session.current.id,session.current.wallet.available);
+   // A restored command may already be reserved on the server and has no local
+   // hand yet. Only a newly submitted action previews an additional deduction.
+   if(session.current&&creditPresentation.game!==props.game)holdStake(props.game,session.current.id,session.current.wallet.available,pending.value?'0':action==='DEAL'?stake.value:['DOUBLE','SPLIT'].includes(action)?String(hand.value!.hands[hand.value!.active].stake):'0');
    pending.value??={action,requestKey:crypto.randomUUID(),profileId:profile.id,...(action==='DEAL'?{stake:stake.value}:{id:hand.value!.id,revision:hand.value!.revision})};savePending();
    const result=await api<View>('blackjack',pending.value);pending.value=null;savePending();if(disposed)return;present(result);
   }else{

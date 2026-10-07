@@ -9,12 +9,16 @@ for (const name of (await readdir('apps/player/public/art')).sort()) {
 for (const path of ['apps/player/src/ArcadeSymbol.vue','apps/player/src/GamePoster.vue','apps/player/src/arcade-v4.css','apps/player/src/reef-textures.ts','apps/player/src/arcade-v6.css','apps/player/src/arcade-v7.css','apps/player/src/ArcadeLobby.vue','apps/player/src/FishingLobby.vue','apps/player/src/arcade-v8.css','apps/player/src/GameShelf.vue','apps/player/src/arcade-v15.css','apps/player/src/arcade-v16.css','apps/player/src/arcade-v17.css','apps/player/src/music-score.ts','apps/player/src/FishRewardReveal.vue','apps/player/src/arcade-v18.css','apps/player/src/AbyssJackpotWheel.vue','apps/player/src/abyss-cannons.ts','apps/player/src/WinShowcase.vue','apps/player/src/arcade-v24.css','apps/player/src/arcade-v25.css','apps/player/src/depth-motion.ts']) {
   assets.push({ path, creator: 'Original artwork authored for New Game in this workspace', source: 'Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets', license: 'Project original; owner review pending', sha256: createHash('sha256').update(await readFile(path)).digest('hex') });
 }
-for (const path of ['apps/player/src/WinBurst.vue','apps/player/src/win-effects.ts','apps/player/src/arcade-v26.css','apps/player/src/neon-vegas.css','apps/player/src/GameCharacter.vue','apps/player/src/expansion-theme.ts','apps/player/src/expansion-v28.css']) {
+for (const path of ['apps/player/src/WinBurst.vue','apps/player/src/win-effects.ts','apps/player/src/arcade-v26.css','apps/player/src/neon-vegas.css','apps/player/src/GameCharacter.vue','apps/player/src/expansion-theme.ts','apps/player/src/expansion-v28.css','apps/player/src/screen-v29.css','apps/player/src/GameViewport.vue']) {
  assets.push({path,creator:'Original animation authored for New Game',source:'Repository-native CSS, TypeScript and Vue; no third-party assets',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});
 }
 for (const name of (await readdir('apps/player/public/audio/v23')).filter(name=>name.endsWith('.wav')).sort()) {
  const path=`apps/player/public/audio/v23/${name}`;
  assets.push({path,creator:'Original synthesized instruments for New Game',source:'scripts/render-music-bank.py; no third-party recordings or soundfonts',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});
+}
+for (const name of (await readdir('apps/player/public/audio/v29')).filter(name=>name.endsWith('.wav')).sort()) {
+ const path=`apps/player/public/audio/v29/${name}`;
+ assets.push({path,creator:'Original synthesized ensembles for New Game',source:'scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});
 }
 await writeFile('reports/asset-manifest.json', JSON.stringify({ generatedAt: new Date().toISOString(), privateReferencesShipped: false, assets }, null, 2) + '\n');
 console.log(`Recorded ${assets.length} original art assets.`);

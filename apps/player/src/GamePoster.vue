@@ -1,42 +1,29 @@
 <script setup lang="ts">
+import {computed,useId} from 'vue';
+import type {GameId} from '@new-game/contracts';
+import {catalog} from '@new-game/contracts';
+import {isFishGame,isKenoGame,isBlackjackGame,fishBosses} from '@new-game/game-math';
 import {characterBox,characterCell} from './expansion-theme';
-import { computed } from 'vue';
-import {catalog,isPremiumGame,type GameId } from '@new-game/contracts';
 import AquaticSprite from './AquaticSprite.vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
-const props = defineProps<{game: GameId; name: string}>();
-import {isFishGame,isKenoGame,fishBosses} from '@new-game/game-math';
-import {fishWorlds} from './fish-worlds';
-const symbols: Partial<Record<GameId,string[]>> = {
-  'disco-diamonds':['seven','gem','cherry'],'midnight-express':['dragon','bell','gem'],'pirate-gold':['coin','bar','bell'],
-  'royal-blackjack':['gem','coin','gem'],'sunken-dynasty':['gem'],'polar-odyssey':['gem'],'neon-numbers':['gem'],'pearl-keno':['gem'],
-  'ruby-rush':['seven','gem','cherry'], 'sapphire-crown':['lotus','dragon','coin'], 'solar-fortune':['seven','coin','bar'],
-  'neon-sevens':['cherry','seven','bell'], 'jade-fortune':['coin','dragon','lotus'], 'coin-carnival':['bar','coin','seven'],
-  'aurora-vault':['sapphire','gem','amethyst'], 'ember-relics':['amber','ruby','emerald'],
-  'temple-lights':['lotus','sun','moon'], 'orchard-numbers':['leaf','cherry','leaf'], 'reef-party':['gem','coin','gem'],'abyss-legends':['gem','coin','gem']
-};
-const chosen = computed(() => symbols[props.game]);
-const newPoster=computed(()=>['ruby-rush','sapphire-crown','solar-fortune'].indexOf(props.game));
-const poster23=computed(()=>['disco-diamonds','midnight-express','pirate-gold'].indexOf(props.game));
-const ribbons: Partial<Record<GameId,string>> = {
-  'disco-diamonds':'DISCO SEVENS','midnight-express':'LOCOMOTIVE WILDS','pirate-gold':'DOUBLOON RESPINS',
-  'royal-blackjack':'BLACKJACK PAYS 3:2', 'sunken-dynasty':'JADE PALACE FISHING', 'polar-odyssey':'FROZEN FRONTIER',
-  'neon-numbers':'NEON KENO', 'pearl-keno':'PEARL KENO', 'ruby-rush':'RUBY REELS', 'sapphire-crown':'CROWN WILDS',
-  'solar-fortune':'SUN COIN RESPINS', 'neon-sevens':'CLASSIC REELS', 'jade-fortune':'WILD DRAGONS',
-  'coin-carnival':'LOCK & RESPIN', 'aurora-vault':'LOCK & COLLECT', 'ember-relics':'CLUSTER CASCADES',
-  'abyss-legends':'TREASURE & LEGENDS', 'reef-party':'4-SEAT FISHING', 'orchard-numbers':'PICK YOUR NUMBERS',
-  'temple-lights':'5-REEL ADVENTURE'
-};
+const props=defineProps<{game:GameId;name:string}>();
+const clip=useId().replace(/:/g,'')+'-poster';
+const art=computed(()=>{
+ if(characterCell(props.game)>=0)return {src:'/art/expansion-posters-v28.png',box:characterBox(props.game),width:1536,height:1024};
+ const classics=['ruby-rush','sapphire-crown','solar-fortune'].indexOf(props.game),recent=['disco-diamonds','midnight-express','pirate-gold'].indexOf(props.game);
+ if(recent>=0||classics>=0)return {src:recent>=0?'/art/cabinet-posters-v23.png':'/art/cabinet-posters-v15.png',box:`${Math.max(recent,classics)*512} 0 512 1024`,width:1536,height:1024};
+ return null;
+});
+const symbols:Partial<Record<GameId,string>>={'neon-sevens':'seven','jade-fortune':'dragon','coin-carnival':'coin','aurora-vault':'sapphire','ember-relics':'ruby','temple-lights':'lotus'};
+const symbol=computed(()=>symbols[props.game]||'gem');
+const color=computed(()=>catalog.find(g=>g.id===props.game)?.color||'#bc91ff');
 </script>
-<template>
-  <div class="arcade-poster" :class="game" :style="isFishGame(game)&&fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`,backgroundSize:'cover'}:{}" aria-hidden="true">
-    <svg v-if="characterCell(game)>=0" class="painted-poster-art" :viewBox="characterBox(game)" preserveAspectRatio="xMidYMid slice"><image href="/art/expansion-posters-v28.png" width="1536" height="1024"/></svg><svg v-else-if="poster23>=0" class="painted-poster-art" :viewBox="`${poster23*512} 0 512 1024`" preserveAspectRatio="xMidYMid slice"><image href="/art/cabinet-posters-v23.png" width="1536" height="1024"/></svg>
-    <svg v-else-if="newPoster>=0" class="painted-poster-art" :viewBox="`${newPoster*512} 0 512 1024`" preserveAspectRatio="xMidYMid slice"><image href="/art/cabinet-posters-v15.png" width="1536" height="1024"/></svg>
-    <div class="poster-rays"></div><div class="poster-halo"></div><span class="poster-spark one">✦</span><span class="poster-spark two">✦</span>
-    <div v-if="isFishGame(game)&&game!=='reef-party'" class="abyss-poster-creatures"><AquaticSprite :species="fishBosses[game][0]"/><AquaticSprite :species="fishBosses[game][1]"/></div><div v-else-if="game === 'reef-party'" class="poster-fish-school"><ArcadeSymbol v-for="(fish,index) in ['fish','fish-pink','fish']" :key="index" :symbol="fish" /></div>
-    <div v-else-if="isKenoGame(game)" class="poster-keno-balls"><b>7</b><b>80</b><b>24</b></div>
-    <div v-else-if="game==='royal-blackjack'" class="blackjack-poster-cards"><b>A<span>♠</span></b><b>K<span>♥</span></b></div><div v-else-if="newPoster<0&&poster23<0&&characterCell(game)<0" class="poster-symbols"><ArcadeSymbol v-for="(symbol,index) in chosen" :key="index" :symbol="symbol" /></div>
-    <div class="machine-title"><span>{{name.split(' ')[0]}}</span><strong>{{name.split(' ').slice(1).join(' ')}}</strong></div>
-    <span v-if="isPremiumGame(game)" class="premium-poster-mark">PREMIUM</span><span class="poster-ribbon">{{ ribbons[game] || catalog.find(item=>item.id===game)?.detail }}</span>
-  </div>
-</template>
+<template><div class="arcade-poster clean-poster" :class="game" :style="{'--poster-accent':color}" aria-hidden="true">
+ <div class="poster-art-frame">
+  <svg v-if="art" class="poster-contained-art" :viewBox="art.box" preserveAspectRatio="xMidYMid meet"><defs><clipPath :id="clip"><rect :x="art.box.split(' ')[0]" :y="art.box.split(' ')[1]" :width="art.box.split(' ')[2]" :height="art.box.split(' ')[3]"/></clipPath></defs><image :href="art.src" :width="art.width" :height="art.height" :clip-path="`url(#${clip})`"/></svg>
+  <AquaticSprite v-else-if="isFishGame(game)" :species="fishBosses[game][0]"/>
+  <div v-else-if="isKenoGame(game)" class="clean-keno"><b>7</b><b>24</b><b>80</b></div>
+  <div v-else-if="isBlackjackGame(game)" class="clean-cards"><b>A<span>♠</span></b><b>K<span>♥</span></b></div>
+  <ArcadeSymbol v-else :symbol="symbol" :theme="game"/>
+ </div>
+</div></template>

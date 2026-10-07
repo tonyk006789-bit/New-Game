@@ -26,10 +26,10 @@ describe('casino audio lifecycle',()=>{
   audio.setMusicScene('abyss-legends');expect(vi.getTimerCount()).toBe(1);
   expect(firstTrack.every(s=>s.stop.mock.calls.length===2)).toBe(true);
   expect(audio.musicNow.scene).toBe('abyss-legends');
-  audio.nextMusicTrack();expect(audio.musicNow.title).toBe('Leviathan Overdrive');
-  audio.selectMusicTrack(2);expect(audio.musicNow.title).toBe('Deepwater Afterburn');
-  audio.selectMusicTrack(99);expect(audio.musicNow.index).toBe(2);
-  audio.setMusicScene('lobby');audio.setMusicScene('abyss-legends');expect(audio.musicNow.index).toBe(2);
+  audio.nextMusicTrack();expect(audio.musicNow.title).toBe('Blackwater Engine');
+  audio.selectMusicTrack(2);expect(audio.musicNow.title).toBe('Blackwater Engine');
+  audio.selectMusicTrack(99);expect(audio.musicNow.index).toBe(0);
+  audio.setMusicScene('lobby');audio.setMusicScene('abyss-legends');expect(audio.musicNow.index).toBe(0);
   expect(vi.getTimerCount()).toBe(1);
   for(let i=0;i<1500;i++){context.currentTime+=.05;vi.advanceTimersByTime(50);}
   expect(audio.musicNow.index).toBe(0);expect(vi.getTimerCount()).toBe(1);

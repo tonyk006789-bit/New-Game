@@ -5,6 +5,7 @@ import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import Icon from '@new-game/ui/Icon.vue';
 import { expansionIds, catalog, isPremiumGame, type GameId } from '@new-game/contracts';
 import GamePreview from './GamePreview.vue';
+import GameViewport from './GameViewport.vue';
 import BlackjackGame from './BlackjackGame.vue';
 import BlackjackRules from './BlackjackRules.vue';
 import PremiumSpotlight from './PremiumSpotlight.vue';
@@ -16,7 +17,7 @@ import CabinetGame from './CabinetGame.vue';
 import ArcadeLobby from './ArcadeLobby.vue';
 import GameShelf from './GameShelf.vue';
 import {isCabinetGame,isFishGame,isFeatureGame,isBlackjackGame} from '@new-game/game-math';
-import {isPortraitGame,portraitRotationQuery} from './cabinet-layout';
+import {isPortraitGame} from './cabinet-layout';
 import FishingLobby from './FishingLobby.vue';
 import type {ReefRoom} from './reef-room';
 import LoginScreen from './LoginScreen.vue';
@@ -66,9 +67,7 @@ const depthRoot=ref<HTMLElement>();
 useDepthMotion(depthRoot,computed(()=>ready.value&&!reducedMotion.value&&!modal.value));
 const currentGame = computed(() => catalog.find(game => game.id === activeGame.value));
 const portraitGame=computed(()=>!!activeGame.value&&isPortraitGame(activeGame.value));
-const portraitMedia=window.matchMedia(portraitRotationQuery),rotatePortrait=ref(portraitMedia.matches);
-const onPortraitOrientation=()=>{rotatePortrait.value=portraitMedia.matches;};
-const cabinetReady=computed(()=>ready.value&&!(portraitGame.value&&rotatePortrait.value));
+const cabinetReady=ready;
 const visibleGames = computed(() => catalog.filter(game =>
   (category.value === 'All games' || category.value === 'Favorites' || category.value==='New'&&(expansionIds as readonly string[]).includes(game.id) || category.value==='Premium'&&isPremiumGame(game.id) || game.category === category.value) &&
   (category.value !== 'Favorites' || favorites.value.includes(game.id)) &&
@@ -101,7 +100,7 @@ const nativeListeners: PluginListenerHandle[] = [];
 watch(()=>stage.revision,()=>{if(session.current?.id===account.value?.id&&session.current)account.value={...session.current};else void syncAccount();});
 watch(()=>[recovering.value,stage.busy,ready.value,account.value?.id],()=>void reconcileRound());
 onMounted(async () => {
-  portraitMedia.addEventListener('change',onPortraitOrientation);
+
   setAudioActive(ready.value);
   try{await loadEnvironment();}catch{/* Unavailable config keeps staking closed. */}
   try{const restored=await refreshAccount();if(restored.role==='PLAYER')await authenticated();}catch{/* No authenticated session yet. */}
@@ -135,7 +134,7 @@ watch(modal, async value => {
   else focusBeforeModal?.focus();
 });
 onBeforeUnmount(() => {
-  portraitMedia.removeEventListener('change',onPortraitOrientation);
+
   clearInterval(syncTimer);
   clearInterval(recoveryTimer);
   document.removeEventListener('visibilitychange', onVisibility);
@@ -158,15 +157,14 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </header>
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Games are paused until you reconnect.</div>
       <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
-      <main v-if="currentGame" class="immersive-game" :class="{'portrait-cabinet':portraitGame,'portrait-blocked':portraitGame&&rotatePortrait}" :data-layout="portraitGame?'portrait':'wide'">
-        <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
+      <GameViewport v-if="currentGame" :portrait="portraitGame" :identity="currentGame.id" v-slot="screen"><main class="immersive-game" :class="{'portrait-cabinet':portraitGame}" :data-layout="portraitGame?'portrait':'wide'">
+        <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><button class="screen-fit-button" :aria-pressed="screen.autoFit" aria-label="Auto fit screen" @click="screen.toggleFit">{{screen.autoFit?'AUTO FIT':'ACTUAL SIZE'}}</button><button v-if="screen.fullscreenSupported" class="screen-fit-button screen-fullscreen" :aria-label="screen.fullscreen?'Exit full screen':'Full screen'" @click="screen.toggleFullscreen">⛶</button><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
         <BlackjackGame :key="activeGame" :game="activeGame" @resume="openGame" v-else-if="isBlackjackGame(activeGame)" :running="ready&&!modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits"/><FeatureGame v-else-if="isFeatureGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <section v-if="portraitGame&&rotatePortrait" class="portrait-rotation" role="status"><i aria-hidden="true"></i><h2>Turn to portrait</h2><p>{{currentGame.name}} plays in an upright cabinet.</p><button @click="backFromGame">BACK TO LOBBY</button></section>
 
-      </main>
+      </main></GameViewport>
       <template v-else-if="page === 'lobby'">
         <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
         <main class="arcade-lobby"><div class="lobby-quick-actions"><span><i aria-hidden="true">✦</i> YOUR NEXT GREAT GAME</span><button @click="modal='wheel'"><b aria-hidden="true">✺</b> DAILY SPIN</button><button @click="modal='share'"><b aria-hidden="true">▦</b> SHARE</button></div><WinShowcase v-if="account&&stage.enabled" :account-id="account.id" :revision="stage.revision" :running="ready&&!modal" :reduced-motion="reducedMotion" @history="navigate('history')"/><PremiumSpotlight premium-only v-if="category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
