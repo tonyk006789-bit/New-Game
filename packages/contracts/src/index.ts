@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import {expansionCatalog} from './catalog-v28.ts';
+export {expansionIds} from './catalog-v28.ts';
 
 export const MAX_UNITS = 9223372036854775807n;
 export const Units = z.string().regex(/^(0|[1-9]\d{0,18})$/).pipe(z.string().refine(value => BigInt(value) <= MAX_UNITS, 'Exceeds PostgreSQL bigint'));
@@ -9,7 +11,7 @@ export const credentialPattern='(?=.*[A-Za-z])(?=.*[0-9]).{6,256}';
 export const NewPassword=z.string().min(6,credentialHint).max(256).regex(/[A-Za-z]/,credentialHint).regex(/[0-9]/,credentialHint);
 export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
  z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));
-export const GameId = z.enum(['disco-diamonds','midnight-express','pirate-gold','sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
+export const GameId = z.enum(['corsair-cove','cosmic-tides','double-deck-blackjack','european-blackjack','clockwork-vault','phoenix-falls','outlaw-sevens','celestial-wilds','meteor-keno','bamboo-keno','disco-diamonds','midnight-express','pirate-gold','sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -40,10 +42,10 @@ export const RoundRequest = z.object({
   gameId: GameId, ruleVersion: z.string().min(1).max(80), costUnits: PositiveUnits,
   clientRequestId: z.uuid(), selections: z.array(z.number().int().min(1).max(80)).min(4).max(10).optional()
 }).strict().superRefine((round, ctx) => {
-  if (['orchard-numbers','neon-numbers','pearl-keno'].includes(round.gameId) && (!round.selections || new Set(round.selections).size !== round.selections.length)) {
+  if (['orchard-numbers','neon-numbers','pearl-keno','meteor-keno','bamboo-keno'].includes(round.gameId) && (!round.selections || new Set(round.selections).size !== round.selections.length)) {
     ctx.addIssue({ code: 'custom', message: 'Keno requires 4–10 unique selections' });
   }
-  if (!['orchard-numbers','neon-numbers','pearl-keno'].includes(round.gameId) && round.selections) ctx.addIssue({ code: 'custom', message: 'Selections are only valid for keno' });
+  if (!['orchard-numbers','neon-numbers','pearl-keno','meteor-keno','bamboo-keno'].includes(round.gameId) && round.selections) ctx.addIssue({ code: 'custom', message: 'Selections are only valid for keno' });
 });
 export const CursorQuery = z.object({ cursor: z.string().max(256).optional(), limit: z.coerce.number().int().min(1).max(100).default(25) }).strict();
 export const FishCommand = z.object({
@@ -52,9 +54,10 @@ export const FishCommand = z.object({
 }).strict();
 export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SERVICE_NOT_READY', 'FORBIDDEN', 'STALE_WALLET', 'INSUFFICIENT_AVAILABLE', 'IDEMPOTENCY_CONFLICT']);
 
-export const premiumGames=['royal-blackjack'] as const;
+export const premiumGames=['royal-blackjack','double-deck-blackjack','european-blackjack'] as const;
 export const isPremiumGame=(id:string)=>(premiumGames as readonly string[]).includes(id);
 export const catalog = [
+  ...expansionCatalog,
   { id: 'disco-diamonds', name: 'Disco Diamonds', category: 'Slots', tagline: 'Turn up the lights.', description: 'Three chrome reels, mirror diamonds and disco sevens across five active lines.', detail: '3 reels · 5 lines', color: '#ff65e2' },
   { id: 'midnight-express', name: 'Midnight Express', category: 'Slots', tagline: 'Your ticket to the midnight line.', description: 'A portrait railway cabinet with nine lines and a substituting locomotive wild.', detail: 'Portrait · 5 reels · Wilds', color: '#e9bb69' },
   { id: 'pirate-gold', name: 'Pirate Gold', category: 'Slots', tagline: 'Hold the doubloons. Claim the treasure.', description: 'Five reels with doubloon locks and up to three included respins. Collect all five center coins.', detail: '5 reels · Hold & respin', color: '#ffc65e' },

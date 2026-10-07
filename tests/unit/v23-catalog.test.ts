@@ -3,10 +3,10 @@ import {catalog,premiumGames} from '@new-game/contracts';
 import {stagingOutcome,stagingMultiplier,stagingGameProfileId,storyboardRandom,type StagingGame,reefTarget} from '@new-game/game-math';
 import {chooseBotFlight} from '../../apps/player/src/bot-targeting';
 
-describe('twenty-game collection and independent visual bots',()=>{
- it('contains twenty unique games and reserves Premium for Blackjack',()=>{
-  expect(catalog).toHaveLength(20);expect(new Set(catalog.map(g=>g.id)).size).toBe(20);
-  expect(premiumGames).toEqual(['royal-blackjack']);
+describe('thirty-game collection and independent visual bots',()=>{
+ it('contains thirty unique games and reserves Premium for Blackjack',()=>{
+  expect(catalog).toHaveLength(30);expect(new Set(catalog.map(g=>g.id)).size).toBe(30);
+  expect(premiumGames).toEqual(['royal-blackjack','double-deck-blackjack','european-blackjack']);
  });
  it.each([['disco-diamonds','neon-sevens'],['midnight-express','jade-fortune'],['pirate-gold','coin-carnival']] as const)('%s preserves %s approved outcome math', (game,base)=>{
   expect(stagingGameProfileId(game)).toBe('stage-cabinets-v23');

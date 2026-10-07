@@ -4,6 +4,16 @@ export type Instrument='keys'|'brass'|'pluck'|'strings'|'bass'|'mallet'|'kick'|'
 type Style='disco'|'house'|'jazz'|'tropical'|'cinematic';
 export type MusicScore={name:string;bpm:number;key:number;swing:number;style:Style;lead:Instrument;seed:number;progression:readonly number[];melody:readonly number[]};
 const scenes:Record<MusicScene,{titles:string[];bpm:number;key:number;style:Style}>={
+ 'corsair-cove':{titles:['Ghost Harbor Groove','The Copper Fleet','Moonlit Mutiny'],bpm:129,key:55,style:'cinematic'},
+ 'cosmic-tides':{titles:['Plasma Current','Orbit Afterhours','Nebula Night Swim'],bpm:132,key:63,style:'house'},
+ 'double-deck-blackjack':{titles:['Double Down Quartet','Pink Velvet Club','Two Deck Shuffle'],bpm:123,key:61,style:'jazz'},
+ 'european-blackjack':{titles:['Riviera Nocturne','The Late Card','Midnight Promenade'],bpm:116,key:66,style:'jazz'},
+ 'clockwork-vault':{titles:['Brass Pendulum','Owl at Midnight','Mechanical Waltz'],bpm:126,key:58,style:'cinematic'},
+ 'phoenix-falls':{titles:['Rise in Flames','Ember Cascade','Wingbeat Overdrive'],bpm:136,key:60,style:'cinematic'},
+ 'outlaw-sevens':{titles:['Neon Frontier','Saloon After Dark','Sheriff Shuffle'],bpm:128,key:57,style:'disco'},
+ 'celestial-wilds':{titles:['Moonlight Frequency','Silver Constellation','Sorceress at Dawn'],bpm:124,key:69,style:'house'},
+ 'meteor-keno':{titles:['Orbit Hustle','Meteor Radio','Star Map Session'],bpm:130,key:62,style:'house'},
+ 'bamboo-keno':{titles:['Lantern Parade','Bamboo Social Club','Red Panda Rhythm'],bpm:122,key:64,style:'tropical'},
  lobby:{titles:['Grand Entrance','Champagne District','Last Dance at the Arcade'],bpm:124,key:60,style:'disco'},
  'royal-blackjack':{titles:['The High Roller Quartet','Satin & Spades','Penthouse After Midnight'],bpm:118,key:62,style:'jazz'},
  'reef-party':{titles:['Tropic Heat','Coral Club Radio','Island Fever'],bpm:128,key:65,style:'tropical'},

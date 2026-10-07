@@ -32,7 +32,7 @@ function wheelReveal(reward:BossReveal){
 function catchParticles(species:number,x:number,y:number,seat:number){
  if(props.reducedMotion)return;
  const origin=reefCannon(seat),tier=reefTier(species),count={small:16,medium:26,large:40,boss:60}[tier];
- const colors:Record<FishGame,number[]>={'reef-party':[0xffd94c,0x7cffff],'abyss-legends':[0xffad39,0xff615a],'sunken-dynasty':[0xffe09a,0x62ffbb],'polar-odyssey':[0xf0ffff,0x88cdff]},[gold,accent]=colors[props.game];
+ const colors:Record<FishGame,number[]>={'corsair-cove':[0xffcd74,0x6bddd9],'cosmic-tides':[0xb3a3ff,0x6cfcff],'reef-party':[0xffd94c,0x7cffff],'abyss-legends':[0xffad39,0xff615a],'sunken-dynasty':[0xffe09a,0x62ffbb],'polar-odyssey':[0xf0ffff,0x88cdff]},[gold,accent]=colors[props.game];
  for(let i=0;i<count;i++){const a=i*2.399,r=18+i*1.5,dx=Math.cos(a)*r,dy=Math.sin(a)*r;
   const coin=new Graphics().circle(1,2,8).fill(0x805021).circle(0,0,8).fill(gold).circle(0,0,6).stroke({color:0xfff3bc,width:1.4}).moveTo(-2,-4).lineTo(2,4).stroke({color:0x9c641d,width:1.5});
   effect(coin,x+dx,y+dy,1.5,'coin',(origin.x-x-dx)/1.5,(origin.y-y-dy)/1.5-111);

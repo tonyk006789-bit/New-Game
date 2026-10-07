@@ -1,0 +1,13 @@
+export const expansionCatalog = [
+ {id:'corsair-cove',name:'Corsair Cove',category:'Fish',tagline:'Command the haunted fleet.',description:'Bronze deck cannons patrol a moonlit wreck with pirate puffers, swordfish and the spectral captain.',detail:'4 seats · Haunted harbor',color:'#ffb970'},
+ {id:'cosmic-tides',name:'Cosmic Tides',category:'Fish',tagline:'Hunt beneath an alien ocean.',description:'Plasma cannons track comet minnows, nebula rays and a luminous cosmic leviathan.',detail:'4 seats · Alien ocean',color:'#a091ff'},
+ {id:'double-deck-blackjack',name:'Double Deck Blackjack',category:'Table',tagline:'Two decks. A sharper decision.',description:'An electric lounge with two decks, a soft-17 hitting dealer and restricted doubles.',detail:'2 decks · Dealer hits soft 17',color:'#fa83dc'},
+ {id:'european-blackjack',name:'European Blackjack',category:'Table',tagline:'The second card comes later.',description:'An Art Deco salon where the dealer draws the second card after your decisions.',detail:'6 decks · No hole card',color:'#91cbff'},
+ {id:'clockwork-vault',name:'Clockwork Vault',category:'Slots',tagline:'Wind the gears. Unlock the stars.',description:'The owl clockmaker guides a fifteen-gear clockface. New gears restore three pulses.',detail:'Portrait · Clockface collection',color:'#eaba7b'},
+ {id:'phoenix-falls',name:'Phoenix Falls',category:'Slots',tagline:'Rise through the cascade.',description:'A ruby phoenix watches connected groups ignite across a six-column falling-symbol board.',detail:'6 × 5 · Cluster cascades',color:'#ff885b'},
+ {id:'outlaw-sevens',name:'Outlaw Sevens',category:'Slots',tagline:'Three reels. One dusty showdown.',description:'The neon sheriff hosts three mechanical reels and five matching-triple paylines.',detail:'3 reels · 5 lines',color:'#ffbd6c'},
+ {id:'celestial-wilds',name:'Celestial Wilds',category:'Slots',tagline:'Let the moon guide your lines.',description:'A star sorceress commands five tall reels and nine paylines with substituting moon wilds.',detail:'Portrait · 5 reels · Wilds',color:'#bcadff'},
+ {id:'meteor-keno',name:'Meteor Keno',category:'Keno',tagline:'Plot your constellation.',description:'Pick four to ten coordinates with a robot navigator and follow a twenty-meteor orbital reveal.',detail:'80 coordinates · Orbital draw',color:'#f9a865'},
+ {id:'bamboo-keno',name:'Bamboo Keno',category:'Keno',tagline:'Follow the lantern trail.',description:'A red panda explorer lights your chosen numbers through a twenty-lantern bamboo reveal.',detail:'80 lanterns · Number garden',color:'#a6e59d'}
+] as const;
+export const expansionIds = expansionCatalog.map(game=>game.id);

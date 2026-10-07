@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T08:16:52.833Z",
+  "generatedAt": "2026-10-07T10:16:39.440Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -101,6 +101,20 @@
       "sha256": "b91c55aa4f617903cab373f043eae9da3e9cfebd114c12f0a4ad9410706f1000"
     },
     {
+      "path": "apps/player/public/art/corsair-background-v28.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v28.json",
+      "license": "Project original; owner review pending",
+      "sha256": "faf60c7e6746c35651f2af7c7bb2a423c07e392b0e31f43ee05804f1f421c75b"
+    },
+    {
+      "path": "apps/player/public/art/cosmic-background-v28.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v28.json",
+      "license": "Project original; owner review pending",
+      "sha256": "9340e914db77f9d327a2d8ca5ab90b4a2c14080e0fd129c4e5cc02c2afe5e63b"
+    },
+    {
       "path": "apps/player/public/art/dynasty-atlas-v22.png",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v22.json",
@@ -120,6 +134,27 @@
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v3.json",
       "license": "Project original; owner review pending",
       "sha256": "99d2b2dc763e1f992895334e1309f944be51f3e53f2b724574089609a505c11b"
+    },
+    {
+      "path": "apps/player/public/art/expansion-posters-v28.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v28.json",
+      "license": "Project original; owner review pending",
+      "sha256": "1c0d504683b86824f455ba28377669a3ff78709e163146fbb042113663b29a31"
+    },
+    {
+      "path": "apps/player/public/art/expansion-symbols-v28.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v28.json",
+      "license": "Project original; owner review pending",
+      "sha256": "9c0c8724376bbcdc48643acd4ef3838fb812e3ba4abc1be9f8266ffe80c7c600"
+    },
+    {
+      "path": "apps/player/public/art/fish-atlas-final-v28.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-correction-v28.json",
+      "license": "Project original; owner review pending",
+      "sha256": "c080a93b9c753f0fe29d2c371e1ff01f4d01de44efc6ed1f1b8ceb0a7476af66"
     },
     {
       "path": "apps/player/public/art/jackpot-target-v26.svg",
@@ -245,14 +280,14 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "6d31a58d8ae54c1a21640ae75551cc206ec6011af943c085da476a9d76dcc0a9"
+      "sha256": "6e9e5b8dd0592692f8d6632f6d1ff2110a2be980206431bd7df186b7c407f194"
     },
     {
       "path": "apps/player/src/GamePoster.vue",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "0ca72f8c03b9d11bf87b165fb28f8a423587952be6dde1ae4b724b61289a2cb6"
+      "sha256": "997403393a920c5bf8f01dafad4f1f3cdc3bb2dfd63da70a17f6aaf5ebf25545"
     },
     {
       "path": "apps/player/src/arcade-v4.css",
@@ -336,7 +371,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "75f395da5d44401e601e49cd810cbd7260d9bd3afbe4e6b9ab73445aec6e9877"
+      "sha256": "349848f33d562c821850a9eba07bb8c52bfdb2f3dd14c5e9432e9e1e24853c02"
     },
     {
       "path": "apps/player/src/FishRewardReveal.vue",
@@ -406,7 +441,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "8bfd8112e164d2bfa019c24f891ad4778a1e716349d45e282e3ecfa4a6546521"
+      "sha256": "a50d8ab82792836a12844764ffaf88e9fc87489c6eecfaa1ac9aed873cad0427"
     },
     {
       "path": "apps/player/src/arcade-v26.css",
@@ -421,6 +456,27 @@
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
       "sha256": "b134674187e5c1e981ffa3bd9468c3b5b819458035e64a26820977d3aced447b"
+    },
+    {
+      "path": "apps/player/src/GameCharacter.vue",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "7d8ea9d2fcec0544241fb810ff61f1ae2fb49b5b399b0040b89687588af02051"
+    },
+    {
+      "path": "apps/player/src/expansion-theme.ts",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "3ea44a38996944ae03fe3d35e4a7090834efdd75b3820694bd52741db26eeb99"
+    },
+    {
+      "path": "apps/player/src/expansion-v28.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "45606ea97d0863e65c2e24cd6c4dcef2ff2bd3c8010c751846c1b95d67ac5ca4"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",

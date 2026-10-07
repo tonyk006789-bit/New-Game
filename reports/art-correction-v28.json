@@ -1,0 +1,6 @@
+{
+  "tool": "Built-in image_gen",
+  "file": "apps/player/public/art/fish-atlas-final-v28.png",
+  "reference": ".local/art-drafts/fish-atlas-v28.png",
+  "prompt": "Edit this original sprite atlas for production use. Preserve the identity and appearance of all 24 subjects and their order, but FIX THE GRID: exactly 1024px wide and 1536px tall, 4 columns x 6 rows of equal 256px square cells. Scale each whole subject down so it fits inside the central 190x190px of its cell, with at least 33px fully transparent margin on EVERY side, especially leviathan and mermaid (row4 columns3 and4) whose art currently spills across neighboring cells, and cannon row5. Do not let any creature, glow, tail, hair, projectile, shadow or cannon touch another cell. Maintain full bodies, preserve all fins, keep all 4 pirate cannons pointing up in row5 and all4 plasma cannons in row6. Row1 four pirate small/medium fish; row2 swordfish, anchor crab, spectral captain, ghost ship. Row3 comet minnow, shrimp, jellyfish, seahorse. Row4 manta, nautilus, leviathan, mermaid. Row5 pirate cannons. Row6 plasma cannons. Remove the colored background completely: exact transparent alpha=0 outside subjects. No grid lines or labels. High quality crisp sprites with the same lovely dimensional lighting."
+}

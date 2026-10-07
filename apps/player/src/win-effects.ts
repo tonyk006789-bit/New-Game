@@ -3,6 +3,16 @@ type Style={motion:string;motif:string;color:string;accent:string;glyph:string};
 const style=(motion:string,motif:string,color:string,accent:string,glyph:string):Style=>({motion,motif,color,accent,glyph});
 /** Presentation only: these seeds arrange particles, never sample a game outcome. */
 export const winStyles:Record<string,Style>={
+ 'corsair-cove':style('fountain','coin','#ffc879','#75e9da','⚓'),
+ 'cosmic-tides':style('orbit','crystal','#bfa0ff','#6af4ff','✧'),
+ 'double-deck-blackjack':style('royal','chip','#f1acdc','#917aff','♣'),
+ 'european-blackjack':style('royal','chip','#bbd9ff','#ffe3b0','♦'),
+ 'clockwork-vault':style('orbit','coin','#e8b56e','#74c8f5','⚙'),
+ 'phoenix-falls':style('inferno','ember','#ffcf5b','#ff493f','✦'),
+ 'outlaw-sevens':style('fountain','coin','#fac371','#e47e90','★'),
+ 'celestial-wilds':style('orbit','crystal','#e0c6ff','#88e7ff','☾'),
+ 'meteor-keno':style('meteor','spark','#ffb363','#bd9bff','☄'),
+ 'bamboo-keno':style('rise','pearl','#d8f1a6','#fbb17e','✧'),
  'neon-sevens':style('fountain','coin','#ffd865','#fa438e','7'),
  'jade-fortune':style('orbit','jade','#61ffb1','#ffe89b','✦'),
  'coin-carnival':style('fountain','coin','#ffe784','#ff7945','★'),

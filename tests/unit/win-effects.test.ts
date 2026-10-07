@@ -5,8 +5,8 @@ import {BotScoreboard,botCadence,botName} from '../../apps/player/src/bot-score'
 import {fishGames,fishGuide,reefTarget,reefTier,reefOutcome,reefLeadAngle,reefFlight,stagingMultiplier} from '@new-game/game-math';
 
 describe('bounded original win presentations',()=>{
- it('gives all twenty games a distinct effect composition',()=>{
-  expect(catalog).toHaveLength(20);expect(new Set(catalog.map(game=>JSON.stringify(winStyles[game.id]))).size).toBe(20);
+ it('gives all thirty games a distinct effect composition',()=>{
+  expect(catalog).toHaveLength(30);expect(new Set(catalog.map(game=>JSON.stringify(winStyles[game.id]))).size).toBe(30);
   for(const game of catalog)expect(winStyles[game.id]).toBeDefined();
  });
  it('requires a positive recorded award, uses stable decoration and bounds particle count/lifetime',()=>{

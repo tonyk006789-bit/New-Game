@@ -15,7 +15,7 @@ export class BotScoreboard{
  }
  reset(){this.scores.clear();this.chains.clear();}
 }
-const names:Record<FishGame,readonly string[]>={'reef-party':['Coral','Finn','Marina','Kai'],'abyss-legends':['Ember','Nova','Atlas','Onyx'],'sunken-dynasty':['Jade','Lotus','River','Pearl'],'polar-odyssey':['Frost','Aurora','Skye','Glacier']};
+const names:Record<FishGame,readonly string[]>={'corsair-cove':['Rook','Sable','Flint','Pearl'],'cosmic-tides':['Vega','Lyra','Orion','Sol'],'reef-party':['Coral','Finn','Marina','Kai'],'abyss-legends':['Ember','Nova','Atlas','Onyx'],'sunken-dynasty':['Jade','Lotus','River','Pearl'],'polar-odyssey':['Frost','Aurora','Skye','Glacier']};
 export const botName=(game:FishGame,seat:number)=>names[game][seat-1]||'Crew';
 export function botCadence(seat:number,shot:number,reducedMotion=false){
  if(reducedMotion)return 700+(seat*31+shot*17)%160;

@@ -24,7 +24,7 @@ let player,playerAuth,peerAuth;
 async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},await fixture.auth(parentId));assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
 async function wallet(id){return fixture.wallet(id);}
 async function adjust(id,direction,amount){assert.equal(direction,'ADD');return fixture.fund(id,amount);}
-const {blackjackDeal,blackjackProfile,stagingGameProfileId,stagingMultiplier}=await import('../../packages/game-math/src/index.ts');
+const {blackjackDeal,blackjackProfile,stagingGameProfileId,stagingMultiplier,reefBallistics,reefFlight}=await import('../../packages/game-math/src/index.ts');
 const {settleExpiredBlackjack}=await import('../../dist/server/apps/api/src/blackjack.js');
 const deal=(stake='50')=>({action:'DEAL',stake,profileId:blackjackProfile.id,requestKey:randomUUID()});
 const move=(hand,action)=>({action,id:hand.id,revision:hand.revision,profileId:blackjackProfile.id,requestKey:randomUUID()});
@@ -47,6 +47,10 @@ test('PostgreSQL blackjack reservations, receipts and premium variants',async t=
   assert.equal((await adjust(player,'ADD','100000')).status,201);
   assert.equal((await call('blackjack',undefined,admin)).status,403);assert.equal((await call('blackjack',undefined)).status,401);
   for(const stake of ['25','75','2050','050'])assert.equal((await call('blackjack',deal(stake),playerAuth)).status,400);
+  for(const profileId of ['stage-double-deck-v1','stage-european-v1']){
+   const before=await wallet(player),r=await call('blackjack',{...deal(),profileId},playerAuth);
+   assert.equal(r.status,409);assert.equal(r.data.code,'GAME_MATH_NOT_APPROVED');assert.deepEqual(await wallet(player),before);
+  }
  });
  await t.test('concurrent deal retry reserves or settles once and hides the shoe',async()=>{
   const command=deal(),before=await wallet(player),all=await Promise.all(Array.from({length:8},()=>call('blackjack',command,playerAuth)));
@@ -91,9 +95,21 @@ test('PostgreSQL blackjack reservations, receipts and premium variants',async t=
   await control.query('UPDATE accounts SET active=true WHERE id=$1',[player]);
  });
  await t.test('new keno games persist evaluated awards and fish lounges stay separate',async()=>{
-  for(const game of ['neon-numbers','pearl-keno']){await new Promise(r=>setTimeout(r,275));const command={requestKey:randomUUID(),stake:'25',profileId:stagingGameProfileId(game),picks:[1,2,3,4,5,6]};const r=await call(`staging/${game}/rounds`,command,playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.award,String(25*stagingMultiplier(r.data)));assert.deepEqual((await call(`staging/${game}/rounds`,command,playerAuth)).data,r.data);}
-  const ids=[];for(const game of ['sunken-dynasty','polar-odyssey']){const joined=await call('practice/reef/join',{newTable:true,game},playerAuth);assert.equal(joined.status,201,JSON.stringify(joined.data));ids.push(joined.data.id);assert.equal(joined.data.game,game);}
+  for(const game of ['neon-numbers','pearl-keno','meteor-keno','bamboo-keno','clockwork-vault','phoenix-falls','outlaw-sevens','celestial-wilds']){await new Promise(r=>setTimeout(r,275));const command={requestKey:randomUUID(),stake:'25',profileId:stagingGameProfileId(game),...(['neon-numbers','pearl-keno','meteor-keno','bamboo-keno'].includes(game)?{picks:[1,2,3,4,5,6]}:{})};const r=await call(`staging/${game}/rounds`,command,playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.award,String(25*stagingMultiplier(r.data)));assert.equal(r.data.game,game);assert.deepEqual((await call(`staging/${game}/rounds`,command,playerAuth)).data,r.data);}
+  const ids=[];for(const game of ['sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides']){const joined=await call('practice/reef/join',{newTable:true,game},playerAuth);assert.equal(joined.status,201,JSON.stringify(joined.data));ids.push(joined.data.id);assert.equal(joined.data.game,game);}
   assert.notEqual(ids[0],ids[1]);
+ });
+ await t.test('new fish worlds commit verified convoy/orbit impacts with one receipt',async()=>{
+  for(const game of ['corsair-cove','cosmic-tides']){
+   const room=(await call('practice/reef/join',{newTable:true,game},playerAuth)).data;
+   const firedAt=Date.now()-1500,time=(firedAt-Date.parse(room.startedAt))/1000;
+   let flight;
+   for(let angle=-3;angle<0;angle+=.04){const f=reefFlight(room.seat,angle,time,Array.from({length:80},(_,i)=>i+1),game);if(f.targetId!==null){flight=f;break;}}
+   assert.ok(flight,'A visible target must be hittable');
+   const command={requestKey:randomUUID(),stake:'25',profileId:stagingGameProfileId(game),trajectoryVersion:reefBallistics.version,roomId:room.id,targetId:flight.targetId,aimX:flight.x,aimY:flight.y,observedAt:Math.round(firedAt+flight.time*1000),firedAt,angle:flight.angle};
+   const r=await call(`staging/${game}/rounds`,command,playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.game,game);assert.equal(r.data.award,String(25*stagingMultiplier(r.data)));
+   assert.deepEqual((await call(`staging/${game}/rounds`,command,playerAuth)).data,r.data);
+  }
  });
  await t.test('history is scoped and all postings still balance',async()=>{
   assert.deepEqual((await call('staging/history',undefined,peerAuth)).data,[]);
