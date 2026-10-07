@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T16:06:12.403Z",
+  "generatedAt": "2026-10-07T17:12:36.111Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -484,6 +484,13 @@
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
       "sha256": "fc81f639036a70dd49c1f371679be2edec26bf67e7fdce4028b290973f4d764d"
+    },
+    {
+      "path": "apps/player/src/layout-v31.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "e26f691fd34e40dc39a62ede548926d4adb428a5b353479234019ef1402cb3ee"
     },
     {
       "path": "apps/player/src/GameViewport.vue",

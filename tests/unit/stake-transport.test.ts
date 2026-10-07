@@ -7,7 +7,7 @@ beforeEach(()=>{
  vi.stubGlobal('navigator',{onLine:true});vi.stubGlobal('document',{hidden:false});
  vi.stubGlobal('localStorage',{setItem:vi.fn(),removeItem:vi.fn(),getItem:()=>null});
  session.current={id:'tester',username:'tester',displayName:'Tester',role:'PLAYER',csrf:'test',wallet:{available:'1000',settled:'1000',reserved:'0',version:'1'}};
- Object.assign(stage,{enabled:true,stake:'25',pending:null,fishPending:[],busy:false,needsRecovery:false,last:null});revealCredits();
+ Object.assign(stage,{enabled:true,roundPolicy:{revision:'1',payingPercent:20},stake:'25',pending:null,fishPending:[],busy:false,needsRecovery:false,last:null});revealCredits();
 });
 afterEach(()=>{vi.unstubAllGlobals();revealCredits();session.current=null;stage.enabled=false;stage.pending=null;stage.needsRecovery=false;});
 describe('stake presentation at the transport boundary',()=>{
@@ -23,6 +23,12 @@ describe('stake presentation at the transport boundary',()=>{
   vi.stubGlobal('fetch',vi.fn(async()=>reply({code:'INSUFFICIENT_CREDITS'},409)));
   await expect(api('practice/neon-sevens/rounds',{requestKey:'reject-test'})).rejects.toThrow();
   expect(creditPresentation.held).toBeNull();expect(session.current!.wallet.available).toBe('1000');expect(stage.pending).toBeNull();
+ });
+ it('refreshes a changed global policy without silently retrying or charging the rejected round',async()=>{
+  const fetcher=vi.fn().mockResolvedValueOnce(reply({code:'PROFILE_CHANGED'},400)).mockResolvedValueOnce(reply({staging:true,profile:{id:stage.profile.id},roundPolicy:{revision:'2',payingPercent:10}}));vi.stubGlobal('fetch',fetcher);
+  await expect(api('practice/neon-sevens/rounds',{requestKey:'changed-policy'})).rejects.toThrow('PROFILE_CHANGED');
+  expect(fetcher).toHaveBeenCalledTimes(2);expect(fetcher.mock.calls[1][0]).toBe('/v1/environment');
+  expect(stage.roundPolicy).toEqual({revision:'2',payingPercent:10});expect(stage.pending).toBeNull();expect(creditPresentation.held).toBeNull();expect(session.current!.wallet.available).toBe('1000');
  });
  it('keeps the submitted deduction through a timeout and reconciles exactly once without resampling',async()=>{
   const fetcher=vi.fn().mockRejectedValueOnce(new Error('timeout')).mockResolvedValueOnce(reply({status:'settled',result:{game:'neon-sevens',stake:'25',award:'0',net:'-25',after:{available:'975',settled:'975',reserved:'0',version:'2'}}}));vi.stubGlobal('fetch',fetcher);

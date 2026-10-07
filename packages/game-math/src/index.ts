@@ -239,6 +239,23 @@ export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:Fi
 }
 // Owner-approved test profile. Legacy reef-tiers-v1 outcomes remain replayable.
 export const reefAssistProfile={id:'reef-assist-v1',baseProfile:reefTierProfile.id,soloHumanCount:1,maxFreeAssists:3,maxAwardsPerPaidHit:1} as const;
+// V31 approval applies only to new hits; keep the old profiles for receipt evaluation.
+export const reefChallengeProfile={id:'reef-challenge-v31',maxFreeAssists:0,tiers:{
+ small:{label:'Small',multiplier:1,captureTickets:1500},
+ medium:{label:'Medium',multiplier:3,captureTickets:1000},
+ large:{label:'Large',multiplier:8,captureTickets:500},
+ boss:{label:'Boss',multiplier:20,captureTickets:200}
+}} as const;
+export function reefChallengeOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame):StagingVisual{
+ const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefChallengeProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
+ return {id,game,captured,fish:{species,tier,profileId:reefChallengeProfile.id},description:captured?`${reefSpecies[species]} caught! ${rule.multiplier}× shot stake returned.`:`${reefSpecies[species]} resisted the hit.`};
+}
+export const testProbabilityPolicy={id:'stage-global-rate-v31',minimumPercent:5,maximumPercent:50,step:1,defaultPercent:20,scope:'All future slot and keno rounds, equally for every player. Existing paytables; no fish or blackjack changes.'} as const;
+export type RoundPolicy={revision:string;payingPercent:number};
+export function configuredGameProfileId(game:string,policy:RoundPolicy){
+ if(!/^[1-9]\d{0,14}$/.test(policy.revision)||!Number.isInteger(policy.payingPercent)||policy.payingPercent<5||policy.payingPercent>50)throw new Error('Invalid round policy');
+ return isFishGame(game)?reefChallengeProfile.id:`stage-rate-v31-r${policy.revision}-${policy.payingPercent}-${stagingGameProfileId(game)}`;
+}
 export type ReefAssistance={profileId:string;botSeats:number[];attempts:{seat:number;captured:boolean}[];humanCaptured:boolean};
 export function reefBotSeats(humanSeats:readonly number[]):number[]{
  return humanSeats.length===1&&[1,2,3,4].includes(humanSeats[0])?[1,2,3,4].filter(seat=>seat!==humanSeats[0]):[];
@@ -283,7 +300,7 @@ export const classicReelsProfile={id:'stage-classic3-v1',payingProbability:stagi
  rules:{'neon-sevens':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add all five lines.',
  'ruby-rush':'Three reels, five lines. Match all three symbols on a line: cherry 1×, bell 2×, BAR 2×, ruby 3×, seven 5×. Add all five lines.'}
 } as const;
-const currentFishRules=`${stagingProfile.rules['reef-party']} Solo tables add up to three free bot attempts after a resisted paid hit, stopping at the first capture. At most one tier award; bots stop when another human joins. Profile: ${reefAssistProfile.id}.`;
+const currentFishRules=`${reefChallengeProfile.id}: small 1× at 15%, medium 3× at 10%, large 8× at 5%, boss 20× at 2% per valid paid hit. One capture attempt per hit, with no free solo assists. Independent AI shots earn only separate scoreboard points. Larger creatures take more shots on average, not a guaranteed number. Missed/expired/already caught targets cost nothing.`;
 export const newCabinetsProfile={id:'stage-cabinets-v23',baseProfiles:[stagingProfile.id,classicReelsProfile.id],payingProbability:stagingProfile.payingProbability,aliases:newCabinetAliases,rules:{
  'disco-diamonds':classicReelsProfile.rules['neon-sevens'],
  'midnight-express':stagingProfile.rules['jade-fortune'].replace('Dragon substitutes.','Locomotive substitutes.'),
@@ -311,10 +328,11 @@ export function stagingMultiplier(outcome:StagingVisual):number {
  if(isKenoGame(game))return Math.max(0,outcome.picks!.filter(n=>outcome.drawn!.includes(n)).length-(outcome.picks!.length<=6?1:2));
  return outcome.captured?(outcome.fish?reefTierProfile.tiers[reefTier(outcome.fish.species)].multiplier:3):0;
 }
-export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[]):StagingVisual {
+export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[],payingPercent=30):StagingVisual {
+ if(!Number.isInteger(payingPercent)||payingPercent<5||payingPercent>50)throw new Error('Invalid paying-round percentage');
  if(isFishGame(game))throw new Error('A server-validated fish target is required. Use reefOutcome.');
- if(Object.hasOwn(expansionAliases,game))return {...stagingOutcome(expansionAliases[game as keyof typeof expansionAliases],id,random,picks),game};
- const paying=random(10000)<3000;
+ if(Object.hasOwn(expansionAliases,game))return {...stagingOutcome(expansionAliases[game as keyof typeof expansionAliases],id,random,picks,payingPercent),game};
+ const paying=random(10000)<payingPercent*100;
  // Rejection sampling conditions the visible outcome distribution, never a player's history.
  for(let attempt=0;attempt<10000;attempt++){
   let outcome:StagingVisual;
@@ -350,7 +368,7 @@ export const fishSpeciesPools={
 } as const;
 export const fishBosses:Record<FishGame,readonly number[]>={'corsair-cove':[55,48,56],'cosmic-tides':[63,48,64],'reef-party':[8,48,9,7],'abyss-legends':[19,48,23],'sunken-dynasty':[30,48,31],'polar-odyssey':[38,48,39]};
 export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...fishBosses[game]])];}
-export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v8'} as const;
+export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v9'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
 /** Predict a moving target's intercept; a fired projectile still follows a straight ray. */
 export function reefLeadAngle(seat:number,targetId:number,time:number,game:FishGame='reef-party'){
@@ -391,7 +409,7 @@ export function reefTarget(id:number,time:number,game:FishGame='reef-party'){
  const pattern=fishSpeciesPools[game],bosses=fishBosses[game];
  const species=id%20===5?bosses[Math.floor(id/20)%bosses.length]:pattern[(id-1)%pattern.length];
  const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88,13,36,14,48,13,35,9,59,72,10,14,26,30,56,47,85,98,10,12,29,25,54,48,100,84][species];
- const duration={small:32,medium:34,large:36,boss:29}[tier],spawnAt=(id-1)*1.5-32;
+ const duration={small:42,medium:44,large:46,boss:29}[tier],spawnAt=(id-1)*1.5-42;
  const age=((time-spawnAt)%120+120)%120,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
  const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;

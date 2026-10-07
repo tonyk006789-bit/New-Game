@@ -42,7 +42,7 @@ export async function hostedHandler(request:Request, context:{ip?:string}={}){
   const body=request.method==='POST'?await readBody(request):undefined;
   const headers:Record<string,string|string[]>={};
   const res={setHeader:(name:string,value:string|string[])=>{headers[name]=value;}};
-  if(path==='/v1/environment')return json(environment());
+  if(path==='/v1/environment')return json(await environment());
   if(path==='/v1/health'){await settleExpiredBlackjack();await transaction(db=>db.query('SELECT 1'));return json({status:'ok',mode:'private-test'});}
   if(path==='/v1/games')return json(catalog);
   if(path==='/v1/auth/login'){

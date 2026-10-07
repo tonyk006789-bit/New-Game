@@ -9,12 +9,13 @@ import {adjust,transfer,redeem,reverse} from './ledger.js';
 import {changePassword} from './password.js';
 import {transaction,fail} from './store.js';
 import {hostedTest,validateHostedTest} from './environment.js';
+import {operatorGamePolicy,updateGamePolicy} from './game-policy.js';
 
 const reads=new Set(['/v1/health','/v1/me','/v1/operator/dashboard','/v1/operator/accounts','/v1/operator/records','/v1/operator/settings','/v1/admin/audit','/v1/operator/rounds','/v1/operator/totals','/v1/operator/devices','/v1/operator/api','/v1/operator/api/documentation','/v1/integration/account','/v1/integration/users','/v1/integration/records','/v1/integration/rounds']);
 const writes=new Set(['/v1/auth/login','/v1/auth/logout','/v1/auth/verify','/v1/auth/password','/v1/admin/accounts','/v1/admin/credit-adjustments','/v1/admin/reversals','/v1/credit-transfers','/v1/operator/redeems','/v1/operator/devices','/v1/operator/api']);
 const receipt=/^\/v1\/operator\/receipts\/([a-f0-9-]{36})$/;
 const manage=/^\/v1\/admin\/accounts\/([a-f0-9-]{36})\/manage$/;
-export const operatorRoute=(method:string,path:string)=>method==='GET'?(reads.has(path)||receipt.test(path)):method==='POST'&&(writes.has(path)||manage.test(path));
+export const operatorRoute=(method:string,path:string)=>method==='GET'?(reads.has(path)||path==='/v1/operator/game-policy'||receipt.test(path)):method==='POST'&&(writes.has(path)||path==='/v1/operator/game-policy'||manage.test(path));
 const json=(body:unknown,status=200,extra:Record<string,string|string[]>={})=>{
  const headers=new Headers({'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY'});
  for(const [key,value] of Object.entries(extra))for(const item of Array.isArray(value)?value:[value])headers.append(key,item);
@@ -55,6 +56,7 @@ export async function operatorHandler(request:Request,context:{ip?:string}={}){
   else if(path==='/v1/operator/api')result=request.method==='POST'?await updateOperatorApi(req,body):await operatorApiSettings(req);
   else if(path==='/v1/operator/api/documentation')result={text:operatorApiDocumentation,operatorIntegration};
   else if(path==='/v1/operator/settings')result=await operatorSettings(req);
+  else if(path==='/v1/operator/game-policy')result=request.method==='POST'?await updateGamePolicy(req,body):await operatorGamePolicy(req);
   else if(receipt.test(path))result=await operatorReceipt(req,receipt.exec(path)![1]);
   else if(manage.test(path))result=await manageAccount(req,manage.exec(path)![1],body);
   else if(path==='/v1/admin/accounts')result=await createAccount(req,body);

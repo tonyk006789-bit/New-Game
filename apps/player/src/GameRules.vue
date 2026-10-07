@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {expansionSymbolNames} from './expansion-theme';
-import {computed} from 'vue';
-import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefTierProfile,stagingRules,stakeLimits,isFishGame,type StagingGame} from '@new-game/game-math';
+import {computed,onMounted} from 'vue';
+import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefChallengeProfile,stagingRules,stakeLimits,isFishGame,type StagingGame} from '@new-game/game-math';
+import {stage} from './staging-state';
+import {loadEnvironment} from './api';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 const props=defineProps<{game:StagingGame;staked:boolean}>();
 const instructions:Record<StagingGame,string[]>={
@@ -16,7 +18,7 @@ const instructions:Record<StagingGame,string[]>={
  'disco-diamonds':['Three reels and five active paylines. Match all three symbols on a line.','Disco diamonds use the gem award. Cherry 1×, bell/BAR 2×, diamond 3× and seven 5×; add all winning lines.'],
  'midnight-express':['An upright five-reel cabinet with nine active paylines. Play in portrait on phones.','The locomotive is WILD. It substitutes in left-to-right runs of at least three symbols. An all-locomotive run pays once on its line.'],
  'pirate-gold':['Center-row doubloons lock their entire reel. The other reels respin up to three times with no extra stake.','Collect all five doubloons for the existing 5× return. New locks do not reset the respin counter.'],
- 'sunken-dynasty':['Choose one of four jade cannons. Koi and shrimp are small; lionfish and cuttlefish medium; turtles and sentinel crabs large; the dynasty dragon and sea empress are bosses.','A moving jackpot wheel is a boss target. Shoot and capture it for the existing 20× stake return. Auto, lock, rapid firing and solo bot assistance work exactly as in Reef Party.'],
+ 'sunken-dynasty':['Choose one of four jade cannons. Koi and shrimp are small; lionfish and cuttlefish medium; turtles and sentinel crabs large; the dynasty dragon and sea empress are bosses.','A moving jackpot wheel is a boss target. Shoot and capture it for the existing 20× stake return. Auto, lock and rapid firing work exactly as in Reef Party. AI shots do not add capture attempts.'],
  'polar-odyssey':['Choose a crystal cannon. Icefish and shrimp are small; seals and squid medium; narwhals and snow crabs large; glacial serpents and crystal orcas are bosses.','The moving jackpot wheel can be shot and caught for the existing 20× boss award. Small creatures arrive between larger targets, with one boss at a time.'],
  'neon-numbers':['Choose 4–10 numbers from 1–80. Twenty numbers reveal in sequence. Quick Pick selects six editable numbers.','Uses the same test paytable as Orchard Numbers. There is no separate bonus stake.'],
  'pearl-keno':['Choose 4–10 numbered pearls from 1–80. Twenty pearls reveal. Matching selected pearls are highlighted.','Uses the same test paytable as Orchard Numbers. There is no additional bonus pool.'],
@@ -40,7 +42,8 @@ const themed=computed(()=>Object.hasOwn(cabinetExpansionProfile.rules,props.game
 function symbolName(symbol:string){if(expansionSymbolNames[props.game]?.[symbol])return expansionSymbolNames[props.game][symbol];if(props.game==='midnight-express')return ({dragon:'Locomotive · WILD',coin:'Ticket',lotus:'Pocket watch',gem:'Sapphire',bell:'Whistle',leaf:'Luggage',seven:'Lantern'} as Record<string,string>)[symbol];if(props.game==='pirate-gold')return ({coin:'Doubloon · HOLD',cherry:'Compass',bell:'Skull',bar:'Ship',seven:'Treasure map'} as Record<string,string>)[symbol];if(props.game==='disco-diamonds'&&symbol==='gem')return 'Disco diamond';if(props.game==='sapphire-crown')return ({dragon:'Crown · WILD',coin:'Sun coin',lotus:'Crystal lotus',gem:'Amethyst',bell:'Scepter',leaf:'Treasure pouch',seven:'Star'} as Record<string,string>)[symbol];if(props.game==='solar-fortune')return ({coin:'Sun coin · HOLD',cherry:'Planet',bell:'Moon',bar:'Star',seven:'Phoenix'} as Record<string,string>)[symbol];return symbol==='gem'&&themed.value?'Ruby':symbol.toUpperCase();}
 function returns(symbol:string,count:number){return baseGame.value==='neon-sevens'?({cherry:1,bell:2,bar:2,gem:3,seven:5}[symbol]||0)*({3:1,4:2,5:4}[count]||0):({3:2,4:4,5:8}[count]||0);}
 const matchCounts=computed(()=>cabinet.value?.columns===3?[3]:[3,4,5]);
-const tiers=Object.values(reefTierProfile.tiers);
+const tiers=Object.values(reefChallengeProfile.tiers);
+onMounted(()=>{if(props.staked)void loadEnvironment().catch(()=>{});});
 </script>
 <template>
  <div class="game-rules">
@@ -49,10 +52,10 @@ const tiers=Object.values(reefTierProfile.tiers);
   <ol><li v-for="instruction in instructions[game]" :key="instruction">{{instruction}}</li></ol>
   <section class="rules-return"><h3>{{isFishGame(game)?'CREATURE RETURNS':'WINNING RETURNS'}}</h3>
    <template v-if="isFishGame(game)">
-    <p>When you are the only human at the table, three labeled bot teammates assist each paid hit. If your first attempt fails, they take up to three free attempts using the same tier chance, stopping at the first capture. You receive at most one tier award. Bots stop when another human joins; they never spend credits or claim awards themselves. Their independent shots build AI hit combos: 4 small, 8 medium, 14 large or 24 boss hits earn that AI 10, 30, 80 or 200 scoreboard points. A 12-second gap resets the combo. AI points are for the current table visit, have no credit value, and do not remove shared creatures or change your awards. Each computer player is identified as AI CREW. The paid-hit solo assistance above is unchanged.</p><table><thead><tr><th>Size</th><th>Return</th><th>Per attempt</th><th>With solo assists</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td><td>{{(100*(1-(1-tier.captureTickets/10000)**4)).toFixed(2)}}%</td></tr></tbody></table>
+    <p>Each valid paid hit gets one independent capture attempt, with no free solo assists. When you are the only human, three labeled AI crew fire at their own targets. Their hit combos require 8 small, 14 medium, 24 large or 40 boss hits to earn that AI 10, 30, 80 or 200 scoreboard points. A 12-second gap resets the combo. AI points have no credit value and do not remove shared creatures or change your awards. The crew stop when another human joins.</p><table><thead><tr><th>Size</th><th>Return</th><th>Capture per paid hit</th><th>Average hits per catch</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td><td>{{(10000/tier.captureTickets).toFixed(1)}}</td></tr></tbody></table>
     <p>At a 0.25 stake, a successful small, medium, large or boss catch returns 0.25, 0.75, 2.00 or 5.00 credits respectively. Open SPECIES at the table to see each creature’s size tier.</p>
    </template>
-   <p v-else>{{stagingRules[game]}}</p>
+   <template v-else><p>{{stagingRules[game]}}</p><p v-if="staked&&stage.roundPolicy"><strong>Current chance of any credit return: {{stage.roundPolicy.payingPercent}}%.</strong> Applies equally to all players in independent rounds; no fixed win schedule. A return can be smaller than the stake. This is not RTP or a guarantee for a short session. Revision {{stage.roundPolicy.revision}} applies to new rounds; saved results retain their original rules.</p></template>
    <p>Multipliers apply to the total selected stake. Returns include any returned stake; they are not extra profit on top of it. An unsuccessful paid play returns zero.</p>
   </section>
   <table v-if="cabinet && baseGame!=='coin-carnival'" class="symbol-paytable"><thead><tr><th>Symbol</th><th v-for="count in matchCounts" :key="count">{{count}}</th></tr></thead><tbody><tr v-for="symbol in cabinet.symbols" :key="symbol"><th><ArcadeSymbol :symbol="symbol" :theme="game"/><span>{{symbolName(symbol)}}</span></th><td v-for="count in matchCounts" :key="count">{{returns(symbol,count)}}×</td></tr></tbody></table>

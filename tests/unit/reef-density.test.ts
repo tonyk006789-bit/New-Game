@@ -1,10 +1,10 @@
 import {describe,it,expect} from 'vitest';
 import {reefTarget,reefOutcome,reefTier,reefTierProfile,stagingMultiplier,reefFlight,fishGuide,type FishGame} from '@new-game/game-math';
-describe('sparse reef migrations and tiered catches',()=>{
- it('never exceeds 24 targets or one boss and spaces arrivals 1.5 seconds apart',()=>{
+describe('bounded richer reef migrations and tiered catches',()=>{
+ it('never exceeds 31 targets or one boss and spaces arrivals 1.5 seconds apart',()=>{
   const species=new Set<number>();let smallest=100,largest=0;
   for(let t=0;t<960;t+=.5){const visible=Array.from({length:80},(_,i)=>reefTarget(i+1,t)).filter(p=>p.active);
-   expect(visible.length).toBeLessThanOrEqual(24);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
+   expect(visible.length).toBeLessThanOrEqual(31);expect(visible.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);
    for(const p of visible){species.add(p.species);smallest=Math.min(smallest,p.radius);largest=Math.max(largest,p.radius);expect(p.y).toBeGreaterThan(70);expect(p.y).toBeLessThan(510);}
   }
   for(let id=2;id<=80;id++)expect(reefTarget(id,0).spawnAt-reefTarget(id-1,0).spawnAt).toBe(1.5);
@@ -17,8 +17,8 @@ describe('sparse reef migrations and tiered catches',()=>{
  it('gives every world two original additions while bounding its population and boss count',()=>{
   for(const [world,first] of [['reef-party',40],['abyss-legends',42],['sunken-dynasty',44],['polar-odyssey',46]] as const){
    const seen=new Set<number>();let peak=0;
-   for(let time=0;time<240;time+=1){const active=Array.from({length:80},(_,index)=>reefTarget(index+1,time,world as FishGame)).filter(p=>p.active);peak=Math.max(peak,active.length);expect(active.length).toBeLessThanOrEqual(24);expect(active.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);for(const fish of active)seen.add(fish.species);}
-   expect(seen.has(first)).toBe(true);expect(seen.has(first+1)).toBe(true);expect(peak).toBeGreaterThanOrEqual(20);
+   for(let time=0;time<240;time+=1){const active=Array.from({length:80},(_,index)=>reefTarget(index+1,time,world as FishGame)).filter(p=>p.active);peak=Math.max(peak,active.length);expect(active.length).toBeLessThanOrEqual(31);expect(active.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);for(const fish of active)seen.add(fish.species);}
+   expect(seen.has(first)).toBe(true);expect(seen.has(first+1)).toBe(true);expect(peak).toBeGreaterThanOrEqual(27);
   }
  });
  it('exhausts every tier ticket and evaluates awards using the target species',()=>{

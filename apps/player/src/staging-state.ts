@@ -1,8 +1,8 @@
 import {reactive} from 'vue';
-import {stagingProfile,isFishGame} from '@new-game/game-math';
+import {stagingProfile,isFishGame,type RoundPolicy} from '@new-game/game-math';
 export type Pending={accountId:string;path:string;body:Record<string,unknown>};
 export type FishPending=Pending&{recover:boolean};
-export const stage=reactive({enabled:false,sampleLogin:null as null|{username:string;password:string},profile:stagingProfile,stake:'25',busy:false,needsRecovery:false,pending:null as Pending|null,fishPending:[] as FishPending[],last:null as null|{id?:string;game:string;stake:string;award:string;net:string},revision:0,recovered:0});
+export const stage=reactive({enabled:false,roundPolicy:null as RoundPolicy|null,sampleLogin:null as null|{username:string;password:string},profile:stagingProfile,stake:'25',busy:false,needsRecovery:false,pending:null as Pending|null,fishPending:[] as FishPending[],last:null as null|{id?:string;game:string;stake:string;award:string;net:string},revision:0,recovered:0});
 export function restorePending(accountId:string){try{const pending=JSON.parse(localStorage.getItem(`ng-stage-pending:${accountId}`)||'null');stage.pending=pending?.accountId===accountId&&/^staging\/[a-z-]+\/rounds$/.test(pending.path)&&typeof pending.body?.requestKey==='string'?pending:null;}catch{stage.pending=null;}stage.needsRecovery=!!stage.pending;}
 export function savePending(pending:Pending){localStorage.setItem(`ng-stage-pending:${pending.accountId}`,JSON.stringify(pending));stage.pending=pending;}
 export function clearPending(){if(stage.pending)localStorage.removeItem(`ng-stage-pending:${stage.pending.accountId}`);stage.pending=null;stage.needsRecovery=false;}

@@ -20,7 +20,7 @@ describe('distinct music and fish worlds',()=>{
  });
  it('both games expose varied sizes, treasure targets, and a bounded shared population',()=>{
   for(const game of ['reef-party','abyss-legends'] as const){const species=new Set<number>();
-   for(let t=0;t<480;t+=.5){const active=Array.from({length:80},(_,i)=>reefTarget(i+1,t,game)).filter(p=>p.active);expect(active.length).toBeLessThanOrEqual(24);expect(active.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);active.forEach(p=>species.add(p.species));}
+   for(let t=0;t<480;t+=.5){const active=Array.from({length:80},(_,i)=>reefTarget(i+1,t,game)).filter(p=>p.active);expect(active.length).toBeLessThanOrEqual(31);expect(active.filter(p=>p.tier==='boss').length).toBeLessThanOrEqual(1);active.forEach(p=>species.add(p.species));}
    expect([...species].sort()).toEqual([...fishGuide(game)].sort());expect(species.has(22)).toBe(true);
   }expect(isFishGame('abyss-legends')).toBe(true);expect(isFishGame('unknown')).toBe(false);
  });

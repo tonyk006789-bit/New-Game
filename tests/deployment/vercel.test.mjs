@@ -19,8 +19,8 @@ test('Vercel preserves the public path and rejects mismatched or extra routing i
  const fixture={GAME_ENV:'hosted-test',HOSTED_TEST_SITE_ID:'11111111-1111-4111-8111-111111111111',HOSTED_TEST_PLATFORM:'vercel',HOSTED_TEST_PROJECT_ID:'prj_Test123',VERCEL_PROJECT_ID:'prj_Test123',VERCEL:'1',HOSTED_TEST_PROFILE:'stage-paying30-v2',DATABASE_URL:'postgresql://fixture:fixture@database.example/test?sslmode=verify-full'};
  const saved=Object.fromEntries(Object.keys(fixture).map(key=>[key,process.env[key]]));Object.assign(process.env,fixture);
  try{
-  for(const path of ['/v1/environment?__route=environment','/game?__route=environment','/v1/environment']){
-   const r=await fetch(origin+path);assert.equal(r.status,200);assert.equal((await r.json()).staging,true);
+  for(const path of ['/v1/games?__route=games','/game?__route=games','/v1/games']){
+   const r=await fetch(origin+path);assert.equal(r.status,200);assert.equal((await r.json()).length,30);
   }
   for(const path of ['/v1/me?__route=environment','/game?__route=environment&__route=health','/v1/environment?__route=environment&accountId=someone','/v1/admin/accounts?__route=admin/accounts'])assert.equal((await fetch(origin+path)).status,404,path);
  }finally{for(const [key,value] of Object.entries(saved)){if(value===undefined)delete process.env[key];else process.env[key]=value;}}

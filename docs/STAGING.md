@@ -1,3 +1,5 @@
+> **V31 (7 October 2026) supersedes the historical 30% configuration below.** New slot/keno rounds use a single Main Admin setting, initially 20%, adjustable from 5% to 50% in integer steps. This measures the chance of any positive credit return, not RTP or profit. Paytables are unchanged. Setting changes require recent password verification, an immutable revision, an audit event, durable idempotency and optimistic concurrency. Each new round records its revision/rate/profile hash; a stale client is rejected before charging. Historical results replay under their original profile. The setting is visible in player game rules and affects all players equally. Fish use `reef-challenge-v31`: 15%/10%/5%/2% capture per paid hit for small/medium/large/boss, paying 1×/3×/8×/20×, with no free solo capture assists. Blackjack retains its independently approved rules. Production math remains unapproved. See `reports/REFINEMENT_V31.md`.
+
 # Local staging
 
 Player: **http://127.0.0.1:5183**. Admin: **http://127.0.0.1:5184**. API: **http://127.0.0.1:3001/v1**.

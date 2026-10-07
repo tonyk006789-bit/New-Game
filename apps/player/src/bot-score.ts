@@ -1,6 +1,6 @@
 import {reefTier,type FishGame} from '@new-game/game-math';
 export type BotScore={points:number;combos:number;hits:number;lastGain:number};
-const goals={small:4,medium:8,large:14,boss:24},points={small:10,medium:30,large:80,boss:200};
+const goals={small:8,medium:14,large:24,boss:40},points={small:10,medium:30,large:80,boss:200};
 /** AI hit-combo points only. No wallet, payout request or shared target mutation. */
 export class BotScoreboard{
  private scores=new Map<number,BotScore>();

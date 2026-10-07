@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import {reefAssistProfile,isFishGame,stagingGameProfileId} from '@new-game/game-math';
+import {reefChallengeProfile,isFishGame,configuredGameProfileId,type RoundPolicy} from '@new-game/game-math';
 import {stage,savePending,clearPending,restorePending,restoreFishPending,saveFishPending,clearFishPending,type Pending,type FishPending} from './staging-state';
 import {holdStake,holdAward,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
@@ -20,7 +20,8 @@ export async function api<T>(path:string,body?:unknown):Promise<T>{
    if(stage.fishPending.length)throw new Error('Your cannon shots are still settling.');
    const target=path==='practice/reef/shots'?'staging/reef-party/rounds':path.replace('practice/','staging/');
    if(stage.pending)throw new Error('Your connection is being restored. Please wait.');
-   if(!stage.pending)savePending({accountId:session.current.id,path:target,body:{...(body as Record<string,unknown>),stake:stage.stake,profileId:stagingGameProfileId(target.split('/')[1])}});
+   if(!stage.roundPolicy)throw new Error('Game rules are loading. Refresh the arcade.');
+   if(!stage.pending)savePending({accountId:session.current.id,path:target,body:{...(body as Record<string,unknown>),stake:stage.stake,profileId:configuredGameProfileId(target.split('/')[1],stage.roundPolicy)}});
    return settle<T>();
   }
  }
@@ -31,7 +32,7 @@ type WalletReceipt={after?:Account['wallet']};
 function applyWallet(result:WalletReceipt,accountId:string){if(result.after&&session.current?.id===accountId&&BigInt(result.after.version)>=BigInt(session.current.wallet.version))session.current.wallet=result.after;}
 async function settleFish<T>(body:Record<string,unknown>):Promise<T>{
  if(!session.current||stage.pending||stage.busy||stage.fishPending.some(p=>p.recover))throw new Error('Your connection is being restored. Please wait.');
- const pending:FishPending={accountId:session.current.id,path:`staging/${isFishGame(body.game)?body.game:'reef-party'}/rounds`,body:{...Object.fromEntries(Object.entries(body).filter(([key])=>key!=='game')),stake:body.stake??stage.stake,profileId:reefAssistProfile.id},recover:false};
+ const pending:FishPending={accountId:session.current.id,path:`staging/${isFishGame(body.game)?body.game:'reef-party'}/rounds`,body:{...Object.fromEntries(Object.entries(body).filter(([key])=>key!=='game')),stake:body.stake??stage.stake,profileId:reefChallengeProfile.id},recover:false};
  saveFishPending(pending);
  try{
   const result=await request<T&WalletReceipt&NonNullable<typeof stage.last>>(pending.path,pending.body);
@@ -50,7 +51,7 @@ async function settle<T>():Promise<T>{
  try{
   const result=await request<T&WalletReceipt&{game:string;stake:string;award:string;net:string}>(pending.path,pending.body);
   if(stage.pending===pending&&session.current?.id===pending.accountId){applyWallet(result,pending.accountId);if(result.after)holdAward(result.game,pending.accountId,result.after.available,result.award);clearPending();stage.last=result;stage.revision++;}return result;
- }catch(error){if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status))){clearPending();revealCredits();}else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
+ }catch(error){if(stage.pending===pending){if(error instanceof Error&&'status' in error&&[400,403,404,409,429].includes(Number(error.status))){clearPending();revealCredits();if('code' in error&&error.code==='PROFILE_CHANGED')await loadEnvironment();}else stage.needsRecovery=true;}throw error;}finally{stage.busy=false;}
 }
 export async function recoverRound(){
  if(!navigator.onLine||document.hidden||stage.busy||!session.current)return;
@@ -74,6 +75,6 @@ async function recoverFish(pending:Pending){
  if(session.current?.id!==pending.accountId)return;
  clearFishPending(pending);if(receipt.result){applyWallet(receipt.result,pending.accountId);stage.last=receipt.result;}stage.revision++;stage.recovered++;
 }
-export async function loadEnvironment(){const info=await request<{staging:boolean;sampleLogin?:{username:string;password:string};profile?:typeof stage.profile}>('environment');stage.enabled=info.staging&&info.profile?.id===stage.profile.id;stage.sampleLogin=stage.enabled?info.sampleLogin||null:null;}
+export async function loadEnvironment(){const info=await request<{staging:boolean;roundPolicy?:RoundPolicy;sampleLogin?:{username:string;password:string};profile?:typeof stage.profile}>('environment');stage.enabled=info.staging&&info.profile?.id===stage.profile.id;stage.roundPolicy=info.roundPolicy||null;stage.sampleLogin=stage.enabled?info.sampleLogin||null:null;}
 export async function refreshAccount(){const account=await api<Account>('me');if(session.current?.id===account.id&&BigInt(session.current.wallet.version)>BigInt(account.wallet.version))account.wallet=session.current.wallet;session.current=account;return account;}
 export async function signIn(username:string,password:string,code?:string){await api('auth/login',{username,password,...(code?{code}:{})});const account=await refreshAccount();restorePending(account.id);restoreFishPending(account.id);return account;}

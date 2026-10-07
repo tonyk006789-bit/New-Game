@@ -48,3 +48,9 @@ The latest direct owner request and confirmation supersede earlier TOTP and lowe
 ## Owner correction — 1 October 2026 direct parent management
 
 Only the parent actor creates, edits, resets, suspends, archives or funds its direct next-role children. Main Admin cannot create/manage/fund agents or individual players; sub-contractors cannot host players. Individual player lists, game records and receipts belong to their agent. Higher operators retain branch aggregates grouped by their direct staff children. Every new wallet starts at zero. Preserve existing balances and historical ledger entries; do not rewrite historical provisioning to fit new permissions. Abyss Legends must have distinct background/cannons and a persistent jackpot wheel revealing already committed boss awards, under the previously approved fish reward rules.
+
+## Owner approval — 7 October 2026 V31 test probabilities
+
+The owner explicitly approved a global Main Admin slider from 5% through 50%, in 1% steps, initially 20%, for the chance of any positive credit return on future slot/keno rounds. Keep reward amounts unchanged; this is not RTP or a profit target. Require password verification, immutable setting revisions, an audit record and durable idempotency. Apply one setting equally to all players, disclose it in game rules, and preserve every accepted result. Fish and blackjack are outside this slider. No per-player rates or automatic situation/history-based adjustment is authorized.
+
+The owner approved `reef-challenge-v31` for all six test fish tables: small 1× at 15%, medium 3× at 10%, large 8× at 5%, boss 20× at 2% per paid hit. Remove all free solo capture attempts for new hits. Independent labeled AI crews continue to earn separate, non-credit hit-combo points. This supersedes the prior solo-assist approval for new hits only; accepted old receipts remain unchanged. Production mathematics remains unapproved.

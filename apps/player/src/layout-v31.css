@@ -1,0 +1,50 @@
+/* The board owns its height; decorative characters never push it off screen. */
+.game-viewport .keno-game{display:flex;flex-direction:column;height:auto;min-height:0;padding:10px 16px 0;gap:7px}
+.game-viewport .keno-game .keno-intro{height:42px;min-height:42px;margin:0;padding:0;flex-direction:row;gap:16px}
+.game-viewport .keno-game .keno-intro h2{font-size:clamp(22px,3vw,34px)}
+.game-viewport .keno-game .keno-layout{display:grid;grid-template-columns:150px minmax(0,1fr);width:100%;height:clamp(300px,calc(100dvh - 265px),530px);flex:none;gap:12px;margin:0;clear:none}
+.game-viewport .keno-game .keno-board{width:100%;height:100%;min-height:0;grid-template-rows:repeat(8,minmax(0,1fr));gap:5px;padding:8px;box-sizing:border-box}
+.game-viewport .keno-game .keno-board button{display:grid;place-items:center;height:auto;min-height:0;aspect-ratio:auto;padding:0;font-size:clamp(18px,2.5vw,27px);line-height:1;border-width:1px;border-bottom-width:2px}
+.game-viewport .keno-game .keno-wood-sign{display:flex;flex-direction:column;justify-content:center;align-items:center;width:auto;min-width:0;padding:10px 6px;gap:8px;overflow:hidden}
+.game-viewport .keno-wood-sign>.game-character{position:relative;float:none;width:110px;height:140px;margin:0;flex:none}
+.game-viewport .keno-wood-sign>strong{font-size:19px;line-height:1.1;margin:0}.game-viewport .keno-wood-sign small{font-size:11px}.game-viewport .keno-wood-sign .orchard-apples{font-size:28px;margin:0}.game-viewport .keno-wood-sign:has(.game-character) .orchard-apples{display:none}
+.game-viewport .keno-game .draw-track{margin:0;min-height:36px;height:36px;flex:none;gap:8px}.game-viewport .keno-game .draw-track b{width:30px;height:30px;font-size:16px}
+.game-viewport .keno-game .keno-pattern-tools{margin:0;gap:8px}.game-viewport .keno-game .keno-pattern-tools button{padding:7px 13px}
+.game-viewport .keno-game .keno-tools{position:static;margin:0;min-height:34px;gap:8px}.game-viewport .keno-game .keno-tools button{padding:6px 12px;min-height:30px}
+.game-viewport .keno-game .preview-controls{position:static;inset:auto;width:auto;margin:0 -16px;min-height:72px;height:auto;flex:none;padding:8px 12px}
+.game-viewport .keno-game .preview-notice{position:static;inset:auto;min-height:22px;height:auto;margin:0 -16px;padding:5px 10px;flex:none;font-size:10px}
+/* Upright cabinets reserve the largest continuous area for the actual reels. */
+.game-viewport .portrait-cabinet .slot-cabinet:not(.single-row-cabinet){height:clamp(680px,calc(100dvh - 54px),940px);min-height:0;max-height:none;display:flex;flex-direction:column;padding-top:6px}
+.game-viewport .portrait-cabinet .slot-cabinet .slot-marquee{height:64px;min-height:64px;margin:0;flex:none}
+.game-viewport .portrait-cabinet .slot-cabinet>.game-character{position:absolute;left:15px;top:9px;width:47px;height:60px;margin:0;z-index:2}.game-viewport .portrait-cabinet .slot-cabinet>.game-character figcaption{display:none}
+.game-viewport .portrait-cabinet .slot-cabinet:has(>.game-character) .slot-marquee{padding-left:58px}.game-viewport .portrait-cabinet .slot-cabinet:has(>.game-character) .slot-marquee>div{width:100%}
+.game-viewport .portrait-cabinet .express-feature,.game-viewport .portrait-cabinet .portrait-crown-feature{height:62px;flex:none;grid-template-columns:1fr 75px 1fr;margin:0 5px}
+.game-viewport .portrait-cabinet .express-feature .arcade-symbol,.game-viewport .portrait-cabinet .portrait-crown-feature .arcade-symbol{width:75px;height:60px}
+.game-viewport .portrait-cabinet .cabinet-game-body{flex:1;min-height:350px;display:flex;width:100%;margin:6px auto 0}
+.game-viewport .portrait-cabinet .slot-reel-surround{flex:1;min-height:0;display:flex;flex-direction:column}
+.game-viewport .portrait-cabinet .slot-cabinet .reel-playfield{height:auto;flex:1;min-height:0}
+.game-viewport .portrait-cabinet .slot-cabinet .cabinet-controls{margin-top:10px;min-height:130px;gap:7px;padding:8px 7px}
+.game-viewport .portrait-cabinet .slot-cabinet .cabinet-notice{min-height:24px}
+@media(orientation:landscape) and (max-height:650px){
+ .game-viewport .game-topline{height:38px;min-height:38px;padding:2px 8px}.game-viewport .game-topline .round-control{width:30px;height:30px;min-width:30px;min-height:30px}
+ .game-viewport .keno-game{display:grid;grid-template-columns:120px minmax(0,1fr);grid-template-rows:26px minmax(0,1fr) 62px 18px;height:calc(100dvh - 38px);box-sizing:border-box;padding:3px 8px 0;gap:4px 9px}
+ .game-viewport .keno-game .keno-intro{grid-column:2;grid-row:1;height:26px;min-height:0;gap:12px}.game-viewport .keno-game .keno-intro h2{font-size:20px}
+ .game-viewport .keno-game .keno-layout{grid-column:1/-1;grid-row:2;height:100%;min-height:0;grid-template-columns:120px minmax(0,1fr);gap:9px}
+ .game-viewport .keno-game .keno-board{gap:3px;padding:4px}.game-viewport .keno-game .keno-board button{font-size:18px}
+ .game-viewport .keno-game .keno-wood-sign{justify-content:flex-start;padding:7px 5px;gap:5px}.game-viewport .keno-wood-sign>.game-character{width:62px;height:80px}
+ .game-viewport .keno-wood-sign>strong{font-size:14px}.game-viewport .keno-wood-sign small,.game-viewport .keno-wood-sign .harvest-count{display:none}
+ .game-viewport .keno-game .keno-pattern-tools{grid-column:1;grid-row:2;align-self:end;flex-direction:column;gap:3px;margin:0 5px 8px;z-index:1}.game-viewport .keno-game .keno-pattern-tools button{padding:4px 2px;font-size:8px;min-height:21px}
+ .game-viewport .keno-game .keno-tools{grid-column:1;grid-row:1;min-height:0;justify-content:center;gap:5px}.game-viewport .keno-game .keno-tools>span{display:none}.game-viewport .keno-game .keno-tools button{padding:4px;min-height:24px;font-size:10px}
+ .game-viewport .keno-game .draw-track{grid-column:1;grid-row:3;height:auto;min-height:0;flex-wrap:wrap;align-content:center;gap:3px}.game-viewport .keno-game .draw-track>span{width:100%;text-align:center;font-size:8px}.game-viewport .keno-game .draw-track b{width:23px;height:23px;font-size:12px}.game-viewport .keno-game .draw-track b:nth-of-type(-n+3){display:none}
+ .game-viewport .keno-game .preview-controls{grid-column:2;grid-row:3;margin:0;min-height:0;height:62px;padding:4px;gap:7px;border-radius:6px}
+ .game-viewport .keno-game .preview-notice{grid-column:1/-1;grid-row:4;min-height:0;margin:0;padding:2px;font-size:8px}
+}
+@media(max-width:700px) and (orientation:portrait){
+ .game-viewport .keno-game{padding:8px 5px 0;gap:7px}
+ .game-viewport .keno-game .keno-intro{flex-direction:column;height:65px;min-height:65px;gap:5px}
+ .game-viewport .keno-game .keno-layout{display:block;height:clamp(365px,52dvh,520px)}
+ .game-viewport .keno-game .keno-wood-sign{display:none}.game-viewport .keno-game .keno-board{gap:3px;padding:5px}
+ .game-viewport .keno-game .keno-board button{font-size:17px}
+ .game-viewport .keno-game .preview-controls{flex-wrap:wrap;margin:0 -5px;gap:8px;padding:8px;min-height:95px}
+ .game-viewport .keno-game .preview-notice{margin:0 -5px}.game-viewport .keno-game .keno-pattern-tools{gap:5px}.game-viewport .keno-game .keno-pattern-tools button{font-size:8px;padding:8px 9px}
+}

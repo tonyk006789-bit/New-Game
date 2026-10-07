@@ -245,3 +245,13 @@ The owner requested mobile/iPad-friendly proportions, automatic fitting, entirel
 ## 7 October 2026 — full-card thumbnail correction (V30)
 
 The owner rejected the inset minimal thumbnails and requested fuller artwork filling the whole thumbnail section. This supersedes the prior minimal thumbnail preference. All 30 cards now use edge-to-edge original illustrations or scene-backed character/symbol compositions, with enlarged subjects and overlaid titles. Continue the established Vercel player update workflow. This is presentation only; retain music, screen fitting, credit timing and all accounting/game rules. Evidence: `../reports/REFINEMENT_V30.md`.
+
+## 7 October 2026 — responsive boards, larger reels and controlled test probabilities (V31)
+
+The owner reported squeezed landscape Meteor/Bamboo Keno boards, small reel areas in Celestial Wilds/Midnight Express/Sapphire Crown, too few fish, too-frequent catches and high overall win rates. They reaffirmed six-character alphanumeric passwords, which were already implemented and are verified again through real API create/reset/change/login paths.
+
+After requesting a Main Admin win-rate slider, the owner explicitly answered **“Approve 5%–50%, start at 20%”** to a global, integer-step chance of any credit return on future slot/keno rounds. Existing rewards remain unchanged. Changes require password verification and an audit record, apply equally to every player, and are disclosed in game rules. Blackjack, fish and saved rounds are excluded. This is a positive-return probability, not RTP or profit. New `stage-global-rate-v31` revisions are immutable; accepted rounds store revision, rate, profile identity and hash. Stale clients fail before debit and reload policy; retries replay their original receipt.
+
+The owner explicitly answered **“Use these harder fish rules”**: remove the three free solo capture attempts; small/medium/large/boss probabilities become 15%/10%/5%/2% per paid hit, with the same 1×/3×/8×/20× awards. `reef-challenge-v31` replaces assists for new hits only. AI crews remain labeled, fire independently and earn separate points, now requiring 8/14/24/40 hits. More creatures remain on screen through longer bounded swims; 1.5-second arrivals, at most 31 active targets and one boss, under `reef-ballistics-v9` shared by server/client.
+
+Publish both existing Vercel test sites under the established authorization. Additive migrations 019/020 create the immutable global test setting and allow its idempotent operation. They do not alter balances, credentials or historical results. Production remains unapproved; two additional blackjack variants remain free previews pending their separate rules. Evidence and rollback: `../reports/REFINEMENT_V31.md`.

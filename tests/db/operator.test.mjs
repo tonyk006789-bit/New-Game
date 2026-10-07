@@ -131,7 +131,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  });
  await t.test('game settlement and redemption races reconcile without canceling awards',async()=>{
   const before=await wallet(player),amount=before.available;
-  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
+  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
   assert.ok(result.every(r=>[201,409].includes(r.status)),JSON.stringify(result));assert.ok(result.some(r=>r.status===201));
   const after=await wallet(player);assert.ok(BigInt(after.settled)>=0n);
   assert.equal((await control.query('SELECT coalesce(sum(p.units),0)::text n FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id WHERE w.account_id=$1',[player])).rows[0].n,after.settled);
@@ -140,7 +140,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  await t.test('reference game and total reports aggregate committed rounds once and preserve branch scope',async()=>{
   await new Promise(resolve=>setTimeout(resolve,1100));
   ok(await adjust(player,'1000'));
-  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1'},playerAuth));
+  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1'},playerAuth));
   const expected=(await control.query('SELECT count(*)::text total,sum(stake_units)::text played,sum(award_units)::text won FROM staging_rounds WHERE account_id=$1',[player])).rows[0];
   const rounds=await call('operator/rounds',undefined,operator);assert.equal(rounds.status,200,JSON.stringify(rounds.data));assert.equal(rounds.data.total,expected.total);assert.equal(rounds.data.played,expected.played);assert.equal(rounds.data.won,expected.won);
   for(const row of rounds.data.items){assert.equal(BigInt(row.before_units)-BigInt(row.stake_units)+BigInt(row.award_units),BigInt(row.after_units));assert.equal(row.manager,'operator.agent1');}

@@ -16,6 +16,7 @@ import {operatorDevices,manageDevice} from './device.js';
 import {operatorApiSettings,updateOperatorApi,operatorApiDocumentation,operatorIntegration} from './operator-api.js';
 import {blackjackCurrent,blackjackAction,settleExpiredBlackjack} from './blackjack.js';
 import {changePassword} from './password.js';
+import {operatorGamePolicy,updateGamePolicy} from './game-policy.js';
 @Catch()
 class Errors implements ExceptionFilter { catch(error:unknown,host:ArgumentsHost){
  const res=host.switchToHttp().getResponse();
@@ -55,6 +56,8 @@ class ArcadeController {
  @Post('operator/api') apiConfigure(@Req() req:Request,@Body() body:unknown){return updateOperatorApi(req,body);}
  @Get('operator/api/documentation') async apiDocumentation(@Req() req:Request){await operatorApiSettings(req);return {text:operatorApiDocumentation,operatorIntegration};}
  @Get('operator/settings') settings(@Req() req:Request){return operatorSettings(req);}
+ @Get('operator/game-policy') gamePolicy(@Req() req:Request){return operatorGamePolicy(req);}
+ @Post('operator/game-policy') changeGamePolicy(@Req() req:Request,@Body() body:unknown){return updateGamePolicy(req,body);}
  @Post('operator/redeems') redeem(@Req() req:Request,@Body() body:unknown){return redeem(req,body);}
  @Get('admin/accounts') accounts(@Req() req:Request){return accounts(req);}
  @Post('admin/accounts') create(@Req() req:Request,@Body() body:unknown){return createAccount(req,body);}
