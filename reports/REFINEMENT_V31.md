@@ -43,4 +43,9 @@ Preserve migrations and immutable receipts on rollback. A probability correction
 
 ## Publication
 
-Pending final GitHub push, both existing Vercel deployments and live checks.
+- Source commit `84b5cca` pushed to GitHub main.
+- Player deployment `dpl_BFUfHV7un41qWddZ1KFkT5HnN7w1` is READY, aliased to https://new-game-test-topaz.vercel.app/.
+- Operator deployment `dpl_7Q84F29QYeBF9knVdULLya5hX1Ri` is READY, aliased to https://new-game-operator.vercel.app/.
+- Eighteen read-only public checks passed: both health endpoints, exact player/operator entry hashes, 30 game IDs, current policy revision 1 at 20%, both approved V31 profiles, art/audio availability and authentication/audience separation. Evidence: `reports/screenshots/v31/live-route-checks.json`.
+- Hosted browser restored the player session and displayed the corrected Meteor board. Its Rules panel shows **20%**, **Revision 1**. No hosted stake, draw or spin was submitted. Additional screenshots: `meteor-live-landscape.png`, `meteor-live-tablet.png`, and local `sapphire-reels.png`.
+- The public operator bundle and protected policy endpoint are verified. Its prior browser session expired; the existing locally stored operator sample password was rejected on one sign-in attempt, so authenticated slider interaction was verified locally rather than claimed as a hosted UI pass. No password was reset or changed.
