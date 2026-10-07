@@ -39,3 +39,12 @@ Evidence: `reports/screenshots/v25/local-lobby.png`, `sunken-dynasty.png`, `mobi
 ## Data and rollback
 
 No migration, account creation, credit grant, reset or operator change. No new paid service. Publication uses the existing owner-authorized player Vercel project. Rollback must redeploy the matching V24 player and API together because trajectories changed; preserve all wallets, ledger rows, rooms and accepted receipts. Native Android/iPhone verification remains deferred. Harder catches and any shared jackpot-pool design remain pending explicit rules approval.
+
+## Published and verified
+
+- Source commit `fa6c5b7` pushed to `tonyk006789-bit/New-Game` main.
+- Deployment `dpl_9877GXHTSwisnQZyE8mEff9VkAL2` is READY at https://new-game-test-topaz.vercel.app/. Public entry matches `index-D7tIWimR.js`.
+- Public health/environment/catalog/art/audio checks passed. Twenty games remain listed. Unauthenticated `/v1/staging/wins` and blackjack return 401; operator account routes on the player domain return 404. The separate operator is healthy with unchanged `index-CT1MaUjW.js`.
+- The existing signed-in player session restored on reload. Live UI showed total wagered 2,346.00 and Minor/Major/Jackpot actual returns 590.50 / 1,488.50 / 345.00. Neither Generated examples nor DEMO appears. Browser console reported no errors. No login was submitted, no hosted round was placed, and the existing session was left open. Balance displayed 1,578.05.
+- Live evidence: `reports/screenshots/v25/live-lobby.png`, `live-ui-checks.json`, `live-route-checks.json`; screenshots are local ignored artifacts. The live viewport also had no horizontal overflow (615 wide, document 600).
+- Vercel used the already established process-local official web API gateway because direct `api.vercel.com` connectivity was unavailable previously. TLS remained enabled; no OS networking or security settings were changed.
