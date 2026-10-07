@@ -131,7 +131,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  });
  await t.test('game settlement and redemption races reconcile without canceling awards',async()=>{
   const before=await wallet(player),amount=before.available;
-  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
+  const result=await Promise.all([call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1-stakes-v32'},playerAuth),move('operator/redeems',operator,agent,player,amount)]);
   assert.ok(result.every(r=>[201,409].includes(r.status)),JSON.stringify(result));assert.ok(result.some(r=>r.status===201));
   const after=await wallet(player);assert.ok(BigInt(after.settled)>=0n);
   assert.equal((await control.query('SELECT coalesce(sum(p.units),0)::text n FROM ledger_postings p JOIN wallets w ON w.id=p.wallet_id WHERE w.account_id=$1',[player])).rows[0].n,after.settled);
@@ -140,7 +140,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
  await t.test('reference game and total reports aggregate committed rounds once and preserve branch scope',async()=>{
   await new Promise(resolve=>setTimeout(resolve,1100));
   ok(await adjust(player,'1000'));
-  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1'},playerAuth));
+  ok(await call('staging/neon-sevens/rounds',{requestKey:randomUUID(),stake:'25',profileId:'stage-rate-v31-r1-20-stage-classic3-v1-stakes-v32'},playerAuth));
   const expected=(await control.query('SELECT count(*)::text total,sum(stake_units)::text played,sum(award_units)::text won FROM staging_rounds WHERE account_id=$1',[player])).rows[0];
   const rounds=await call('operator/rounds',undefined,operator);assert.equal(rounds.status,200,JSON.stringify(rounds.data));assert.equal(rounds.data.total,expected.total);assert.equal(rounds.data.played,expected.played);assert.equal(rounds.data.won,expected.won);
   for(const row of rounds.data.items){assert.equal(BigInt(row.before_units)-BigInt(row.stake_units)+BigInt(row.award_units),BigInt(row.after_units));assert.equal(row.manager,'operator.agent1');}
@@ -267,6 +267,18 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await call('me',undefined,leafAuth)).status,401);leafAuth=await signin('USER12','xyz123');
   ok(await call('auth/password',{currentPassword:'xyz123',newPassword:'new123'},leafAuth));assert.equal((await call('me',undefined,leafAuth)).status,401);await signin('user12','new123');assert.deepEqual(await wallet(leaf),before);
   ok(await call('auth/password',{currentPassword:'abc123',newPassword:'new123'},auth));await signin('Agent1','new123');
+ });
+ await t.test('all operator tiers can omit, blank or whitespace Nickname with a zero wallet and durable replay',async()=>{
+  let parentId=adminId,auth=admin;
+  for(const [index,displayName] of [undefined,'','   '].entries()){
+   const username=`Optional${index}Name`,data={parentId,username,password:'abc123',requestKey:randomUUID(),...(displayName===undefined?{}:{displayName})};
+   const copies=await Promise.all([call('admin/accounts',data,auth),call('admin/accounts',data,auth)]);copies.forEach(ok);assert.deepEqual(copies[0].data,copies[1].data);
+   const id=copies[0].data.id,row=(await control.query('SELECT display_name,role FROM accounts WHERE id=$1',[id])).rows[0];assert.equal(row.display_name,username.toLowerCase());assert.equal(row.role,['SUB_DISTRIBUTOR','AGENT','PLAYER'][index]);assert.equal((await wallet(id)).available,'0');
+   const signed=await signin(username,'abc123');assert.equal((await call('me',undefined,signed)).data.displayName,username.toLowerCase());parentId=id;auth=signed;
+  }
+  const longName='LongAccount1'+ 'x'.repeat(110),r=await call('admin/accounts',{parentId:adminId,username:longName,password:'abc123',requestKey:randomUUID()},admin);ok(r);
+  assert.equal((await control.query('SELECT length(display_name) n FROM accounts WHERE id=$1',[r.data.id])).rows[0].n,100);
+  assert.equal((await call('admin/accounts',{parentId:adminId,username:'BadName1',displayName:'x'.repeat(101),password:'abc123'},admin)).status,400);
  });
  await t.test('bigint balances survive paginated JSON without precision loss',async()=>{
   for(let i=0;i<10;i++)ok(await adjust(peer,'999999999999999'));

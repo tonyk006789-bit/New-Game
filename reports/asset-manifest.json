@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T17:12:36.111Z",
+  "generatedAt": "2026-10-07T19:29:52.346Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -493,11 +493,18 @@
       "sha256": "e26f691fd34e40dc39a62ede548926d4adb428a5b353479234019ef1402cb3ee"
     },
     {
+      "path": "apps/player/src/screen-v32.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "38940a1a25d15f7549b95f7062c52e1a2654d956f816e7c5a00326c380b0c0cc"
+    },
+    {
       "path": "apps/player/src/GameViewport.vue",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "52cce104739c0eea4c34db3120980724da872815db43d72003d68ede8118da15"
+      "sha256": "cad3afb6fba736a2acedd6280612e4c03696cee7859f57f15108f8e9144bc27e"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",

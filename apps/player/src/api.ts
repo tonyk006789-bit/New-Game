@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import {reefChallengeProfile,isFishGame,configuredGameProfileId,type RoundPolicy} from '@new-game/game-math';
+import {isFishGame,configuredGameProfileId,type RoundPolicy} from '@new-game/game-math';
 import {stage,savePending,clearPending,restorePending,restoreFishPending,saveFishPending,clearFishPending,type Pending,type FishPending} from './staging-state';
 import {holdStake,holdAward,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
@@ -32,7 +32,7 @@ type WalletReceipt={after?:Account['wallet']};
 function applyWallet(result:WalletReceipt,accountId:string){if(result.after&&session.current?.id===accountId&&BigInt(result.after.version)>=BigInt(session.current.wallet.version))session.current.wallet=result.after;}
 async function settleFish<T>(body:Record<string,unknown>):Promise<T>{
  if(!session.current||stage.pending||stage.busy||stage.fishPending.some(p=>p.recover))throw new Error('Your connection is being restored. Please wait.');
- const pending:FishPending={accountId:session.current.id,path:`staging/${isFishGame(body.game)?body.game:'reef-party'}/rounds`,body:{...Object.fromEntries(Object.entries(body).filter(([key])=>key!=='game')),stake:body.stake??stage.stake,profileId:reefChallengeProfile.id},recover:false};
+ const pending:FishPending={accountId:session.current.id,path:`staging/${isFishGame(body.game)?body.game:'reef-party'}/rounds`,body:{...Object.fromEntries(Object.entries(body).filter(([key])=>key!=='game')),stake:body.stake??stage.stake,profileId:configuredGameProfileId(isFishGame(body.game)?body.game:'reef-party',stage.roundPolicy||{revision:'1',payingPercent:20})},recover:false};
  saveFishPending(pending);
  try{
   const result=await request<T&WalletReceipt&NonNullable<typeof stage.last>>(pending.path,pending.body);

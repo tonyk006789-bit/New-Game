@@ -32,3 +32,4 @@ import './neon-vegas.css';
 import './expansion-v28.css';
 import './screen-v29.css';
 import './layout-v31.css';
+import './screen-v32.css';

@@ -10,7 +10,7 @@ describe('approved configurable global test distribution',()=>{
  it('versions changes, isolates fish, and rejects rates outside the approved range',()=>{
   const a={revision:'1',payingPercent:20},b={revision:'2',payingPercent:20};
   expect(configuredGameProfileId('neon-sevens',a)).not.toBe(configuredGameProfileId('neon-sevens',b));
-  expect(configuredGameProfileId('reef-party',a)).toBe(reefChallengeProfile.id);
+  expect(configuredGameProfileId('reef-party',a)).toBe(reefChallengeProfile.id+'-stakes-v32');
   for(const value of [0,4,51,100,20.5,NaN])expect(()=>stagingOutcome('neon-sevens','test',storyboardRandom(1),undefined,value)).toThrow();
  });
 });

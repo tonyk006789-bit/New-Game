@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {expansionSymbolNames} from './expansion-theme';
 import {computed,onMounted} from 'vue';
-import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefChallengeProfile,stagingRules,stakeLimits,isFishGame,type StagingGame} from '@new-game/game-math';
+import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefChallengeProfile,stagingRules,hasLowStake,isFishGame,type StagingGame} from '@new-game/game-math';
 import {stage} from './staging-state';
 import {loadEnvironment} from './api';
 import ArcadeSymbol from './ArcadeSymbol.vue';
@@ -62,7 +62,7 @@ onMounted(()=>{if(props.staked)void loadEnvironment().catch(()=>{});});
   <div v-if="lines.length" class="rules-lines" aria-label="Active payline paths"><figure v-for="(line,index) in lines" :key="index"><svg :viewBox="`0 0 ${line.length*20} 60`" role="img" :aria-label="`Line ${index+1}: rows ${line.map(row=>row+1).join(', ')}`"><path :d="`M0 20H${line.length*20}M0 40H${line.length*20}`" stroke="#ffffff25" fill="none"/><polyline :points="line.map((row,col)=>`${col*20+10},${row*20+10}`).join(' ')" fill="none" stroke="#ffd76c" stroke-width="3"/></svg><figcaption>LINE {{index+1}}</figcaption></figure></div>
   <p>The lobby groups settled returns as Minor below 5× stake, Major from 5× to below 20×, and Jackpot from 20×. These groups do not add another payout or a progressive pool. The lobby totals add your settled returns in each tier and show your total wagered. They include returned stakes, exclude grants and daily-wheel awards, and do not form a separate prize pool.</p>
   <h3>STAKE & CONTROLS</h3>
-  <p>Use −, +, the stake menu or MAX to choose {{(stakeLimits.min/100).toFixed(2)}}–{{(stakeLimits.max/100).toFixed(2)}} credits in {{(stakeLimits.step/100).toFixed(2)}} steps. {{isFishGame(game)?'The stake is per valid hit.':'One stake pays for the complete spin, draw or feature sequence. Fast animation and Show result do not alter the outcome.'}}</p>
+  <p>Use −, +, the stake menu or MAX to choose {{hasLowStake(game)?'0.10, 0.20, then 0.25–20.00 in 0.25 steps':'0.25–20.00 credits in 0.25 steps'}}. {{isFishGame(game)?'The stake is per valid hit.':'One stake pays for the complete spin, draw or feature sequence. Fast animation and Show result do not alter the outcome.'}}</p>
   <p>{{staked?'Plays require an online session and enough available credits. Accepted results are saved; reconnecting restores them without charging for a new play.':'Guest previews and free practice do not spend or award credits. The returns above describe the play-credit games.'}}</p>
  </div>
 </template>

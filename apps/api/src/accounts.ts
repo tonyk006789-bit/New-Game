@@ -15,7 +15,7 @@ export async function accounts(req:Request){return transaction(async db=>{
  JOIN branches b ON b.id=a.branch_id JOIN branch_ancestors c ON c.branch_id=a.branch_id JOIN wallets w ON w.account_id=a.id WHERE c.ancestor_id=$1 AND (a.id=$2 OR ${directChildrenSql(actor.role)}) ORDER BY a.created_at DESC LIMIT 500`,[actor.branch_id,actor.id]);
  return rows.map(row=>({id:row.id,username:row.username,displayName:row.display_name,role:row.role,active:row.active,branch:row.branch,wallet:walletView(row as Wallet)}));
 });}
-const createSchema=z.object({parentId:z.uuid(),username:NewUsername,displayName:z.string().trim().min(1).max(100),password:NewPassword,requestKey:z.string().min(8).max(128).optional()}).strict();
+const createSchema=z.object({parentId:z.uuid(),username:NewUsername,displayName:z.string().trim().max(100).optional(),password:NewPassword,requestKey:z.string().min(8).max(128).optional()}).strict().transform(data=>({...data,displayName:data.displayName||Array.from(data.username).slice(0,100).join('')}));
 export async function createAccount(req:Request,body:unknown){
  const data=parse(createSchema,body);
  return transaction(async db=>{

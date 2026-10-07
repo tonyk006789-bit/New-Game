@@ -67,7 +67,9 @@ const depthRoot=ref<HTMLElement>();
 useDepthMotion(depthRoot,computed(()=>ready.value&&!reducedMotion.value&&!modal.value));
 const currentGame = computed(() => catalog.find(game => game.id === activeGame.value));
 const portraitGame=computed(()=>!!activeGame.value&&isPortraitGame(activeGame.value));
-const cabinetReady=ready;
+const orientationReady=ref(true);
+const gameReady=computed(()=>ready.value&&orientationReady.value);
+const cabinetReady=gameReady;
 const visibleGames = computed(() => catalog.filter(game =>
   (category.value === 'All games' || category.value === 'Favorites' || category.value==='New'&&(expansionIds as readonly string[]).includes(game.id) || category.value==='Premium'&&isPremiumGame(game.id) || game.category === category.value) &&
   (category.value !== 'Favorites' || favorites.value.includes(game.id)) &&
@@ -157,12 +159,12 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       </header>
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Games are paused until you reconnect.</div>
       <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
-      <GameViewport v-if="currentGame" :portrait="portraitGame" :identity="currentGame.id" v-slot="screen"><main class="immersive-game" :class="{'portrait-cabinet':portraitGame}" :data-layout="portraitGame?'portrait':'wide'">
+      <GameViewport v-if="currentGame" :portrait="portraitGame" :identity="currentGame.id" @orientation-ready="orientationReady=$event" @back="navigate('lobby')" v-slot="screen"><main class="immersive-game" :class="{'portrait-cabinet':portraitGame}" :data-layout="portraitGame?'portrait':'wide'">
         <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><button class="screen-fit-button" :aria-pressed="screen.autoFit" aria-label="Auto fit screen" @click="screen.toggleFit">{{screen.autoFit?'AUTO FIT':'ACTUAL SIZE'}}</button><button v-if="screen.fullscreenSupported" class="screen-fit-button screen-fullscreen" :aria-label="screen.fullscreen?'Exit full screen':'Full screen'" @click="screen.toggleFullscreen">⛶</button><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
-        <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="ready && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
-        <BlackjackGame :key="activeGame" :game="activeGame" @resume="openGame" v-else-if="isBlackjackGame(activeGame)" :running="ready&&!modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits"/><FeatureGame v-else-if="isFeatureGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="gameReady && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
+        <BlackjackGame :key="activeGame" :game="activeGame" @resume="openGame" v-else-if="isBlackjackGame(activeGame)" :running="gameReady&&!modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits"/><FeatureGame v-else-if="isFeatureGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
-        <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="ready && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
+        <GamePreview v-else :key="`${activeGame}-${stage.recovered}`" :game="activeGame!" :running="gameReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
 
       </main></GameViewport>
       <template v-else-if="page === 'lobby'">

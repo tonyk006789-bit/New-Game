@@ -1,3 +1,5 @@
+import {hasLowStake} from './stakes.ts';
+export {stakePolicy,lowStakeGames,hasLowStake,stakesForGame,validGameStake} from './stakes.ts';
 export * from './blackjack.ts';
 export const mathStatus = Object.freeze({
  'corsair-cove': {approved:false,profileId:null,mathHash:null},
@@ -254,7 +256,8 @@ export const testProbabilityPolicy={id:'stage-global-rate-v31',minimumPercent:5,
 export type RoundPolicy={revision:string;payingPercent:number};
 export function configuredGameProfileId(game:string,policy:RoundPolicy){
  if(!/^[1-9]\d{0,14}$/.test(policy.revision)||!Number.isInteger(policy.payingPercent)||policy.payingPercent<5||policy.payingPercent>50)throw new Error('Invalid round policy');
- return isFishGame(game)?reefChallengeProfile.id:`stage-rate-v31-r${policy.revision}-${policy.payingPercent}-${stagingGameProfileId(game)}`;
+ const base=isFishGame(game)?reefChallengeProfile.id:`stage-rate-v31-r${policy.revision}-${policy.payingPercent}-${stagingGameProfileId(game)}`;
+ return hasLowStake(game)?`${base}-stakes-v32`:base;
 }
 export type ReefAssistance={profileId:string;botSeats:number[];attempts:{seat:number;captured:boolean}[];humanCaptured:boolean};
 export function reefBotSeats(humanSeats:readonly number[]):number[]{
