@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T15:30:28.124Z",
+  "generatedAt": "2026-10-07T16:06:12.403Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -287,7 +287,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "5ccb3f459cc12c3280edc9bf49d7146fe7551eca6dae6ed540e1dbf7f1f6caaf"
+      "sha256": "4bf9d22106ca00678f8fb60ff716155ce486dc8c1679e717013f4a7fb9f4a8e2"
     },
     {
       "path": "apps/player/src/arcade-v4.css",
@@ -483,7 +483,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "43fb1a5043a1f696f89bdf4b6d9396a2daa9e5b7cfa1d65bf8cd0f6a0cadab3c"
+      "sha256": "fc81f639036a70dd49c1f371679be2edec26bf67e7fdce4028b290973f4d764d"
     },
     {
       "path": "apps/player/src/GameViewport.vue",
