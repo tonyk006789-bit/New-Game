@@ -2,10 +2,12 @@
 import {computed} from 'vue';
 import {formatCredits} from '@new-game/domain';
 import type {BossReveal} from './boss-reveal';
-const props=defineProps<{title?:string;reward:BossReveal|null;reducedMotion:boolean}>();
+import WinBurst from './WinBurst.vue';
+const props=defineProps<{title?:string;game:string;reward:BossReveal;reducedMotion:boolean;running:boolean}>();
 const amount=computed(()=>props.reward?formatCredits(props.reward.award):'20×');
 </script>
 <template><aside class="abyss-jackpot" :class="{'wheel-still':reducedMotion,'wheel-awarded':!!reward}" :aria-label="`${title||'Abyss'} jackpot wheel`">
+ <WinBurst :game="game" :id="reward.id" :award="reward.award" stake="25" :running="running" :reduced-motion="reducedMotion" compact/>
  <h3>{{(title||'Abyss').toUpperCase()}} <b>JACKPOT</b></h3>
  <div class="abyss-wheel-rim"><span class="abyss-wheel-pointer" aria-hidden="true">◆</span>
   <div :key="reward?.id||'idle'" class="abyss-wheel-disc" :class="{'wheel-spinning':!!reward}" aria-hidden="true"><i v-for="n in 8" :key="n" :style="{transform:`rotate(${n*45}deg)`}"><span>{{n%2?'◆':'✦'}}</span></i></div>

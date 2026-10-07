@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WinBurst from './WinBurst.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { featurePractice, storyboardRandom, type FeatureResult, type VaultFrame, type CascadeFrame } from '@new-game/game-math';
 import ArcadeSymbol from './ArcadeSymbol.vue';
@@ -102,7 +103,7 @@ onBeforeUnmount(() => { disposed = true; generation++; clearTimeout(timer); canc
 </script>
 <template>
   <section class="feature-stage" :class="[isVault ? 'aurora-stage' : 'ember-stage', `phase-${phase}`, { 'feature-active': active, 'stage-paused': !running }]" :style="{'--motion-rate':fast ? 1 / featureTiming.speed : 1}" :data-phase="phase">
-    <div class="stage-vignette"></div><div class="atmosphere" aria-hidden="true"><i v-for="n in 18" :key="n" :style="{ '--i': n }"></i></div>
+    <WinBurst v-if="staked&&phase==='complete'&&result&&stage.last?.id===result.id&&BigInt(stage.last.award)>0n" :key="result.id" :game="game" :id="result.id" :award="stage.last.award" :stake="stage.last.stake" :running="running" :reduced-motion="reducedMotion"/><div class="stage-vignette"></div><div class="atmosphere" aria-hidden="true"><i v-for="n in 18" :key="n" :style="{ '--i': n }"></i></div>
     <div class="feature-top"><span>NEW GAME ORIGINALS</span><span>{{ authenticated ? (staked ? 'PLAY' : 'FREE PRACTICE') : 'GUEST STORYBOARD' }}</span></div>
     <div class="feature-marquee"><small>{{ isVault ? 'LOCK THE LIGHT' : 'AWAKEN THE FIRE' }}</small><h2>{{ isVault ? 'AURORA VAULT' : 'EMBER RELICS' }}</h2><p>{{ isVault ? 'Crystals stay. The vault awakens.' : 'Connect. Clear. Cascade.' }}</p></div>
     <div class="feature-playfield">

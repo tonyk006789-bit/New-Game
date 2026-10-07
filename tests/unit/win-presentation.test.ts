@@ -14,6 +14,6 @@ describe('win presentations never generate an award',()=>{
    expect(bossReveal('committed-id',2,species,true,'500')).toEqual({id:'committed-id',seat:2,award:'500'});
    expect(bossReveal('miss',2,species,false,'500')).toBeNull();
   }
-  expect(bossReveal('invalid',1,48,true,'500')).toBeNull();
+  expect(bossReveal('invalid',1,49,true,'500')).toBeNull();
  });
 });

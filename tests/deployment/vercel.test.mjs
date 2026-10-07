@@ -29,8 +29,8 @@ test('API routing precedes SPA fallback and static output excludes privileged ap
  const config=JSON.parse(await readFile('.vercel/output/config.json','utf8'));
  assert.equal(config.version,3);assert.equal(config.routes[1].src,'/v1/(.*)');assert.equal(config.routes.at(-1).dest,'/index.html');
  const html=await readFile('.vercel/output/static/index.html','utf8');assert.match(html,/New Game/);assert.doesNotMatch(html,/admin\/src/);
- const staticFiles=await readdir('.vercel/output/static');assert.ok(!staticFiles.includes('motion-check.html'));
+ const staticFiles=await readdir('.vercel/output/static');assert.ok(!staticFiles.includes('motion-check.html'));assert.ok(!staticFiles.includes('win-check.html'));
  const entry=html.match(/src="(\/assets\/index-[^"]+\.js)"/)?.[1];assert.ok(entry);
- assert.doesNotMatch(await readFile(`.vercel/output/static${entry}`,'utf8'),/Local motion acceptance|motion-report/);
+ assert.doesNotMatch(await readFile(`.vercel/output/static${entry}`,'utf8'),/Local motion acceptance|motion-report|Local win effects acceptance/);
  const functionConfig=JSON.parse(await readFile('.vercel/output/functions/game.func/.vc-config.json','utf8'));assert.equal(functionConfig.runtime,'nodejs24.x');
 });

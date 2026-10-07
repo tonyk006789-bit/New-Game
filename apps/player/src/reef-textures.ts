@@ -24,6 +24,7 @@ export async function reefTextures(app:Application,game:FishGame='reef-party'){
  if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];creatures[world.first+i]=crop(premium,x,y,w,h,false);}
  const expansion=await Assets.load<Texture>(extraFishAtlas.atlas);
  for(let i=0;i<8;i++){const [x,y,w,h]=extraFishAtlas.regions[i];creatures[extraFishAtlas.first+i]=crop(expansion,x,y,w,h,false);}
+ const wheel=await Assets.load<Texture>('/art/jackpot-target-v26.svg');creatures[48]=crop(wheel,0,0,wheel.width,wheel.height,false);
  const cannons=world&&premium?world.regions.slice(8).map(([x,y,w,h])=>crop(premium,x,y,w,h,false)):abyss?abyssCannons.regions.map(([x,y,w,h])=>crop(sources[1],x,y,w,h,false)):Array.from({length:4},(_,i)=>crop(sources[1],i%2*768,Math.floor(i/2)*512,768,512));
  filter.destroy();return {creatures,cannons};
 }

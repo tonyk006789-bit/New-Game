@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WinBurst from './WinBurst.vue';
 import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
 import {blackjackProfile,blackjackDeal,blackjackShoe,blackjackAct,blackjackPublic,handValue,type BlackjackState,type Card} from '@new-game/game-math';
 import {api,session} from './api';
@@ -58,7 +59,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);finishReveal();});
 </script>
 <template><section class="blackjack-cabinet" :class="{'cards-still':reducedMotion,'hand-revealing':revealing}">
  <div class="blackjack-rail"><span>♠ ROYAL SALON</span><b>PREMIUM</b><span>{{staked?'PLAY CREDITS':'FREE PREVIEW'}}</span></div>
- <div class="blackjack-felt">
+ <div class="blackjack-felt"><WinBurst v-if="hand?.settled&&showResult&&hand.hands.some(h=>h.result==='WIN'||h.result==='BLACKJACK')" :key="hand.id" game="royal-blackjack" :id="hand.id" :award="hand.award" :stake="String(hand.hands.reduce((sum,h)=>sum+h.stake,0))" :running="running" :reduced-motion="reducedMotion"/>
   <div class="card-shoe" aria-hidden="true"><span>♠</span><b>6 DECKS</b></div><div class="table-chip-rack" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="dealer-emblem" aria-label="Automated dealer"><span>♠</span><b>THE DEALER</b><small>STANDS ON ALL 17s</small></div>
   <div class="dealer-cards" aria-label="Dealer hand"><template v-if="hand"><div v-for="(card,i) in dealerCards" :key="`${hand.id}-dealer-${i}-${card?.rank}`" class="playing-card" :class="{red:card&&(card.suit===1||card.suit===2),back:!card}" :style="{'--deal-index':i}"><template v-if="card"><b>{{rank(card)}}<small>{{suits[card.suit]}}</small></b><strong :class="{'court-card':card.rank>10}"><em v-if="card.rank>10">♛</em>{{suits[card.suit]}}</strong><b class="card-bottom">{{rank(card)}}<small>{{suits[card.suit]}}</small></b></template><span v-else>♠</span></div></template><div v-else class="card-space">♠</div><span v-if="hand?.dealerValue&&showResult" class="hand-total">{{hand.dealerValue.total}}</span></div>
   <div class="felt-lettering"><strong>BLACKJACK PAYS 3 TO 2</strong><small>SIX DECKS · HIT / STAND / DOUBLE / SPLIT</small></div>

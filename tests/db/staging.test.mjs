@@ -28,7 +28,7 @@ async function wallet(id){return fixture.wallet(id);}
 async function adjust(id,direction,amount){assert.equal(direction,'ADD');return fixture.fund(id,amount);}
 const {stagingMultiplier,stagingGameProfileId,reefFlight,reefTarget,reefLeadAngle,reefTierProfile,reefAssistProfile}=await import('../../packages/game-math/src/index.ts');
 const sleep=()=>new Promise(resolve=>setTimeout(resolve,275));
-const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1',...(extra.roomId?{trajectoryVersion:'reef-ballistics-v6'}:{}),...extra});
+const body=(extra={})=>({requestKey:randomUUID(),stake:'25',profileId:'stage-classic3-v1',...(extra.roomId?{trajectoryVersion:'reef-ballistics-v7'}:{}),...extra});
 test('isolated staging accounting and outcomes',async t=>{
  await t.test('zero-start hierarchy and environment separation',async()=>{
   const north=await create(adminId,'stage.north1'),agent=await create(north,'stage.agent1');player=await create(agent,'stage.player1');await create(agent,'stage.peer1');playerAuth=await signin('stage.player1');peerAuth=await signin('stage.peer1');
@@ -142,7 +142,7 @@ test('isolated staging accounting and outcomes',async t=>{
   const teleport=aim();delete teleport.firedAt;delete teleport.angle;assert.equal((await call('staging/reef-party/rounds',teleport,playerAuth)).status,400);
   assert.equal((await wallet(player)).settled,before);
   let captured=false,last;
-  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v6');assert.equal(r.data.ruleVersion,reefAssistProfile.id);assert.equal(r.data.award,(25n*BigInt(stagingMultiplier(r.data))).toString());assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
+  for(let i=0;i<25&&!captured;i++){await sleep();const data=aim(),r=await call('staging/reef-party/rounds',data,playerAuth);assert.equal(r.status,201,JSON.stringify(r));captured=r.data.captured;last=data;assert.equal(r.data.flight.version,'reef-ballistics-v7');assert.equal(r.data.ruleVersion,reefAssistProfile.id);assert.equal(r.data.award,(25n*BigInt(stagingMultiplier(r.data))).toString());assert.deepEqual((await call('staging/reef-party/rounds',data,playerAuth)).data,r.data);}
   assert.equal(captured,true);await sleep();assert.equal((await call('staging/reef-party/rounds',{...last,requestKey:randomUUID()},playerAuth)).status,409);
   // A durable historical receipt is replayable after the trajectory-proof upgrade.
   const legacy={...last,profileId:'stage-paying30-v1',requestKey:randomUUID()};delete legacy.firedAt;delete legacy.angle;delete legacy.trajectoryVersion;

@@ -26,3 +26,5 @@ import './arcade-v23.css';
 
 import './arcade-v24.css';
 import './arcade-v25.css';
+
+import './arcade-v26.css';

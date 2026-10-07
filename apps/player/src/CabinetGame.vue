@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import WinBurst from './WinBurst.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { cabinetGames, legacyCabinetGames, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
 import { catalog } from '@new-game/contracts';
@@ -10,7 +11,6 @@ import BetControls from './BetControls.vue';
 import {stage} from './staging-state';
 import {creditPresentation} from './credit-presentation';
 import {displayedReelGrid} from './cabinet-layout';
-
 const staked=computed(()=>stage.enabled&&props.authenticated);
 const props = defineProps<{ game: CabinetGameId; running: boolean; reducedMotion: boolean; authenticated: boolean; balance: string }>();
 const profile = cabinetGames[props.game], game = catalog.find(item => item.id === props.game)!;
@@ -95,7 +95,7 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
 
 <template>
   <section class="slot-cabinet" :class="[game.id, {'cabinet-active':active, 'stage-paused':!running,'classic-three':renderProfile.columns===3,'single-row-cabinet':singleRow}]" :data-phase="phase" :style="{'--game-color':game.color}">
-    <div v-if="newTheme>=0" class="cabinet-v23-backdrop" :style="{backgroundPosition:`${newTheme*50}% center`}" aria-hidden="true"></div><div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
+    <WinBurst v-if="celebrating&&result" :key="result.id" :game="game.id" :id="result.id" :award="returnAmount" :stake="stage.last?.stake||'25'" :running="running" :reduced-motion="reducedMotion"/><div v-if="newTheme>=0" class="cabinet-v23-backdrop" :style="{backgroundPosition:`${newTheme*50}% center`}" aria-hidden="true"></div><div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
     <header class="slot-marquee"><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span><div><small>NEW GAME ORIGINAL</small><h2>{{ game.name }}</h2><p>{{legacyReceipt?'SAVED 5-REEL RESULT':game.detail}}</p></div><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span></header>
     <p v-if="legacyReceipt" class="legacy-layout-note">Previous five-reel round · New spins use three reels</p>
     <div v-if="game.id==='midnight-express'" class="express-feature" aria-hidden="true"><span>MIDNIGHT DEPARTURE</span><ArcadeSymbol symbol="dragon" theme="midnight-express"/><b>LOCOMOTIVE WILD</b></div><div v-if="crownGame" class="portrait-crown-feature" aria-hidden="true"><span>THE ROYAL COLLECTION</span><ArcadeSymbol symbol="dragon" :theme="game.id"/><b>CROWN WILD</b></div>
@@ -104,7 +104,7 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
       <div class="slot-reel-surround">
         <div class="reel-banner"><span>{{ coinGame ? singleRow?'SUN COINS • LOCK & COLLECT':'LOCK A COIN • HOLD THE REEL' : `${renderProfile.lines.length} LINES • LEFT TO RIGHT` }}</span><span>{{ coinGame ? `${remaining} RESPINS LEFT` : (staked ? 'PLAY' : 'FREE PRACTICE') }}</span></div>
         <div class="reel-playfield">
-          <div v-if="celebrating" class="cabinet-win-flare" aria-hidden="true"><span v-for="n in 12" :key="`${result?.id}-${n}`" :style="{'--spark':n}">✦</span></div>
+
           <ReelStage ref="reels" :theme="game.id" :initial-grid="reelGrid(initialGrid)" :strip-symbols="profile.symbols" :reduced-motion="reducedMotion" :highlighted="highlighted" :locked="coinGame ? locked : []" />
           <svg v-if="!coinGame" class="payline-overlay" :viewBox="`0 0 ${renderProfile.columns * 100} 300`" preserveAspectRatio="none" aria-hidden="true"><polyline v-for="line in visibleLines" :key="line.line" :points="line.rows.slice(0,line.count).map((row,col) => `${col*100+50},${row*100+50}`).join(' ')" :stroke="lineColors[(line.line-1)%lineColors.length]" fill="none" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><text v-for="line in visibleLines" :key="`label-${line.line}`" x="10" :y="line.rows[0]*100+43" :fill="lineColors[(line.line-1)%lineColors.length]" stroke="#fff9dc" stroke-width=".7" font-size="18" font-weight="900">{{line.line}}</text></svg>
         </div>

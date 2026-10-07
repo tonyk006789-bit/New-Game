@@ -10,6 +10,7 @@ import {stage} from './staging-state';
 import {catalog} from '@new-game/contracts';
 import {fishWorlds} from './fish-worlds';
 import {chooseBotFlight} from './bot-targeting';
+import {BotScoreboard,botName,botCadence,type BotScore} from './bot-score';
 import {reefTextures} from './reef-textures';
 import BetControls from './BetControls.vue';
 import AquaticSprite from './AquaticSprite.vue';
@@ -24,17 +25,26 @@ import FishRewardReveal from './FishRewardReveal.vue';
 import type {ReefImpact} from './reef-room';
 const rewardReveals=ref<{id:number;species:number;award:string}[]>([]);let revealId=0;
 const revealTimers=new Set<ReturnType<typeof setTimeout>>();
-function celebrate(species:number,award:string,x:number,y:number){
- const id=++revealId;const boss=props.game!=='reef-party'?bossReveal(`own-${id}`,room.value?.seat||1,species,true,award):null;
- if(boss)jackpotReward.value=boss;else rewardReveals.value=[...rewardReveals.value.slice(-3),{id,species,award}];
- const timer=setTimeout(()=>{rewardReveals.value=rewardReveals.value.filter(r=>r.id!==id);revealTimers.delete(timer);},2500);revealTimers.add(timer);
- playSound(species===22||reefTier(species)==='boss'?'treasure':'win');
+function wheelReveal(reward:BossReveal){
+ jackpotReward.value=reward;
+ const timer=setTimeout(()=>{if(jackpotReward.value?.id===reward.id)jackpotReward.value=null;revealTimers.delete(timer);},3200);revealTimers.add(timer);
+}
+function catchParticles(species:number,x:number,y:number,seat:number){
  if(props.reducedMotion)return;
- const origin=reefCannon(room.value?.seat||1);
- for(let i=0;i<18;i++){const a=i*2.399,r=22+i*2,dx=Math.cos(a)*r,dy=Math.sin(a)*r;
-  const coin=new Graphics().circle(0,0,8).fill(0xffc632).circle(0,0,6).stroke({color:0xfff3a1,width:1.5});
-  effect(coin,x+dx,y+dy,1.15,'coin',(origin.x-x-dx)/1.15,(origin.y-y-dy)/1.15-85);
+ const origin=reefCannon(seat),tier=reefTier(species),count={small:16,medium:26,large:40,boss:60}[tier];
+ const colors:Record<FishGame,number[]>={'reef-party':[0xffd94c,0x7cffff],'abyss-legends':[0xffad39,0xff615a],'sunken-dynasty':[0xffe09a,0x62ffbb],'polar-odyssey':[0xf0ffff,0x88cdff]},[gold,accent]=colors[props.game];
+ for(let i=0;i<count;i++){const a=i*2.399,r=18+i*1.5,dx=Math.cos(a)*r,dy=Math.sin(a)*r;
+  const coin=new Graphics().circle(1,2,8).fill(0x805021).circle(0,0,8).fill(gold).circle(0,0,6).stroke({color:0xfff3bc,width:1.4}).moveTo(-2,-4).lineTo(2,4).stroke({color:0x9c641d,width:1.5});
+  effect(coin,x+dx,y+dy,1.5,'coin',(origin.x-x-dx)/1.5,(origin.y-y-dy)/1.5-111);
  }
+ for(let i=0;i<(tier==='boss'?28:14);i++){const a=i*2.399;const shard=props.game==='polar-odyssey'?new Graphics().poly([0,-9,4,0,0,9,-4,0]).fill(accent):props.game==='sunken-dynasty'?new Graphics().star(0,0,4,8,2).fill(accent):new Graphics().star(0,0,5,5,1).fill(accent);effect(shard,x,y,1.2,'particle',Math.cos(a)*(90+i*4),Math.sin(a)*(90+i*4)-25);}
+ const ring=new Graphics().circle(0,0,45).stroke({color:accent,width:tier==='boss'?5:2,alpha:.8});effect(ring,x,y,1.2,'burst');
+}
+function celebrate(species:number,award:string,x:number,y:number){
+ const id=++revealId;const boss=species===48?bossReveal(`own-${id}`,room.value?.seat||1,species,true,award):null;
+ if(boss)wheelReveal(boss);else rewardReveals.value=[...rewardReveals.value.slice(-2),{id,species,award}];
+ const timer=setTimeout(()=>{rewardReveals.value=rewardReveals.value.filter(r=>r.id!==id);revealTimers.delete(timer);},2800);revealTimers.add(timer);
+ playSound(species===22||reefTier(species)==='boss'?'treasure':'win');catchParticles(species,x,y,room.value?.seat||1);
 }
 import type {ReefRoom as Room} from './reef-room';
 const props=defineProps<{running:boolean;reducedMotion:boolean;authenticated?:boolean;balance?:string;initialRoom?:Room|null;game:FishGame}>();
@@ -45,6 +55,7 @@ const firedCount=ref(0);
 const botShots=ref(0),botSeats=computed(()=>props.authenticated?(room.value?.bots||[]).map(bot=>bot.seat):reefBotSeats([1]));
 const presentingTargets=new Set<number>();
 const botBolts:{view:Graphics;seat:number;targetId:number;x:number;y:number;origin:{x:number;y:number};start:number;duration:number;launched:boolean}[]=[];
+const aiScores=ref<Record<number,BotScore>>({}),aiGains=ref<Record<number,number>>({}),aiScoreboard=new BotScoreboard(),botFocus=new Map<number,number>(),botRest=new Map<number,{target:number;until:number}>(),botSeatShots=new Map<number,number>();
 const botTargets=ref(''),botDeadline=new Map<number,number>();let botSequence=0,lastHumanTarget:number|null=null,lastHumanUntil=0;
 function humanTargets(){return new Set([lockedTarget.value,performance.now()<lastHumanUntil?lastHumanTarget:null,...projectiles.map(p=>p.flight.targetId),...presentingTargets].filter((id):id is number=>id!==null));}
 function independentBots(time:number,now:number){
@@ -55,16 +66,27 @@ function independentBots(time:number,now:number){
   if(ownBolts.length>=4)continue;
   if(!botDeadline.has(seat)){botDeadline.set(seat,now+seat*90);continue;}
   if(now<botDeadline.get(seat)!)continue;
-  botDeadline.set(seat,now+(props.reducedMotion?700:220)+(seat*37+botSequence*13)%80);
-  const excluded=new Set([...humans,...chosen,...botBolts.filter(b=>b.seat!==seat).map(b=>b.targetId)]),flight=chooseBotFlight(props.game,seat,time,alive(),excluded,botSequence++,ownBolts[0]?.targetId);
-  if(!flight||flight.targetId===null)continue;chosen.add(flight.targetId);
+  const seatShots=(botSeatShots.get(seat)||0)+1;botSeatShots.set(seat,seatShots);botDeadline.set(seat,now+botCadence(seat,seatShots,props.reducedMotion));
+  const rest=botRest.get(seat),excluded=new Set([...humans,...chosen,...(rest&&now<rest.until?[rest.target]:[]),...botBolts.filter(b=>b.seat!==seat).map(b=>b.targetId)]),flight=chooseBotFlight(props.game,seat,time,alive(),excluded,botSequence++,botFocus.get(seat)??ownBolts[0]?.targetId);
+  if(!flight||flight.targetId===null)continue;chosen.add(flight.targetId);botFocus.set(seat,flight.targetId);
   const cannon=cannons[seat-1];cannon.angle=flight.angle;cannon.recoil=props.reducedMotion?0:.24;botShots.value++;
-  if(props.reducedMotion){const fish=creatures.find(f=>f.id===flight.targetId);if(fish)fish.hit=.06;continue;}
   const view=new Graphics().ellipse(-7,0,12,3).fill({color:[0xffd978,0x78c8ff,0xff9e8a,0xc7a0ff][seat-1],alpha:.7}).circle(0,0,3).fill(0xd9fff7);
-  view.position.set(flight.origin.x,flight.origin.y);world.addChild(view);
+  view.position.set(flight.origin.x,flight.origin.y);view.visible=!props.reducedMotion;world.addChild(view);
   botBolts.push({view,seat,targetId:flight.targetId,x:flight.x,y:flight.y,origin:flight.origin,start:now,duration:Math.max(40,flight.time*1000),launched:true});
  }
  botTargets.value=botBolts.map(b=>`${b.seat}:${b.targetId}`).join(',');
+}
+function scoreBotImpact(seat:number,targetId:number,x:number,y:number){
+ const fish=creatures.find(f=>f.id===targetId);if(error.value||disposed||!props.running||!botSeats.value.includes(seat)||!fish||fish.captured||humanTargets().has(targetId)||!alive().includes(targetId))return;
+ const species=targetAt(targetId,0).species,result=aiScoreboard.hit(seat,targetId,species,performance.now());aiScores.value={...aiScores.value,[seat]:result.score};fish.hit=.09;
+ if(!result.gain)return;
+ botFocus.delete(seat);botRest.set(seat,{target:targetId,until:performance.now()+4000});aiGains.value={...aiGains.value,[seat]:result.gain};
+ const timer=setTimeout(()=>{aiGains.value={...aiGains.value,[seat]:0};revealTimers.delete(timer);},1500);revealTimers.add(timer);
+ const base=reefCannon(seat),label=new Text({text:`+${result.gain} PTS`,style:{fontFamily:'Georgia',fontSize:18,fontWeight:'bold',fill:0xffdf7f,stroke:{color:0x182842,width:3}}});label.anchor.set(.5);effect(label,base.x,base.y+(seat<3?-65:65),1.5,'particle',0,seat<3?-12:12);
+ if(!props.reducedMotion){
+  const ring=new Graphics().circle(0,0,24).stroke({color:0xffdf7f,width:2,alpha:.65});effect(ring,x,y,.7,'burst');
+  for(let i=0;i<6;i++){const token=new Graphics().star(0,0,4,5,2).fill(0xffe594);effect(token,x+i*3,y,1,'coin',base.x-x-i*3,base.y-y-74);}
+ }
 }
 const autoOn=ref(false),lockOn=ref(false),fast=ref(false),lockedTarget=ref<number|null>(null);
 let reticle:Graphics,nextAutoAt=0;
@@ -85,7 +107,7 @@ function alive(){const caught=new Set(creatures.filter(f=>f.captured).map(f=>f.i
 async function syncRoom(){
  if(!props.authenticated||!props.running||polling||disposed)return;polling=true;
  try{const snapshot=await api<Room>('practice/reef/join',{game:props.game,...(props.initialRoom?{roomId:props.initialRoom.id}:{})});if(disposed)return;
-  const sameRoom=room.value?.id===snapshot.id;room.value=snapshot;clockOffset=snapshot.serverTime-Date.now();epoch=new Date(snapshot.startedAt).getTime();
+  const sameRoom=room.value?.id===snapshot.id;if(!sameRoom){aiScoreboard.reset();aiScores.value={};aiGains.value={};botFocus.clear();botRest.clear();botSeatShots.clear();}room.value=snapshot;clockOffset=snapshot.serverTime-Date.now();epoch=new Date(snapshot.startedAt).getTime();
   for(const fish of creatures){fish.captured=(sameRoom&&fish.captured)||(!presentingTargets.has(fish.id)&&!!snapshot.targets.find(t=>t.target_id===fish.id)?.captured);fish.view.visible=!fish.captured;}
   for(const event of snapshot.impacts||[])showPeerImpact(event);
   error.value='';
@@ -101,7 +123,7 @@ function showPeerImpact(event:ReefImpact){
  if(!props.reducedMotion){
   const trail=new Graphics().moveTo(origin.x,origin.y).lineTo(event.flight.x,event.flight.y).stroke({color:[0xffd774,0x76d9ff,0xff978d,0xd5a0ff][event.seat-1],width:2,alpha:.6});effect(trail,0,0,.25,'trail');
  }
- if(event.captured){const boss=props.game!=='reef-party'?bossReveal(event.id,event.seat,targetAt(event.targetId,0).species,event.captured,event.award):null;if(boss)jackpotReward.value=boss;const label=new Text({text:`P${event.seat} +${formatCredits(event.award)}`,style:{fontFamily:'Georgia',fontSize:23,fontWeight:'bold',fill:0xffe28c,stroke:{color:0x152344,width:3}}});label.anchor.set(.5);effect(label,event.flight.x,event.flight.y,1.1,'particle',0,-24);}
+ if(event.captured){const boss=targetAt(event.targetId,0).species===48?bossReveal(event.id,event.seat,48,event.captured,event.award):null;if(boss)wheelReveal(boss);catchParticles(targetAt(event.targetId,0).species,event.flight.x,event.flight.y,event.seat);const label=new Text({text:`P${event.seat} +${formatCredits(event.award)}`,style:{fontFamily:'Georgia',fontSize:23,fontWeight:'bold',fill:0xffe28c,stroke:{color:0x152344,width:3}}});label.anchor.set(.5);effect(label,event.flight.x,event.flight.y,1.1,'particle',0,-24);}
 }
 function effect(view:Container,x:number,y:number,life:number,kind='burst',vx=0,vy=0){view.position.set(x,y);world.addChild(view);if(effects.length>=400)effects.shift()!.view.destroy();effects.push({view,age:0,life,kind,vx,vy,x,y});}
 function impact(x:number,y:number,win=false){
@@ -174,10 +196,10 @@ onMounted(async()=>{
   app.ticker.add(ticker=>{
    if(!props.running)return;const dt=Math.min(ticker.deltaMS,50)/1000,time=(Date.now()+clockOffset-epoch)/1000;
    waterLight.visible=!props.reducedMotion;if(waterLight.visible){waterLight.x=Math.sin(time*.09)*24;for(let i=0;i<bubbles.length;i++)bubbles[i].position.set(45+(i*67)%1120+Math.sin(time*.45+i)*9,610-((time*(8+i%5)+i*37)%640));}
-   for(const fish of creatures){const p=targetAt(fish.id,time);fish.hit=Math.max(0,fish.hit-dt);fish.view.position.set(p.x+(props.reducedMotion?0:Math.sin(fish.hit*50)*fish.hit*14),p.y);fish.view.scale.set(p.direction,Math.min(1,world.scale.x/world.scale.y));fish.sprite.tint=fish.hit>.2?0xc6f5ff:0xffffff;
+   for(const fish of creatures){const p=targetAt(fish.id,time);fish.hit=Math.max(0,fish.hit-dt);fish.view.position.set(p.x+(props.reducedMotion?0:Math.sin(fish.hit*50)*fish.hit*14),p.y);fish.view.scale.set(p.species===48?1:p.direction,Math.min(1,world.scale.x/world.scale.y));fish.sprite.tint=fish.hit>.2?0xc6f5ff:0xffffff;
     fish.view.rotation=props.reducedMotion?0:Math.sin(time*2+fish.id)*.035;fish.view.visible=!fish.captured&&p.active&&p.x>-200&&p.x<1400;
     if(fish.view.visible){fish.shadow.position.set(7+(props.reducedMotion?0:Math.sin(time*.8+fish.id)*2),12+(props.reducedMotion?0:Math.cos(time*.8+fish.id)*3));const buffer=fish.sprite.geometry.getAttribute('aPosition').buffer,positions=buffer.data as Float32Array,width=fish.sprite.texture.width;
-     for(let i=0;i<positions.length;i+=2){const along=fish.vertices[i]/width,tail=(1-along)**2;positions[i+1]=fish.vertices[i+1]+(props.reducedMotion?0:Math.sin(time*(p.radius<20?8:4.2)-along*5+fish.id)*width*.035*tail);}
+     for(let i=0;i<positions.length;i+=2){const along=fish.vertices[i]/width,tail=(1-along)**2;positions[i+1]=fish.vertices[i+1]+(props.reducedMotion||p.species===48?0:Math.sin(time*(p.radius<20?8:4.2)-along*5+fish.id)*width*.035*tail);}
      buffer.update();
     }
    }
@@ -187,8 +209,8 @@ onMounted(async()=>{
    for(let i=0;i<cannons.length;i++){const c=cannons[i];c.recoil=Math.max(0,c.recoil-dt);c.visualAngle=props.reducedMotion?c.angle:dampAngle(c.visualAngle,c.angle,dt);c.barrel.rotation=c.visualAngle+Math.PI/2;const kick=props.reducedMotion?0:recoilOffset(c.recoil);c.barrel.position.set(-Math.cos(c.visualAngle)*kick,-Math.sin(c.visualAngle)*kick);c.view.scale.y=Math.min(1,world.scale.x/world.scale.y);c.view.alpha=!room.value||room.value.seat===i+1||botSeats.value.includes(i+1)||room.value.seats.some(s=>s.seat===i+1)?1:.6;}
    for(let i=botBolts.length-1;i>=0;i--){const b=botBolts[i],age=performance.now()-b.start;if(age<0)continue;
     if(!b.launched){b.launched=true;const c=cannons[b.seat-1];c.angle=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);c.recoil=.24;botShots.value++;}
-    const progress=Math.min(1,age/b.duration);b.view.visible=true;b.view.rotation=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);b.view.position.set(b.origin.x+(b.x-b.origin.x)*progress,b.origin.y+(b.y-b.origin.y)*progress);
-    if(progress>=1){const spark=new Graphics().circle(0,0,9).stroke({color:0x85deef,width:1.5,alpha:.6});effect(spark,b.x,b.y,.22,'bot-impact');b.view.destroy();botBolts.splice(i,1);}
+    const progress=Math.min(1,age/b.duration);b.view.visible=!props.reducedMotion;b.view.rotation=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);b.view.position.set(b.origin.x+(b.x-b.origin.x)*progress,b.origin.y+(b.y-b.origin.y)*progress);
+    if(progress>=1){scoreBotImpact(b.seat,b.targetId,b.x,b.y);const spark=new Graphics().circle(0,0,9).stroke({color:0x85deef,width:1.5,alpha:.6});effect(spark,b.x,b.y,.22,'bot-impact');b.view.destroy();botBolts.splice(i,1);}
    }
    for(let i=projectiles.length-1;i>=0;i--){const s=projectiles[i];s.age=(Date.now()+clockOffset-s.firedAt)/1000;const t=Math.min(s.age,s.flight.time);s.view.position.set(s.flight.origin.x+s.flight.vx*t,s.flight.origin.y+s.flight.vy*t);
     if(s.age>=s.flight.time){s.view.destroy();projectiles.splice(i,1);void settleShot(s);}
@@ -197,13 +219,13 @@ onMounted(async()=>{
   });if(!props.running)app.stop();
  }catch(e){error.value=`The reef renderer could not start: ${(e as Error).message}`;}
 });
-function cancelFlight(){for(const shot of projectiles){shot.view.destroy();finishedShot(shot.requestKey);}projectiles.length=0;for(const bolt of botBolts)bolt.view.destroy();botBolts.length=0;botDeadline.clear();botTargets.value='';}
+function cancelFlight(){for(const shot of projectiles){shot.view.destroy();finishedShot(shot.requestKey);}projectiles.length=0;for(const bolt of botBolts)bolt.view.destroy();botBolts.length=0;botDeadline.clear();botFocus.clear();botTargets.value='';}
 watch(()=>props.running,running=>{if(!running){stopAuto('Paused. Auto fire is off.');cancelFlight();}if(!app?.renderer)return;if(running){app.start();void syncRoom();}else app.stop();});
 watch(()=>stage.stake,()=>{stopAuto('Stake changed. Auto fire is off.');cancelFlight();});
 watch(()=>stage.recovered,()=>{stopAuto('Connection restored. Ready to fire.');void syncRoom();});
 watch(()=>props.authenticated,()=>stopAuto());
 onBeforeUnmount(()=>{for(const timer of revealTimers)clearTimeout(timer);stopAuto();disposed=true;cancelFlight();revealCredits(props.game);clearInterval(poll);observer?.disconnect();if(app?.renderer){app.canvas.removeEventListener('pointerdown',fire);app.canvas.removeEventListener('pointermove',aimAt);app.destroy(true,{children:true});if(art)Object.values(art).flat().forEach((t:RenderTexture)=>t.destroy(true));}});
 </script>
-<template><section class="reef-preview reef-deluxe" :class="game" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount" :data-bot-shots="botShots" :data-bot-count="botSeats.length" :data-bot-targets="botTargets" :data-human-targets="[...humanTargets()].join(',')"><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:(room?.seat||1)===seat,bot:botSeats.includes(seat)}]"><small>{{botSeats.includes(seat)?'BOT TEAMMATE':(room?.seat||1)===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || (botSeats.includes(seat)?`Bot ${seat}`:!authenticated&&seat===1?'You':'Open seat')}}</b><em v-if="botSeats.includes(seat)">AI · VISUAL FIRE</em><em v-else-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><AbyssJackpotWheel v-if="game!=='reef-party'" :title="catalog.find(g=>g.id===game)?.name.split(' ')[0]" :reward="jackpotReward" :reduced-motion="reducedMotion"/><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
+<template><section class="reef-preview reef-deluxe" :class="game" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount" :data-bot-shots="botShots" :data-bot-count="botSeats.length" :data-ai-scores="JSON.stringify(aiScores)" :data-bot-targets="botTargets" :data-human-targets="[...humanTargets()].join(',')"><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:(room?.seat||1)===seat,bot:botSeats.includes(seat)}]"><small>{{botSeats.includes(seat)?'AI CREW':(room?.seat||1)===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || (botSeats.includes(seat)?botName(game,seat):!authenticated&&seat===1?'You':'Open seat')}}</b><em v-if="botSeats.includes(seat)" class="ai-score" :data-score="aiScores[seat]?.points||0">{{(aiScores[seat]?.points||0).toLocaleString()}} PTS <span v-if="aiGains[seat]" :key="aiScores[seat]?.combos" class="ai-score-gain">+{{aiGains[seat]}}</span></em><em v-else-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><span class="jackpot-target-hint">SHOOT THE GOLD WHEEL · 20×</span><AbyssJackpotWheel v-if="jackpotReward" :game="game" :running="running" :title="catalog.find(g=>g.id===game)?.name.split(' ')[0]" :reward="jackpotReward" :reduced-motion="reducedMotion"/><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :id="String(reward.id)" :game="game" :running="running" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
 
 <style>.reef-seat-plaque.bot{border-color:#80e8c0}.reef-seat-plaque.bot small,.reef-seat-plaque.bot em{color:#a5ffda}</style>

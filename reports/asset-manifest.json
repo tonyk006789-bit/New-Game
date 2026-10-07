@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T04:57:25.791Z",
+  "generatedAt": "2026-10-07T06:52:37.679Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -120,6 +120,13 @@
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v3.json",
       "license": "Project original; owner review pending",
       "sha256": "99d2b2dc763e1f992895334e1309f944be51f3e53f2b724574089609a505c11b"
+    },
+    {
+      "path": "apps/player/public/art/jackpot-target-v26.svg",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "c92c09a66d0565828b1ba265f10fbff50f9a1db0f93141a340549175d1e1b722"
     },
     {
       "path": "apps/player/public/art/mark.svg",
@@ -259,7 +266,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "5193aeb7165cbc930dc7cd93ac85142ff855f0e4c731c77ecd8abbb5bea2aa49"
+      "sha256": "954fd5784ecbe7753ac8568ff83c38d5bbab7ac5bfaab44c6cb8104a34686d86"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -336,7 +343,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "79885fd36d47c126c01c1cbeb05d0e54c77367e8252479105ea7ca5d43f69319"
+      "sha256": "dead5305732a92f8524b5c6bb10c6e2dee7f03ff55d8214366fa7e34265ab604"
     },
     {
       "path": "apps/player/src/arcade-v18.css",
@@ -350,7 +357,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "3fe621446fd5427952ae618bffe565f5b02343361cd4b60eb738540a7c683b93"
+      "sha256": "ebee5e43685f31e09d03a76dcde2ebe21b38341d2ba093674b29cb86d917c16b"
     },
     {
       "path": "apps/player/src/abyss-cannons.ts",
@@ -393,6 +400,27 @@
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
       "sha256": "3ec1ccf406647f447010c5d1ac0e9ff587279bb60bc5a8e2613721d8f89d9086"
+    },
+    {
+      "path": "apps/player/src/WinBurst.vue",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "c5a779b963db692ff5bdc358f10e7eb79cc869217db453ab03169597f1bd0d71"
+    },
+    {
+      "path": "apps/player/src/win-effects.ts",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "8bfd8112e164d2bfa019c24f891ad4778a1e716349d45e282e3ecfa4a6546521"
+    },
+    {
+      "path": "apps/player/src/arcade-v26.css",
+      "creator": "Original animation authored for New Game",
+      "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
+      "license": "Project original",
+      "sha256": "50839d5a8726086c1f285d0bbbe3d67329f61f0aacaa12794476f19572ee4ca0"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",
