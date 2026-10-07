@@ -28,4 +28,8 @@ No migration, ledger, math, music, account or operator changes. Revert the two p
 
 ## Publication
 
-Pending publication and live evidence.
+- Source commit `0307395` pushed to GitHub main.
+- Vercel deployment `dpl_EKQ5aL4WsSSCJLuhcC96CLDmGVeY` is READY and aliased to https://new-game-test-topaz.vercel.app/.
+- Sixteen public live checks passed, including the exact `index-oyQ-Qie7.js` release, all 30 game IDs, art availability, health, staging flag and authentication boundaries. Operator remains on `index-CT1MaUjW.js`.
+- Live route evidence: `reports/screenshots/v30/live-route-checks.json`.
+- Hosted browser verified the exact release and eight full-card posters on page one after submitting the already filled tester login. No game actions were submitted. Saved `reports/screenshots/v30/live-catalog.png`; reset the temporary viewport and retained the catalog tab for the owner.
