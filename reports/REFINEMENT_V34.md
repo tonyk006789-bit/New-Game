@@ -22,4 +22,7 @@ No migrations or data changes. Revert the component or redeploy the prior operat
 
 ## Publication
 
-Pending operator deployment and read-only live checks.
+- Source commit `507607c` pushed to GitHub main.
+- Operator deployment `dpl_5fCtaKqFxrrPi5s5YDkvxmQ7egXi` is READY at https://new-game-operator.vercel.app/.
+- `node .local/verify-v34-live.mjs` — eighteen read-only checks passed, including the exact new operator bundle and frequency labels, health, authentication boundaries, unchanged player bundle/catalog and existing policy revision 1 at 20%. Evidence: `reports/screenshots/v34/live-route-checks.json`.
+- No hosted frequency change, wager or balance operation was submitted. Existing player deployment remains unchanged. Local browser draft was restored without saving; viewport overrides were reset and the verification tab closed. Final `git diff --check` passed.
