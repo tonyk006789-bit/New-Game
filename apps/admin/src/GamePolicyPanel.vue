@@ -17,7 +17,7 @@ async function save(){
   if(!pending.value){const change={payingPercent:percent.value,expectedRevision:saved.value.current.revision,requestKey:crypto.randomUUID()};localStorage.setItem(storageKey,JSON.stringify(change));pending.value=change;}
   const result=await api<{current:RoundPolicy}>('operator/game-policy',pending.value);
   localStorage.removeItem(storageKey);pending.value=null;review.value=false;
-  await load();notice.value=`Saved ${result.current.payingPercent}% for future slot and keno rounds. Revision ${result.current.revision}.`;
+  await load();notice.value=`Paying-round frequency saved: ${result.current.payingPercent}% for future slot and keno rounds. Payout amounts are unchanged. Revision ${result.current.revision}.`;
  }catch(e){
   error.value=(e as Error).message;
   if(e instanceof ApiError&&[400,403,404,409].includes(e.status)&&e.code!=='VERIFICATION_REQUIRED'){
@@ -32,24 +32,25 @@ onMounted(async()=>{
 </script>
 <template>
  <section class="panel game-policy-panel">
-  <h2 class="panel-heading">Slot & Keno Win Rate</h2>
-  <p>Controls how often slot and keno rounds return credits. Lower rate = fewer paying rounds; higher rate = more paying rounds. Every winning result still pays the same published amount.</p>
+  <h2 class="panel-heading">Slot & Keno Paying Rounds</h2>
+  <p>Move left for fewer paying rounds or right for more paying rounds. Each winning result keeps its published payout amount.</p>
   <template v-if="saved">
-   <div class="policy-current">Current <strong>{{saved.current.payingPercent}}%</strong><span>Revision {{saved.current.revision}}</span></div>
+   <div class="policy-current">Active frequency <strong>{{saved.current.payingPercent}}%</strong><span>Revision {{saved.current.revision}}</span></div>
    <form @submit.prevent="review?save():prepare()">
-    <label for="global-win-rate">Global win rate <strong>{{percent}}%</strong></label>
-    <input id="global-win-rate" v-model.number="percent" type="range" :min="testProbabilityPolicy.minimumPercent" :max="testProbabilityPolicy.maximumPercent" step="1" :disabled="busy||review||!!pending" :aria-valuetext="`${percent}% chance of any credit return`">
-    <div class="policy-range"><span>5%</span><span>50%</span></div>
-    <p>One global rate for every player, independent of their identity or balance. This changes win frequency, not the payout multiplier or the percentage of credits returned over time. Fish, blackjack and saved rounds stay unchanged. Players can see the active rate in game rules.</p>
+    <label for="paying-round-frequency">Paying-round frequency <strong>{{percent}}%</strong></label>
+    <input id="paying-round-frequency" v-model.number="percent" type="range" :min="testProbabilityPolicy.minimumPercent" :max="testProbabilityPolicy.maximumPercent" step="1" :disabled="busy||review||!!pending" :aria-valuetext="`${percent}% chance that a slot or keno round returns credits`" aria-describedby="paying-round-help">
+    <div class="policy-range"><span>Fewer paying rounds · 5%</span><span>More paying rounds · 50%</span></div>
+    <p id="paying-round-help" class="policy-frequency">{{percent}}% chance for each new Slot/Keno round to return credits. Individual sessions will vary; no fixed number of wins is guaranteed.</p>
+    <p>Applies equally to all players. Reward amounts, fish, blackjack and already accepted rounds stay unchanged. Players can see the active frequency in game rules.</p>
     <template v-if="review">
-     <p class="policy-review">{{pending?'Retry the saved request to confirm its result.':`Save ${saved.current.payingPercent}% → ${percent}% for future rounds?`}}</p>
+     <p class="policy-review">{{pending?'Retry the saved request to confirm its result.':`Change paying-round frequency from ${saved.current.payingPercent}% to ${percent}% for future Slot/Keno rounds? Payout amounts will stay the same.`}}</p>
      <label>Main Admin password<input v-model="password" type="password" autocomplete="current-password" required :disabled="busy"></label>
-     <div class="actions"><button class="primary" :disabled="busy">{{busy?'Saving…':pending?'Retry saved change':'Verify & save rate'}}</button><button v-if="!pending" type="button" :disabled="busy" @click="review=false;password=''">Cancel</button></div>
+     <div class="actions"><button class="primary" :disabled="busy">{{busy?'Saving…':pending?'Retry saved change':'Verify & save frequency'}}</button><button v-if="!pending" type="button" :disabled="busy" @click="review=false;password=''">Cancel</button></div>
     </template>
     <button v-else class="primary" :disabled="busy||percent===saved.current.payingPercent">Review change</button>
    </form>
    <p v-if="notice" role="status">{{notice}}</p>
-   <details><summary>Rate change history</summary><div class="table-scroll"><table><thead><tr><th>Revision</th><th>Rate</th><th>Changed by</th><th>Time</th></tr></thead><tbody><tr v-for="item in saved.history" :key="item.revision"><td>{{item.revision}}</td><td>{{item.payingPercent}}%</td><td>{{item.actor||'Initial approved setting'}}</td><td>{{new Date(item.createdAt).toLocaleString()}}</td></tr></tbody></table></div></details>
+   <details><summary>Frequency change history</summary><div class="table-scroll"><table><thead><tr><th>Revision</th><th>Paying-round frequency</th><th>Changed by</th><th>Time</th></tr></thead><tbody><tr v-for="item in saved.history" :key="item.revision"><td>{{item.revision}}</td><td>{{item.payingPercent}}%</td><td>{{item.actor||'Initial approved setting'}}</td><td>{{new Date(item.createdAt).toLocaleString()}}</td></tr></tbody></table></div></details>
   </template>
   <p v-if="error" role="alert">{{error}}</p>
  </section>
