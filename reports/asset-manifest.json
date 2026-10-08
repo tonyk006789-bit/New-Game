@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T19:29:52.346Z",
+  "generatedAt": "2026-10-08T02:14:29.171Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -371,7 +371,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "62fbe54b13cfcd9de5bbb878e2746ad598b6913694748b51dec1e3edb758b6aa"
+      "sha256": "3aa809781e1d3ec250d9c876d86a98bdc2cf6772d7f130a14d15116e9f72cddc"
     },
     {
       "path": "apps/player/src/FishRewardReveal.vue",
@@ -497,14 +497,14 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "38940a1a25d15f7549b95f7062c52e1a2654d956f816e7c5a00326c380b0c0cc"
+      "sha256": "0d01bfdc416d4486586a7721a3cb865f0c5a105582da5f3a8d7b49a1985b9b16"
     },
     {
       "path": "apps/player/src/GameViewport.vue",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "cad3afb6fba736a2acedd6280612e4c03696cee7859f57f15108f8e9144bc27e"
+      "sha256": "28496320f70a39fe2e92c3cc13ad6e3c3fee10e0e996139536f045ddaeacc1ca"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",
@@ -603,6 +603,20 @@
       "source": "scripts/render-music-bank.py; no third-party recordings or soundfonts",
       "license": "Project original",
       "sha256": "5e303aa7d12d28e3f7d877287b1b0e53ba91e011fb5a84c9af8db7775a536ee1"
+    },
+    {
+      "path": "apps/player/src/music-collections.ts",
+      "creator": "Original composition and interface authored for New Game",
+      "source": "Repository-native musical scores and Vue; original V29 instrument bank, no third-party music",
+      "license": "Project original",
+      "sha256": "b8ced4652fe3805d59224a44765aef6157a1817d7703cbf5c2964e5217b2429f"
+    },
+    {
+      "path": "apps/player/src/ResolutionControl.vue",
+      "creator": "Original composition and interface authored for New Game",
+      "source": "Repository-native musical scores and Vue; original V29 instrument bank, no third-party music",
+      "license": "Project original",
+      "sha256": "1e1d94098e310aa1f845ce0f0f4507f6600bbb420e3427e6435c55ef77c186a5"
     },
     {
       "path": "apps/player/public/audio/v29/accordion.wav",

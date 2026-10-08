@@ -1,6 +1,12 @@
 import {describe,it,expect} from 'vitest';
 import {stagingRules,isFishGame,isKenoGame,stagingOutcome,stagingMultiplier,configuredGameProfileId,reefChallengeProfile,reefChallengeOutcome,reefTarget,reefTier,fishGames,storyboardRandom,type StagingGame} from '@new-game/game-math';
 describe('approved configurable global test distribution',()=>{
+ it('keeps identical winning results and awards at low and high frequency settings',()=>{
+  for(const game of Object.keys(stagingRules).filter(g=>!isFishGame(g)) as StagingGame[])for(const seed of [7,31,84,199,904]){
+   const outcome=(rate:number)=>{let first=true;const random=storyboardRandom(seed);return stagingOutcome(game,'same-result',max=>{if(first){first=false;return 0;}return random(max);},isKenoGame(game)?[1,2,3,4,5,6]:undefined,rate);};
+   const low=outcome(5),high=outcome(50);expect(low).toEqual(high);expect(stagingMultiplier(low)).toBeGreaterThan(0);expect(stagingMultiplier(low)).toBe(stagingMultiplier(high));
+  }
+ });
  it('conditions every slot/keno result at both endpoints and the 20% initial setting without changing evaluation',()=>{
   for(const game of Object.keys(stagingRules).filter(g=>!isFishGame(g)) as StagingGame[])for(const rate of [5,20,50])for(const ticket of [0,rate*100-1,rate*100,9999]){
    let first=true;const random=storyboardRandom(913+ticket),result=stagingOutcome(game,'test',max=>{if(first){first=false;expect(max).toBe(10000);return ticket;}return random(max);},isKenoGame(game)?[1,2,3,4,5,6]:undefined,rate);

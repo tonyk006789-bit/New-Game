@@ -47,7 +47,10 @@ export const trackSteps=(scene:MusicScene,index=0)=>musicTrack(scene,index).barS
 export const TRACK_STEPS=1280;
 export type ScoreEvent={kind:Instrument;note:number;duration:number;level:number;pan:number};
 export function scoreStep(scene:MusicScene,step:number,index=0):ScoreEvent[]{
- const s=musicTrack(scene,index),bar=Math.floor(step/s.barSteps)%64,tick=step%s.barSteps,seconds=60/s.bpm,root=s.key+s.progression[Math.floor(bar/2)%s.progression.length],out:ScoreEvent[]=[];
+ return scoreEvents(musicTrack(scene,index),step);
+}
+export function scoreEvents(s:MusicScore,step:number):ScoreEvent[]{
+ const bar=Math.floor(step/s.barSteps)%64,tick=step%s.barSteps,seconds=60/s.bpm,root=s.key+s.progression[Math.floor(bar/2)%s.progression.length],out:ScoreEvent[]=[];
  const section=Math.floor(bar/8),intro=section===0,breakdown=section===4,finale=section===7;
  const add=(kind:Instrument,note:number,duration:number,level:number,pan=0)=>out.push({kind,note,duration,level,pan});
  if(!breakdown){

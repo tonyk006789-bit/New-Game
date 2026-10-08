@@ -16,6 +16,9 @@ for (const name of (await readdir('apps/player/public/audio/v23')).filter(name=>
  const path=`apps/player/public/audio/v23/${name}`;
  assets.push({path,creator:'Original synthesized instruments for New Game',source:'scripts/render-music-bank.py; no third-party recordings or soundfonts',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});
 }
+for(const path of ['apps/player/src/music-collections.ts','apps/player/src/ResolutionControl.vue']){
+ assets.push({path,creator:'Original composition and interface authored for New Game',source:'Repository-native musical scores and Vue; original V29 instrument bank, no third-party music',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});
+}
 for (const name of (await readdir('apps/player/public/audio/v29')).filter(name=>name.endsWith('.wav')).sort()) {
  const path=`apps/player/public/audio/v29/${name}`;
  assets.push({path,creator:'Original synthesized ensembles for New Game',source:'scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings',license:'Project original',sha256:createHash('sha256').update(await readFile(path)).digest('hex')});

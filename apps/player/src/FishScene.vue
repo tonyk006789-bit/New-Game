@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
+import {displayPreferences} from './display-preferences';
+import {gameRenderDensity} from './game-screen';
 import {Application,Container,Graphics,Sprite,MeshPlane,Text,type RenderTexture} from 'pixi.js';
 // Pixi's static shader/uniform polyfills avoid eval under the shared site's CSP.
 import 'pixi.js/unsafe-eval';
@@ -170,10 +172,10 @@ function fireCannon(){
  const requestKey=crypto.randomUUID();projectiles.push({view,flight,firedAt,roomId:room.value?.id,requestKey,age:0,stake:stage.stake});shots.set(requestKey,stage.stake);firedCount.value++;firing.value=true;nextAutoAt=performance.now()+(fast.value?125:250);cannon.visualAngle=cannon.angle;cannon.recoil=.24;notice.value='';playSound('shot');
  if(!props.reducedMotion)effect(new Graphics().star(0,0,8,20,5).fill({color:0xffe795,alpha:.9}),flight.origin.x,flight.origin.y,.12);
 }
-function resize(){if(!app||!host.value)return;app.renderer.resize(host.value.clientWidth,host.value.clientHeight);world.scale.set(app.screen.width/1200,app.screen.height/600);}
+function resize(){if(!app||!host.value)return;app.renderer.resolution=gameRenderDensity(displayPreferences.resolution);app.renderer.resize(host.value.clientWidth,host.value.clientHeight);world.scale.set(app.screen.width/1200,app.screen.height/600);}
 onMounted(async()=>{
  try{
-  app=new Application();await app.init({width:1200,height:600,backgroundAlpha:0,antialias:true,resolution:Math.min(devicePixelRatio,2),autoDensity:true,preference:'webgl'});
+  app=new Application();await app.init({width:1200,height:600,backgroundAlpha:0,antialias:true,resolution:gameRenderDensity(displayPreferences.resolution),autoDensity:true,preference:'webgl'});
   if(disposed){app.destroy(true);return;}art=await reefTextures(app,props.game);if(disposed){Object.values(art).flat().forEach(t=>t.destroy(true));app.destroy(true);return;}
   world=new Container();app.stage.addChild(world);host.value!.appendChild(app.canvas);app.canvas.setAttribute('aria-label',`${catalog.find(g=>g.id===props.game)?.name} four-cannon table with varied creatures and treasure chests`);app.canvas.setAttribute('role','img');
   waterLight=new Container();waterLight.eventMode='none';world.addChild(waterLight);
@@ -219,6 +221,7 @@ onMounted(async()=>{
   });if(!props.running)app.stop();
  }catch(e){error.value=`The reef renderer could not start: ${(e as Error).message}`;}
 });
+watch(()=>displayPreferences.resolution,()=>{if(app?.renderer)resize();});
 function cancelFlight(){for(const shot of projectiles){shot.view.destroy();finishedShot(shot.requestKey);}projectiles.length=0;for(const bolt of botBolts)bolt.view.destroy();botBolts.length=0;botDeadline.clear();botFocus.clear();botTargets.value='';}
 watch(()=>props.running,running=>{if(!running){stopAuto('Paused. Auto fire is off.');cancelFlight();}if(!app?.renderer)return;if(running){app.start();void syncRoom();}else app.stop();});
 watch(()=>stage.stake,()=>{stopAuto('Stake changed. Auto fire is off.');cancelFlight();});

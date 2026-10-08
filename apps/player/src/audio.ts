@@ -1,11 +1,15 @@
 import {reactive,watch} from 'vue';
-import {musicScores,musicPlaylists,musicTrack,scoreStep,trackSteps,type MusicScene} from './music-score';
+import {musicScores,musicPlaylists,scoreEvents,type MusicScene,type MusicScore} from './music-score';
+import {musicCollections,validMusicCollection,type MusicCollectionId} from './music-collections';
 import {loadMusicBank,sampledNote} from './music-sampler';
 export const audioPreferences=reactive({music:false,sound:true});
-export const musicNow=reactive({scene:'lobby' as MusicScene,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length,status:'idle' as 'idle'|'loading'|'ready'|'unavailable'});
-const selectedTracks=new Map<MusicScene,number>();
-function trackInfo(index:number){musicNow.index=index;musicNow.title=musicTrack(musicNow.scene,index).name;musicNow.total=musicPlaylists[musicNow.scene].length;selectedTracks.set(musicNow.scene,index);}
+export const musicNow=reactive({scene:'lobby' as MusicScene,collection:'game' as MusicCollectionId,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length,status:'idle' as 'idle'|'loading'|'ready'|'unavailable'});
+const selectedTracks=new Map<string,number>();
+const trackKey=()=>`${musicNow.scene}:${musicNow.collection}`;
+export function currentMusicPlaylist():readonly MusicScore[]{return musicNow.collection==='game'?musicPlaylists[musicNow.scene]:musicCollections[musicNow.collection].tracks;}
+function trackInfo(index:number){const tracks=currentMusicPlaylist();musicNow.index=index%tracks.length;musicNow.title=tracks[musicNow.index].name;musicNow.total=tracks.length;selectedTracks.set(trackKey(),musicNow.index);}
 try{const saved=JSON.parse(localStorage.getItem('ng-audio')||'{}');if(typeof saved.music==='boolean')audioPreferences.music=saved.music;if(typeof saved.sound==='boolean')audioPreferences.sound=saved.sound;}catch{/* Optional settings. */}
+try{const saved=localStorage.getItem('ng-music-collection');if(validMusicCollection(saved)){musicNow.collection=saved;trackInfo(0);}}catch{/* Optional music selection. */}
 let context:AudioContext|undefined,musicGain:GainNode|undefined,soundGain:GainNode|undefined,echo:DelayNode|undefined;
 let bank:Awaited<ReturnType<typeof loadMusicBank>>|undefined,loadingBank:Promise<void>|undefined;
 let timer:ReturnType<typeof setInterval>|undefined,active=true,step=0,nextAt=0;
@@ -22,11 +26,11 @@ function scheduleMusic(){
  if(!context||!musicGain||!bank||!echo||!active||!audioPreferences.music||context.state!=='running')return;
  if(nextAt<context.currentTime)nextAt=context.currentTime+.03;
  while(nextAt<context.currentTime+.18){
-  const score=musicTrack(musicNow.scene,musicNow.index),sixteenth=15/score.bpm;
+  const score=currentMusicPlaylist()[musicNow.index],sixteenth=15/score.bpm;
   echo.delayTime.setTargetAtTime(45/score.bpm,context.currentTime,.1);
-  for(const e of scoreStep(musicNow.scene,step,musicNow.index))sampledNote(context,bank,e,nextAt,musicGain,echo,musicNodes);
+  for(const e of scoreEvents(score,step))sampledNote(context,bank,e,nextAt,musicGain,echo,musicNodes);
   nextAt+=sixteenth*(step%2?1-score.swing:1+score.swing);step++;
-  if(step===trackSteps(musicNow.scene,musicNow.index)){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
+  if(step===score.barSteps*64){step=0;trackInfo((musicNow.index+1)%musicNow.total);}
  }
 }
 function stopMusic(){clearInterval(timer);timer=undefined;for(const node of musicNodes){try{node.stop();}catch{/* Already ended. */}}musicNodes.clear();}
@@ -35,7 +39,8 @@ function update(){
  if(!active||!audioPreferences.music){stopMusic();return;}
  if(context.state==='running'&&bank&&!timer){nextAt=context.currentTime+.03;scheduleMusic();timer=setInterval(scheduleMusic,50);}
 }
-export function setMusicScene(scene:string){const next=Object.hasOwn(musicScores,scene)?scene as MusicScene:'lobby';if(next===musicNow.scene)return;stopMusic();step=0;musicNow.scene=next;trackInfo(selectedTracks.get(next)||0);update();}
+export function setMusicScene(scene:string){const next=Object.hasOwn(musicScores,scene)?scene as MusicScene:'lobby';if(next===musicNow.scene)return;stopMusic();step=0;musicNow.scene=next;trackInfo(selectedTracks.get(trackKey())||0);update();}
+export function selectMusicCollection(id:string){if(!validMusicCollection(id)||id===musicNow.collection)return;stopMusic();step=0;musicNow.collection=id;trackInfo(selectedTracks.get(trackKey())||0);try{localStorage.setItem('ng-music-collection',id);}catch{/* Session selection remains usable. */}update();}
 export function selectMusicTrack(index:number){if(!Number.isInteger(index)||index<0||index>=musicNow.total)return;stopMusic();step=0;trackInfo(index);update();}
 export function nextMusicTrack(){selectMusicTrack((musicNow.index+1)%musicNow.total);}
 export async function unlockAudio(){

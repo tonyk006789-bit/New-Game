@@ -33,14 +33,14 @@ onMounted(async()=>{
 <template>
  <section class="panel game-policy-panel">
   <h2 class="panel-heading">Slot & Keno Win Rate</h2>
-  <p>Chance of a round returning any credits, including returns smaller than the stake. This is not the percentage of credits returned over time.</p>
+  <p>Controls how often slot and keno rounds return credits. Lower rate = fewer paying rounds; higher rate = more paying rounds. Every winning result still pays the same published amount.</p>
   <template v-if="saved">
    <div class="policy-current">Current <strong>{{saved.current.payingPercent}}%</strong><span>Revision {{saved.current.revision}}</span></div>
    <form @submit.prevent="review?save():prepare()">
     <label for="global-win-rate">Global win rate <strong>{{percent}}%</strong></label>
     <input id="global-win-rate" v-model.number="percent" type="range" :min="testProbabilityPolicy.minimumPercent" :max="testProbabilityPolicy.maximumPercent" step="1" :disabled="busy||review||!!pending" :aria-valuetext="`${percent}% chance of any credit return`">
     <div class="policy-range"><span>5%</span><span>50%</span></div>
-    <p>Applies equally to every player's future slot and keno rounds. Reward amounts, fish, blackjack and saved rounds stay unchanged. Players can see the current rate in game rules.</p>
+    <p>One global rate for every player, independent of their identity or balance. This changes win frequency, not the payout multiplier or the percentage of credits returned over time. Fish, blackjack and saved rounds stay unchanged. Players can see the active rate in game rules.</p>
     <template v-if="review">
      <p class="policy-review">{{pending?'Retry the saved request to confirm its result.':`Save ${saved.current.payingPercent}% → ${percent}% for future rounds?`}}</p>
      <label>Main Admin password<input v-model="password" type="password" autocomplete="current-password" required :disabled="busy"></label>

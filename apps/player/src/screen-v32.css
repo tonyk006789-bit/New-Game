@@ -7,6 +7,7 @@
 .fixed-game-frame .game-topline{flex:none;height:48px;min-height:48px;padding:4px 10px}.fixed-game-frame .game-topline h1{font-size:24px}
 .fixed-game-frame[data-orientation=portrait] .game-topline h1{font-size:18px}
 .fixed-game-frame .slot-cabinet:not(.single-row-cabinet),.fixed-game-frame .slot-cabinet.single-row-cabinet{height:672px;min-height:0;max-height:none;display:flex;flex-direction:column;flex:1;padding-top:8px}
+.fixed-game-frame[data-orientation=landscape] .slot-cabinet{width:100%;max-width:none}
 .fixed-game-frame .slot-cabinet .slot-marquee{height:85px;min-height:85px;flex:none;margin:0 0 8px}.fixed-game-frame .slot-marquee h2{font-size:42px}
 .fixed-game-frame .slot-cabinet .cabinet-game-body{flex:1;min-height:0;width:100%;align-items:stretch;margin:8px auto 0}
 .fixed-game-frame .slot-reel-surround{display:flex;flex-direction:column;min-height:0}.fixed-game-frame .slot-cabinet .reel-playfield{height:auto;min-height:0;flex:1}
