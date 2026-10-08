@@ -33,4 +33,10 @@ No database migration, rate-setting update, balance mutation, credential change 
 
 ## Publication
 
-Pending the existing authorized player/operator Vercel test-site deployment and read-only live verification.
+- Source commit `3cbe256` pushed to GitHub main.
+- Player deployment `dpl_FvBtJUxcHbiir2thtH135GfiZNic` is READY at https://new-game-test-topaz.vercel.app/.
+- Operator deployment `dpl_FrcdbFykDRPzFBckQAxc3rna89Ni` is READY at https://new-game-operator.vercel.app/.
+- `node .local/verify-v33-live.mjs` — eighteen read-only checks passed: both health endpoints, exact entry bundle hashes, all thirty games, fifteen lower-stake IDs, asset availability and API authentication/audience boundaries. Hosted rate remains revision 1 at 20%. Evidence: `reports/screenshots/v33/live-route-checks.json`.
+- The hosted player session restored successfully; Settings displayed all five added collections and three resolution choices. Selecting Brass & Lights exposed Marquee Strut and Velvet Rope Shuffle. Music was left muted. Screenshot: `reports/screenshots/v33/settings-live.png`.
+- Local reload retained the selected music collection, 1080p preference and mute state. Hosted backend restored its existing Agent session and dashboard. No hosted wager, balance operation, account mutation or rate-setting change was submitted.
+- Temporary viewport emulation was reset. Final `git diff --check` passed. Physical-device performance and native builds remain unverified as stated above.
