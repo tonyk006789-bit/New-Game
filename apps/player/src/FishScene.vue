@@ -2,7 +2,7 @@
 import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
 import {displayPreferences} from './display-preferences';
 import {gameRenderDensity} from './game-screen';
-import {Application,Container,Graphics,Sprite,MeshPlane,Text,type RenderTexture} from 'pixi.js';
+import {Application,Container,Graphics,Sprite,MeshPlane,Text} from 'pixi.js';
 // Pixi's static shader/uniform polyfills avoid eval under the shared site's CSP.
 import 'pixi.js/unsafe-eval';
 import {reefTarget,reefBallistics,reefSpecies,reefTier,reefTierProfile,reefCannon,reefFlight,reefLeadAngle,fishGuide,reefBotSeats,type ReefAssistance,type FishGame} from '@new-game/game-math';
@@ -13,7 +13,7 @@ import {catalog} from '@new-game/contracts';
 import {fishWorlds} from './fish-worlds';
 import {chooseBotFlight} from './bot-targeting';
 import {BotScoreboard,botName,botCadence,type BotScore} from './bot-score';
-import {reefTextures} from './reef-textures';
+import {reefTextures,releaseReefTextures} from './reef-textures';
 import BetControls from './BetControls.vue';
 import AquaticSprite from './AquaticSprite.vue';
 import {holdCredits,revealCredits} from './credit-presentation';
@@ -27,6 +27,8 @@ import FishRewardReveal from './FishRewardReveal.vue';
 import type {ReefImpact} from './reef-room';
 const rewardReveals=ref<{id:number;species:number;award:string}[]>([]);let revealId=0;
 const revealTimers=new Set<ReturnType<typeof setTimeout>>();
+const effectTemplates=new Map<string,Graphics>();
+function graphic(key:string,create:()=>Graphics){let template=effectTemplates.get(key);if(!template){template=create();effectTemplates.set(key,template);}return new Graphics({context:template.context});}
 function wheelReveal(reward:BossReveal){
  jackpotReward.value=reward;
  const timer=setTimeout(()=>{if(jackpotReward.value?.id===reward.id)jackpotReward.value=null;revealTimers.delete(timer);},3200);revealTimers.add(timer);
@@ -36,10 +38,10 @@ function catchParticles(species:number,x:number,y:number,seat:number){
  const origin=reefCannon(seat),tier=reefTier(species),count={small:16,medium:26,large:40,boss:60}[tier];
  const colors:Record<FishGame,number[]>={'corsair-cove':[0xffcd74,0x6bddd9],'cosmic-tides':[0xb3a3ff,0x6cfcff],'reef-party':[0xffd94c,0x7cffff],'abyss-legends':[0xffad39,0xff615a],'sunken-dynasty':[0xffe09a,0x62ffbb],'polar-odyssey':[0xf0ffff,0x88cdff]},[gold,accent]=colors[props.game];
  for(let i=0;i<count;i++){const a=i*2.399,r=18+i*1.5,dx=Math.cos(a)*r,dy=Math.sin(a)*r;
-  const coin=new Graphics().circle(1,2,8).fill(0x805021).circle(0,0,8).fill(gold).circle(0,0,6).stroke({color:0xfff3bc,width:1.4}).moveTo(-2,-4).lineTo(2,4).stroke({color:0x9c641d,width:1.5});
+  const coin=graphic('catch-coin',()=>new Graphics().circle(1,2,8).fill(0x805021).circle(0,0,8).fill(gold).circle(0,0,6).stroke({color:0xfff3bc,width:1.4}).moveTo(-2,-4).lineTo(2,4).stroke({color:0x9c641d,width:1.5}));
   effect(coin,x+dx,y+dy,1.5,'coin',(origin.x-x-dx)/1.5,(origin.y-y-dy)/1.5-111);
  }
- for(let i=0;i<(tier==='boss'?28:14);i++){const a=i*2.399;const shard=props.game==='polar-odyssey'?new Graphics().poly([0,-9,4,0,0,9,-4,0]).fill(accent):props.game==='sunken-dynasty'?new Graphics().star(0,0,4,8,2).fill(accent):new Graphics().star(0,0,5,5,1).fill(accent);effect(shard,x,y,1.2,'particle',Math.cos(a)*(90+i*4),Math.sin(a)*(90+i*4)-25);}
+ for(let i=0;i<(tier==='boss'?28:14);i++){const a=i*2.399;const shard=graphic('catch-shard',()=>props.game==='polar-odyssey'?new Graphics().poly([0,-9,4,0,0,9,-4,0]).fill(accent):props.game==='sunken-dynasty'?new Graphics().star(0,0,4,8,2).fill(accent):new Graphics().star(0,0,5,5,1).fill(accent));effect(shard,x,y,1.2,'particle',Math.cos(a)*(90+i*4),Math.sin(a)*(90+i*4)-25);}
  const ring=new Graphics().circle(0,0,45).stroke({color:accent,width:tier==='boss'?5:2,alpha:.8});effect(ring,x,y,1.2,'burst');
 }
 function celebrate(species:number,award:string,x:number,y:number){
@@ -53,7 +55,7 @@ const props=defineProps<{running:boolean;reducedMotion:boolean;authenticated?:bo
 const targetAt=(id:number,time:number)=>reefTarget(id,time,props.game);
 type Flight=ReturnType<typeof reefFlight>;
 const host=ref<HTMLDivElement>(),room=ref<Room|null>(props.initialRoom||null),error=ref(''),notice=ref('Aim into the reef. Tap to fire.'),firing=ref(false),guide=ref(false);
-const firedCount=ref(0);
+const firedCount=ref(0),loading=ref(true);
 const botShots=ref(0),botSeats=computed(()=>props.authenticated?(room.value?.bots||[]).map(bot=>bot.seat):reefBotSeats([1]));
 const presentingTargets=new Set<number>();
 const botBolts:{view:Graphics;seat:number;targetId:number;x:number;y:number;origin:{x:number;y:number};start:number;duration:number;launched:boolean}[]=[];
@@ -72,7 +74,7 @@ function independentBots(time:number,now:number){
   const rest=botRest.get(seat),excluded=new Set([...humans,...chosen,...(rest&&now<rest.until?[rest.target]:[]),...botBolts.filter(b=>b.seat!==seat).map(b=>b.targetId)]),flight=chooseBotFlight(props.game,seat,time,alive(),excluded,botSequence++,botFocus.get(seat)??ownBolts[0]?.targetId);
   if(!flight||flight.targetId===null)continue;chosen.add(flight.targetId);botFocus.set(seat,flight.targetId);
   const cannon=cannons[seat-1];cannon.angle=flight.angle;cannon.recoil=props.reducedMotion?0:.24;botShots.value++;
-  const view=new Graphics().ellipse(-7,0,12,3).fill({color:[0xffd978,0x78c8ff,0xff9e8a,0xc7a0ff][seat-1],alpha:.7}).circle(0,0,3).fill(0xd9fff7);
+  const view=graphic(`bot-bolt-${seat}`,()=>new Graphics().ellipse(-7,0,12,3).fill({color:[0xffd978,0x78c8ff,0xff9e8a,0xc7a0ff][seat-1],alpha:.7}).circle(0,0,3).fill(0xd9fff7));
   view.position.set(flight.origin.x,flight.origin.y);view.visible=!props.reducedMotion;world.addChild(view);
   botBolts.push({view,seat,targetId:flight.targetId,x:flight.x,y:flight.y,origin:flight.origin,start:now,duration:Math.max(40,flight.time*1000),launched:true});
  }
@@ -167,7 +169,7 @@ function fireCannon(){
  trackTarget();const seat=room.value?.seat||1,cannon=cannons[seat-1],firedAt=Date.now()+clockOffset,flight=reefFlight(seat,cannon.angle,(firedAt-epoch)/1000,alive(),props.game);
  lastHumanTarget=flight.targetId;lastHumanUntil=performance.now()+3000;
  const shotColor=props.game==='abyss-legends'?[0x42e8ff,0xff9a25,0xf365ff,0x8eff47][seat-1]:0x1bdfff;
- const view=new Graphics().ellipse(-9,0,15,5).fill({color:shotColor,alpha:.5}).circle(0,0,5).fill(0xfff7bd).circle(0,0,2).fill(0xffffff);
+ const view=graphic(`player-bolt-${seat}`,()=>new Graphics().ellipse(-9,0,15,5).fill({color:shotColor,alpha:.5}).circle(0,0,5).fill(0xfff7bd).circle(0,0,2).fill(0xffffff));
  view.rotation=flight.angle;view.position.set(flight.origin.x,flight.origin.y);world.addChild(view);
  const requestKey=crypto.randomUUID();projectiles.push({view,flight,firedAt,roomId:room.value?.id,requestKey,age:0,stake:stage.stake});shots.set(requestKey,stage.stake);firedCount.value++;firing.value=true;nextAutoAt=performance.now()+(fast.value?125:250);cannon.visualAngle=cannon.angle;cannon.recoil=.24;notice.value='';playSound('shot');
  if(!props.reducedMotion)effect(new Graphics().star(0,0,8,20,5).fill({color:0xffe795,alpha:.9}),flight.origin.x,flight.origin.y,.12);
@@ -176,8 +178,8 @@ function resize(){if(!app||!host.value)return;app.renderer.resolution=gameRender
 onMounted(async()=>{
  try{
   app=new Application();await app.init({width:1200,height:600,backgroundAlpha:0,antialias:true,resolution:gameRenderDensity(displayPreferences.resolution),autoDensity:true,preference:'webgl'});
-  if(disposed){app.destroy(true);return;}art=await reefTextures(app,props.game);if(disposed){Object.values(art).flat().forEach(t=>t.destroy(true));app.destroy(true);return;}
-  world=new Container();app.stage.addChild(world);host.value!.appendChild(app.canvas);app.canvas.setAttribute('aria-label',`${catalog.find(g=>g.id===props.game)?.name} four-cannon table with varied creatures and treasure chests`);app.canvas.setAttribute('role','img');
+  if(disposed){app.destroy(true);return;}art=await reefTextures(app,props.game);if(disposed){releaseReefTextures(art);app.destroy(true);return;}
+  app.ticker.maxFPS=60;world=new Container();world.eventMode='none';world.interactiveChildren=false;app.stage.addChild(world);host.value!.appendChild(app.canvas);app.canvas.setAttribute('aria-label',`${catalog.find(g=>g.id===props.game)?.name} four-cannon table with varied creatures and treasure chests`);app.canvas.setAttribute('role','img');
   waterLight=new Container();waterLight.eventMode='none';world.addChild(waterLight);
   for(let i=0;i<5;i++){const beam=new Graphics().poly([i*270-100,-40,i*270+10,-40,i*270+260,640,i*270+20,640]).fill({color:0xc8f8ff,alpha:.027});waterLight.addChild(beam);}
   for(let i=0;i<18;i++){const bubble=new Graphics().circle(0,0,2+i%4).stroke({color:0xc8f4ff,width:.7,alpha:.3}).circle(-1,-1,1).fill({color:0xe8ffff,alpha:.4});bubble.eventMode='none';waterLight.addChild(bubble);bubbles.push(bubble);}
@@ -212,14 +214,14 @@ onMounted(async()=>{
    for(let i=botBolts.length-1;i>=0;i--){const b=botBolts[i],age=performance.now()-b.start;if(age<0)continue;
     if(!b.launched){b.launched=true;const c=cannons[b.seat-1];c.angle=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);c.recoil=.24;botShots.value++;}
     const progress=Math.min(1,age/b.duration);b.view.visible=!props.reducedMotion;b.view.rotation=Math.atan2(b.y-b.origin.y,b.x-b.origin.x);b.view.position.set(b.origin.x+(b.x-b.origin.x)*progress,b.origin.y+(b.y-b.origin.y)*progress);
-    if(progress>=1){scoreBotImpact(b.seat,b.targetId,b.x,b.y);const spark=new Graphics().circle(0,0,9).stroke({color:0x85deef,width:1.5,alpha:.6});effect(spark,b.x,b.y,.22,'bot-impact');b.view.destroy();botBolts.splice(i,1);}
+    if(progress>=1){scoreBotImpact(b.seat,b.targetId,b.x,b.y);const spark=graphic('bot-impact',()=>new Graphics().circle(0,0,9).stroke({color:0x85deef,width:1.5,alpha:.6}));effect(spark,b.x,b.y,.22,'bot-impact');b.view.destroy();botBolts.splice(i,1);}
    }
    for(let i=projectiles.length-1;i>=0;i--){const s=projectiles[i];s.age=(Date.now()+clockOffset-s.firedAt)/1000;const t=Math.min(s.age,s.flight.time);s.view.position.set(s.flight.origin.x+s.flight.vx*t,s.flight.origin.y+s.flight.vy*t);
     if(s.age>=s.flight.time){s.view.destroy();projectiles.splice(i,1);void settleShot(s);}
    }
    for(let i=effects.length-1;i>=0;i--){const e=effects[i];e.age+=dt;const progress=Math.min(1,e.age/e.life);e.view.alpha=1-progress**2;if(e.kind==='particle'||e.kind==='coin'){e.view.x=e.x+e.vx*e.age;e.view.y=e.y+e.vy*e.age+(e.kind==='coin'?74*e.age**2:0);if(e.kind==='coin'){e.view.scale.x=Math.cos(e.age*12);e.view.rotation=e.age*.6;}}else if(e.kind!=='trail')e.view.scale.set(props.reducedMotion?1:.3+effectProgress(e.age,e.life)*1.05);if(e.age>=e.life){e.view.destroy({children:true});effects.splice(i,1);}}
-  });if(!props.running)app.stop();
- }catch(e){error.value=`The reef renderer could not start: ${(e as Error).message}`;}
+  });loading.value=false;if(!props.running)app.stop();
+ }catch(e){loading.value=false;error.value=`The reef renderer could not start: ${(e as Error).message}`;}
 });
 watch(()=>displayPreferences.resolution,()=>{if(app?.renderer)resize();});
 function cancelFlight(){for(const shot of projectiles){shot.view.destroy();finishedShot(shot.requestKey);}projectiles.length=0;for(const bolt of botBolts)bolt.view.destroy();botBolts.length=0;botDeadline.clear();botFocus.clear();botTargets.value='';}
@@ -227,8 +229,8 @@ watch(()=>props.running,running=>{if(!running){stopAuto('Paused. Auto fire is of
 watch(()=>stage.stake,()=>{stopAuto('Stake changed. Auto fire is off.');cancelFlight();});
 watch(()=>stage.recovered,()=>{stopAuto('Connection restored. Ready to fire.');void syncRoom();});
 watch(()=>props.authenticated,()=>stopAuto());
-onBeforeUnmount(()=>{for(const timer of revealTimers)clearTimeout(timer);stopAuto();disposed=true;cancelFlight();revealCredits(props.game);clearInterval(poll);observer?.disconnect();if(app?.renderer){app.canvas.removeEventListener('pointerdown',fire);app.canvas.removeEventListener('pointermove',aimAt);app.destroy(true,{children:true});if(art)Object.values(art).flat().forEach((t:RenderTexture)=>t.destroy(true));}});
+onBeforeUnmount(()=>{for(const timer of revealTimers)clearTimeout(timer);stopAuto();disposed=true;cancelFlight();revealCredits(props.game);clearInterval(poll);observer?.disconnect();if(app?.renderer){app.canvas.removeEventListener('pointerdown',fire);app.canvas.removeEventListener('pointermove',aimAt);app.stop();if(art){app.destroy(true,{children:true});releaseReefTextures(art);}}for(const template of effectTemplates.values())template.destroy();effectTemplates.clear();});
 </script>
-<template><section class="reef-preview reef-deluxe" :class="game" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount" :data-bot-shots="botShots" :data-bot-count="botSeats.length" :data-ai-scores="JSON.stringify(aiScores)" :data-bot-targets="botTargets" :data-human-targets="[...humanTargets()].join(',')"><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:(room?.seat||1)===seat,bot:botSeats.includes(seat)}]"><small>{{botSeats.includes(seat)?'AI CREW':(room?.seat||1)===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || (botSeats.includes(seat)?botName(game,seat):!authenticated&&seat===1?'You':'Open seat')}}</b><em v-if="botSeats.includes(seat)" class="ai-score" :data-score="aiScores[seat]?.points||0">{{(aiScores[seat]?.points||0).toLocaleString()}} PTS <span v-if="aiGains[seat]" :key="aiScores[seat]?.combos" class="ai-score-gain">+{{aiGains[seat]}}</span></em><em v-else-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><span class="jackpot-target-hint">SHOOT THE GOLD WHEEL · 20×</span><AbyssJackpotWheel v-if="jackpotReward" :game="game" :running="running" :title="catalog.find(g=>g.id===game)?.name.split(' ')[0]" :reward="jackpotReward" :reduced-motion="reducedMotion"/><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :id="String(reward.id)" :game="game" :running="running" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
+<template><section class="reef-preview reef-deluxe" :class="game" :style="fishWorlds[game]?{backgroundImage:`url(${fishWorlds[game]!.background})`}:{}"><div ref="host" class="fish-canvas" :data-target="lockedTarget ?? ''" :data-shots-fired="firedCount" :data-bot-shots="botShots" :data-bot-count="botSeats.length" :data-ai-scores="JSON.stringify(aiScores)" :data-bot-targets="botTargets" :data-human-targets="[...humanTargets()].join(',')"><div v-if="loading&&!error" class="fish-loading" role="status">Preparing your table…</div><p v-if="error" class="error" role="alert">{{error}}</p><div v-if="!running" class="paused-overlay">Paused</div></div><div class="reef-seat-plaque" :data-seat="seat" v-for="seat in 4" :key="seat" :class="[`seat-${seat}`,{yours:(room?.seat||1)===seat,bot:botSeats.includes(seat)}]"><small>{{botSeats.includes(seat)?'AI CREW':(room?.seat||1)===seat?'YOUR CANNON':`CANNON ${seat}`}}</small><b>{{room?.seats.find(s=>s.seat===seat)?.display_name || (botSeats.includes(seat)?botName(game,seat):!authenticated&&seat===1?'You':'Open seat')}}</b><em v-if="botSeats.includes(seat)" class="ai-score" :data-score="aiScores[seat]?.points||0">{{(aiScores[seat]?.points||0).toLocaleString()}} PTS <span v-if="aiGains[seat]" :key="aiScores[seat]?.combos" class="ai-score-gain">+{{aiGains[seat]}}</span></em><em v-else-if="room?.seat===seat && stage.enabled">{{formatCredits(stage.stake)}} / SHOT</em></div><span class="jackpot-target-hint">SHOOT THE GOLD WHEEL · 20×</span><AbyssJackpotWheel v-if="jackpotReward" :game="game" :running="running" :title="catalog.find(g=>g.id===game)?.name.split(' ')[0]" :reward="jackpotReward" :reduced-motion="reducedMotion"/><div class="fish-reward-stack"><FishRewardReveal v-for="reward in rewardReveals" :key="reward.id" :id="String(reward.id)" :game="game" :running="running" :species="reward.species" :award="reward.award" :reduced-motion="reducedMotion"/></div><p class="reef-shot-notice" role="status">{{notice}}</p><div class="reef-console"><div class="led-meter"><small>CREDITS</small><strong>{{balance||'0.00'}}</strong></div><BetControls :reduced-motion="reducedMotion" :game="game" :ready="running" :authenticated="!!authenticated" :busy="firing" continuous/><div class="fish-actions"><button :aria-pressed="autoOn" aria-label="Auto fire" :disabled="!running||!!stage.pending||!!error" @click="toggleAuto"><b>⟳</b><span>AUTO {{autoOn?'ON':'OFF'}}</span></button><button :aria-pressed="lockOn" aria-label="Target lock" :disabled="!running" @click="toggleLock"><b>⌖</b><span>LOCK {{lockOn?'ON':'OFF'}}</span></button><button :aria-pressed="fast" aria-label="Fast fire cadence" :disabled="!running" @click="fast=!fast"><b>▶▶</b><span>{{fast?'FAST 2×':'NORMAL 1×'}}</span></button></div><span class="cannon-ready" :class="{busy:firing}">{{firing?'● FIRING':'● CANNON READY'}}</span><button class="line-map-button" :aria-expanded="guide" @click="guide=!guide">SPECIES</button></div><div v-if="guide" class="reef-field-guide" aria-label="Fish species"><span v-for="index in fishGuide(game)" :key="index"><AquaticSprite :species="index"/><b>{{reefSpecies[index]}}</b><small>{{reefTierProfile.tiers[reefTier(index)].label}} · {{reefTierProfile.tiers[reefTier(index)].multiplier}}× shot</small></span></div></section></template>
 
 <style>.reef-seat-plaque.bot{border-color:#80e8c0}.reef-seat-plaque.bot small,.reef-seat-plaque.bot em{color:#a5ffda}</style>

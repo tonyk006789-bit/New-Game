@@ -2,6 +2,7 @@ import {reactive,watch} from 'vue';
 import {musicScores,musicPlaylists,scoreEvents,type MusicScene,type MusicScore} from './music-score';
 import {musicCollections,validMusicCollection,type MusicCollectionId} from './music-collections';
 import {loadMusicBank,sampledNote} from './music-sampler';
+import {soundCue,allowSound,type SoundKind} from './sound-design';
 export const audioPreferences=reactive({music:false,sound:true});
 export const musicNow=reactive({scene:'lobby' as MusicScene,collection:'game' as MusicCollectionId,title:musicScores.lobby.name as string,index:0,total:musicPlaylists.lobby.length,status:'idle' as 'idle'|'loading'|'ready'|'unavailable'});
 const selectedTracks=new Map<string,number>();
@@ -14,13 +15,15 @@ let context:AudioContext|undefined,musicGain:GainNode|undefined,soundGain:GainNo
 let bank:Awaited<ReturnType<typeof loadMusicBank>>|undefined,loadingBank:Promise<void>|undefined;
 let timer:ReturnType<typeof setInterval>|undefined,active=true,step=0,nextAt=0;
 const musicNodes=new Set<AudioScheduledSourceNode>();
-function tone(note:number,start:number,duration:number,gain:GainNode,volume=.1,type:OscillatorType='sine',music=false,kick=false){
- if(!context)return;const oscillator=context.createOscillator(),envelope=context.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(kick?135:440*2**((note-69)/12),start);
- if(kick)oscillator.frequency.exponentialRampToValueAtTime(42,start+.16);
+const soundNodes=new Set<AudioScheduledSourceNode>(),lastSounds=new Map<SoundKind,number>();
+function stopSounds(){for(const node of soundNodes){try{node.stop();}catch{/* Already ended. */}}soundNodes.clear();lastSounds.clear();}
+function tone(note:number,start:number,duration:number,gain:GainNode,volume=.1,type:OscillatorType='sine',end?:number){
+ if(!context||soundNodes.size>=32)return;const oscillator=context.createOscillator(),envelope=context.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(440*2**((note-69)/12),start);
+ if(end!==undefined)oscillator.frequency.exponentialRampToValueAtTime(440*2**((end-69)/12),start+duration);
  envelope.gain.setValueAtTime(0,start);envelope.gain.linearRampToValueAtTime(volume,start+.006);envelope.gain.exponentialRampToValueAtTime(.0001,start+duration);
  const filter=context.createBiquadFilter();filter.type='lowpass';filter.frequency.value=type==='sawtooth'?1500:3300;
- oscillator.connect(filter);filter.connect(envelope);envelope.connect(gain);oscillator.start(start);oscillator.stop(start+duration+.02);if(music)musicNodes.add(oscillator);
- oscillator.onended=()=>{musicNodes.delete(oscillator);oscillator.disconnect();filter.disconnect();envelope.disconnect();};
+ oscillator.connect(filter);filter.connect(envelope);envelope.connect(gain);oscillator.start(start);oscillator.stop(start+duration+.02);soundNodes.add(oscillator);
+ oscillator.onended=()=>{soundNodes.delete(oscillator);oscillator.disconnect();filter.disconnect();envelope.disconnect();};
 }
 function scheduleMusic(){
  if(!context||!musicGain||!bank||!echo||!active||!audioPreferences.music||context.state!=='running')return;
@@ -36,6 +39,7 @@ function scheduleMusic(){
 function stopMusic(){clearInterval(timer);timer=undefined;for(const node of musicNodes){try{node.stop();}catch{/* Already ended. */}}musicNodes.clear();}
 function update(){
  if(!context)return;musicGain!.gain.setTargetAtTime(audioPreferences.music&&active?.34:0,context.currentTime,.03);soundGain!.gain.setTargetAtTime(audioPreferences.sound&&active?.28:0,context.currentTime,.015);
+ if(!active||!audioPreferences.sound)stopSounds();
  if(!active||!audioPreferences.music){stopMusic();return;}
  if(context.state==='running'&&bank&&!timer){nextAt=context.currentTime+.03;scheduleMusic();timer=setInterval(scheduleMusic,50);}
 }
@@ -54,9 +58,9 @@ export async function unlockAudio(){
  update();}catch{musicNow.status='unavailable';/* Unsupported audio never blocks play. */}
 }
 export function setAudioActive(value:boolean){active=value;update();if(!value)void context?.suspend();else if(context)void context.resume().then(update).catch(()=>{});}
-export function playSound(kind:'click'|'shot'|'win'|'impact'|'reel-start'|'reel-stop'|'treasure'='click'){
+export function playSound(kind:SoundKind='click'){
  if(!context||!soundGain||!active||!audioPreferences.sound||context.state!=='running')return;
- const now=context.currentTime,notes=kind==='treasure'?[60,67,72,76,79,84]:kind==='win'?[72,76,79,84]:kind==='reel-start'?[48,55,60]:kind==='reel-stop'?[62,50]:kind==='shot'?[45,33]:kind==='impact'?[64,52]:[79];
- notes.forEach((note,i)=>tone(note,now+i*(kind==='win'||kind==='treasure'?.1:.025),kind==='win'||kind==='treasure'?.42:.13,soundGain!,.15,kind==='shot'?'triangle':'sine'));
+ const now=context.currentTime;if(!allowSound(kind,now*1000,lastSounds))return;
+ for(const note of soundCue(kind,musicNow.scene))tone(note.note,now+note.at,note.duration,soundGain,note.volume,note.wave,note.end);
 }
 watch(audioPreferences,()=>{try{localStorage.setItem('ng-audio',JSON.stringify(audioPreferences));}catch{/* Optional preferences. */}update();});

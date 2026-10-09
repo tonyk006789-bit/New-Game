@@ -50,7 +50,7 @@ async function reveal(token: number) {
   if (!props.running || props.reducedMotion) { finish(true); return; }
   if (isVault.value) {
     phase.value = 'pulse';
-    if (vault.value.added.length) playSound('reel-stop');
+    if (vault.value.added.length) playSound('feature');
     notice.value = frame.value === 0 ? clockwork.value?'Three gears start the clock.':'Three crystals open the vault.' : vault.value.added.length ? `${vault.value.added.length} new ${clockwork.value?'gears':'crystals'} locked. Pulses recharged.` : `${vault.value.remaining} pulses remaining.`;
     later(() => {
       if (frame.value >= sequence.value.frames.length - 1) { finish(); return; }
@@ -72,7 +72,7 @@ async function reveal(token: number) {
     }
     if (!cascade.value.removed.length) { later(() => finish(), featureTiming.fall, token); return; }
     notice.value = `Cascade ${frame.value + 1} · ${cascade.value.removed.length} connected relics.`;
-    later(() => { cancelFalls(); phase.value = 'highlight'; playSound('click'); later(() => { phase.value = 'clear'; later(() => { frame.value++; void reveal(token); }, featureTiming.clear, token); }, featureTiming.highlight, token); }, featureTiming.fall, token);
+    later(() => { cancelFalls(); phase.value = 'highlight'; playSound('feature'); later(() => { phase.value = 'clear'; later(() => { frame.value++; void reveal(token); }, featureTiming.clear, token); }, featureTiming.highlight, token); }, featureTiming.fall, token);
   }
 }
 async function play() {

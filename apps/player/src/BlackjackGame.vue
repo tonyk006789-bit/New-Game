@@ -35,9 +35,9 @@ function present(value:View,animate=true){
  clearMotion();hand.value=value;now.value=Date.now();error.value='';showResult.value=false;dealerVisible.value=1;
  if(value.wallet&&session.current){if(BigInt(value.wallet.version)>=BigInt(session.current.wallet.version))session.current.wallet=value.wallet;holdAward(props.game,session.current.id,session.current.wallet.available,value.settled?value.award:'0');stage.revision++;}
  if(!animate||props.reducedMotion||!props.running){finishReveal();return;}
- revealing.value=true;playSound('click');clearTimeout(revealTimer);
+ revealing.value=true;playSound('card-deal');clearTimeout(revealTimer);
  if(value.settled){
-  for(let i=2;i<=value.dealer.length;i++)later(()=>{dealerVisible.value=i;playSound('click');},420+(i-2)*360);
+  for(let i=2;i<=value.dealer.length;i++)later(()=>{dealerVisible.value=i;playSound('card-deal');},420+(i-2)*360);
   const resultAt=780+Math.max(0,value.dealer.length-2)*360;
   later(()=>{showResult.value=true;if(Number(value.award)>0)playSound('win');},resultAt);
   revealTimer=setTimeout(finishReveal,resultAt+1200);

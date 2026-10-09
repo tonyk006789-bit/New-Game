@@ -15,6 +15,7 @@ import './arcade-v16.css';
 // Shared test links use HTTPS. Never render a sign-in form on a remote HTTP origin.
 if(location.protocol==='http:'&&!['127.0.0.1','localhost'].includes(location.hostname))location.replace(`https://${location.host}${location.pathname}${location.search}`);
 else createApp(App).mount('#app');
+if(import.meta.env.DEV&&new URLSearchParams(location.search).has('profile'))void import('./performance-probe').then(m=>m.installPerformanceProbe());
 
 import './arcade-v17.css';
 
@@ -33,3 +34,4 @@ import './expansion-v28.css';
 import './screen-v29.css';
 import './layout-v31.css';
 import './screen-v32.css';
+import './experience-v35.css';

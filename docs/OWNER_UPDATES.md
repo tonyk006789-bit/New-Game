@@ -275,3 +275,9 @@ Add five selectable collections, each with two original compositions: Neon Drive
 ## 8 October 2026 — replace Win Rate wording with Paying Rounds (V34)
 
 The owner requested a slider for fewer or more paying Slot/Keno rounds, overwriting the existing backend win-rate slider. Replace that single control's title, label, endpoints, review/save messages and history terminology with Slot & Keno Paying Rounds / Paying-round frequency. Retain its existing authenticated Main Admin endpoint, global 5%–50% range, immutable revisions and fixed award evaluation. No second slider, multiplier, policy reset, hidden adjustment or database migration. Publish the operator update to the existing authorized Vercel site. Evidence: `../reports/REFINEMENT_V34.md`.
+
+## 10 October 2026 — lobby workflow, rendering cost and action sounds (V35)
+
+The owner requested an improved theme/workflow, smoother scrolling, lobby changes, gameplay and wins, plus special sound effects. Refine the neon lounge with compact navigation, readable balances, full-art catalog cards, mobile sizing and remembered catalog position. Reduce idle animation work, reel filler rendering, fish effect geometry allocation and redundant account/history requests. Share cached atlas sources safely across fish-table visits, cap fish rendering at 60 FPS, bound simultaneous sound voices and clean up completed win particles. Add original synthesized navigation, reel, keno, card, fish and game-family win cues with independent mute/background handling.
+
+This is a player presentation release under the existing Vercel publication authorization. No operator, database, odds, payout, stake, credit or credential changes. Local browser measurements are limited samples, not a zero-lag guarantee or Android/iOS device certification. Evidence: `../reports/REFINEMENT_V35.md`.

@@ -11,6 +11,7 @@ const totals=ref<Totals|null>(null),displayed=ref<Record<WinTier,string>>({minor
 const descriptions:Record<WinTier,string>={minor:'Returns below 5× their round stake.',major:'Returns from 5× to below 20× their round stake.',jackpot:'Returns of 20× their round stake or higher.'};
 let timer:ReturnType<typeof setInterval>|undefined,frame=0,generation=0,busy=false,disposed=false;
 function show(next:Record<WinTier,string>,animate:boolean){
+ if(tiers.every(t=>displayed.value[t]===next[t]))return;
  cancelAnimationFrame(frame);if(!animate||props.reducedMotion||!props.running){displayed.value={...next};return;}
  const previous={...displayed.value},start=performance.now();
  function tick(now:number){const progress=Math.min(1,(now-start)/650),weight=BigInt(Math.round((1-(1-progress)**3)*10000));

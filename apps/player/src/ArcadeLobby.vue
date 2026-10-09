@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {computed,nextTick,onBeforeUnmount,onMounted,ref,watch} from 'vue';
+import {computed,nextTick,onBeforeUnmount,ref,watch} from 'vue';
+import {playSound} from './audio';
 import {catalog,type GameId} from '@new-game/contracts';
 import Icon from '@new-game/ui/Icon.vue';
 import GamePoster from './GamePoster.vue';
@@ -25,22 +26,23 @@ function keyboard(event:KeyboardEvent){
  if(directions[event.key]){event.preventDefault();const [dx,dy]=directions[event.key];walkTo(x.value+dx,y.value+dy);}
  if(event.key==='Enter'&&machines.value.length){event.preventDefault();const nearest=[...machines.value].sort((a,b)=>Math.hypot(a.spot.x-x.value,a.spot.y+9-y.value)-Math.hypot(b.spot.x-x.value,b.spot.y+9-y.value))[0];choose(nearest.id);}
 }
-function tick(now:number){const dt=Math.max(0,now-last)/1000;last=now;
+function tick(now:number){raf=0;const dt=last?Math.min(.05,Math.max(0,now-last)/1000):1/60;last=now;
  if(walking.value&&props.running){const dx=destination.value.x-x.value,dy=destination.value.y-y.value,d=Math.hypot(dx,dy),step=dt*55;walkTime+=dt;pose.value=1+Math.floor(walkTime*7)%2;if(d<=step){x.value=destination.value.x;y.value=destination.value.y;arrive();}else{x.value+=dx/d*step;y.value+=dy/d*step;}}
- raf=requestAnimationFrame(tick);
+ if(walking.value&&props.running)raf=requestAnimationFrame(tick);else last=0;
 }
+watch(()=>walking.value&&props.running,active=>{if(active&&!raf){last=0;raf=requestAnimationFrame(tick);}else if(!active){cancelAnimationFrame(raf);raf=0;last=0;}});
 watch(()=>props.running,running=>{if(!running){walking.value=false;selected.value=null;pose.value=0;}});
 watch(()=>props.games,()=>{floorPage.value=0;walking.value=false;selected.value=null;pose.value=0;});
 async function selectCabinet(id:GameId){const index=props.games.findIndex(g=>g.id===id);if(index<0)return;floorPage.value=Math.floor(index/8);await nextTick();choose(id);}
-function changeFloor(direction:number){floorPage.value=Math.max(0,Math.min(floorPages.value-1,floorPage.value+direction));walking.value=false;selected.value=null;pose.value=0;}
-onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnimationFrame(raf));
+function changeFloor(direction:number){playSound('page');floorPage.value=Math.max(0,Math.min(floorPages.value-1,floorPage.value+direction));walking.value=false;selected.value=null;pose.value=0;}
+onBeforeUnmount(()=>cancelAnimationFrame(raf));
 </script>
 <template>
  <section class="interactive-hall" aria-label="Interactive arcade lobby">
   <div class="hall-marquee"><button aria-label="Previous arcade floor" :disabled="floorPage===0" @click="changeFloor(-1)">❮</button> NEW GAME GRAND ARCADE <small>{{floorPage+1}} / {{floorPages}}</small><button aria-label="Next arcade floor" :disabled="floorPage>=floorPages-1" @click="changeFloor(1)">❯</button></div>
   <div ref="floor" class="hall-floor" tabindex="0" aria-label="Walk around the arcade with arrow keys or WASD. Enter plays the nearest cabinet." @pointerdown="walkFloor" @keydown="keyboard">
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
-    <button class="hall-cabinet-button" :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
+    <button class="hall-cabinet-button" :data-game-id="game.id" data-own-sound :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
      <span class="machine-crown">{{game.detail}}</span>
      <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
      <span class="machine-deck"><i></i><b>{{game.name}}</b><i></i></span>
@@ -49,7 +51,7 @@ onMounted(()=>{raf=requestAnimationFrame(tick);});onBeforeUnmount(()=>cancelAnim
     <button class="favorite-control" :class="{saved:favorites.includes(game.id)}" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" @click="emit('favorite',game.id)"><Icon name="star" :size="16" /></button>
    </article>
    <div v-if="walking" class="walk-marker" :style="{left:`${destination.x}%`,top:`${destination.y}%`}" aria-hidden="true"></div>
-   <div class="hall-avatar" :class="{walking}" :data-x="x.toFixed(1)" :data-y="y.toFixed(1)" :style="{left:`${x}%`,top:`${y}%`,zIndex:Math.round(y)}" aria-label="Your walking character">
+   <div class="hall-avatar" :class="{walking}" :data-x="x.toFixed(1)" :data-y="y.toFixed(1)" :style="{'--avatar-x':x,'--avatar-y':y,zIndex:Math.round(y)}" aria-label="Your walking character">
     <span class="avatar-ring"></span>
     <svg class="avatar-art" viewBox="0 0 512 1024" :style="{transform:`scaleX(${facing})`}" aria-hidden="true"><defs><filter id="avatar-key" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 -3 0 0 1" /><feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 1 1"/></feComponentTransfer></filter><clipPath id="avatar-crop"><rect width="512" height="1024"/></clipPath></defs><g clip-path="url(#avatar-crop)"><image href="/art/arcade-host-v7.png" :x="-pose*512" width="1536" height="1024" filter="url(#avatar-key)" /></g></svg>
     <span class="avatar-name">{{playerName}}</span>

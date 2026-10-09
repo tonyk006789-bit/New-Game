@@ -3,6 +3,7 @@ import {abyssRegions} from './abyss-atlas';
 import {fishWorlds,extraFishAtlas} from './fish-worlds';
 import type {FishGame} from '@new-game/game-math';
 import {Assets,Filter,GlProgram,Rectangle,RenderTexture,Sprite,Texture,type Application} from 'pixi.js';
+export function releaseReefTextures(art:{creatures:Texture[];cannons:Texture[]}){for(const texture of new Set([art.creatures,art.cannons].flat()))if(texture&&!texture.destroyed)texture.destroy(texture instanceof RenderTexture);}
 const vertex=`in vec2 aPosition;out vec2 vTextureCoord;uniform vec4 uInputSize;uniform vec4 uOutputFrame;uniform vec4 uOutputTexture;void main(){vec2 p=aPosition*uOutputFrame.zw+uOutputFrame.xy;p.x=p.x*(2.0/uOutputTexture.x)-1.0;p.y=p.y*(2.0*uOutputTexture.z/uOutputTexture.y)-uOutputTexture.z;gl_Position=vec4(p,0.0,1.0);vTextureCoord=aPosition*(uOutputFrame.zw*uInputSize.zw);}`;
 const fragment=`in vec2 vTextureCoord;uniform sampler2D uTexture;out vec4 finalColor;void main(){vec4 c=texture(uTexture,vTextureCoord);float spill=max(0.0,c.g-max(c.r,c.b));float key=smoothstep(0.16,0.58,spill);float a=c.a*(1.0-key);c.g=min(c.g,max(c.r,c.b)+0.12);finalColor=vec4(c.rgb*a,a);}`;
 /** The atlas matte is removed by the GPU once, then all creatures share cached textures. */
@@ -11,7 +12,9 @@ export async function reefTextures(app:Application,game:FishGame='reef-party'){
  const sources=await Promise.all(['/art/reef-creatures-v6.png',abyss?'/art/abyss-cannons-v18.png':'/art/reef-cannons-v6.png','/art/reef-legends-v10.png','/art/abyss-creatures-v17.png'].map(url=>Assets.load<Texture>(url)));
  const filter=new Filter({glProgram:GlProgram.from({vertex,fragment}),padding:0});
  function crop(source:Texture,x:number,y:number,width:number,height:number,key=true){
-  const texture=new Texture({source:source.source,frame:new Rectangle(x,y,width,height)}),sprite=new Sprite(texture);
+  const texture=new Texture({source:source.source,frame:new Rectangle(x,y,width,height)});
+  if(!key)return texture;
+  const sprite=new Sprite(texture);
   if(key)sprite.filters=[filter];const target=RenderTexture.create({width,height,resolution:1});
   app.renderer.render({container:sprite,target,clear:true});sprite.destroy();texture.destroy();return target;
  }
@@ -21,7 +24,7 @@ export async function reefTextures(app:Application,game:FishGame='reef-party'){
  for(let i=0;i<8;i++)creatures.push(crop(sources[2],i%4*cellWidth,Math.floor(i/4)*cellHeight,cellWidth,cellHeight,false));
  for(const [x,y,w,h] of abyssRegions)creatures.push(crop(sources[3],x,y,w,h,false));
  const premium=world?await Assets.load<Texture>(world.atlas):null;
- if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];creatures[world.first+i]=crop(premium,x,y,w,h,false);}
+ if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];const previous=creatures[world.first+i];previous?.destroy(previous instanceof RenderTexture);creatures[world.first+i]=crop(premium,x,y,w,h,false);}
  const expansion=await Assets.load<Texture>(extraFishAtlas.atlas);
  for(let i=0;i<8;i++){const [x,y,w,h]=extraFishAtlas.regions[i];creatures[extraFishAtlas.first+i]=crop(expansion,x,y,w,h,false);}
  const wheel=await Assets.load<Texture>('/art/jackpot-target-v26.svg');creatures[48]=crop(wheel,0,0,wheel.width,wheel.height,false);

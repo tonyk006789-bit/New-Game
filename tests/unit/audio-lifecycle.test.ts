@@ -43,6 +43,11 @@ describe('casino audio lifecycle',()=>{
   audio.selectMusicCollection('unknown');expect(audio.musicNow.collection).toBe('neon-drive');
   audio.setMusicScene('lobby');audio.setMusicScene('abyss-legends');expect(audio.musicNow.title).toBe('Last Train Uptown');
   audio.selectMusicCollection('game');expect(audio.musicNow.title).toBe('Blackwater Engine');expect(vi.getTimerCount()).toBe(1);
+  audio.audioPreferences.sound=true;await nextTick();
+  const rapidStart=sources.length;for(let i=0;i<100;i++){context.currentTime+=.05;audio.playSound('shot');}
+  expect(sources.length-rapidStart).toBe(32);
+  audio.audioPreferences.sound=false;await nextTick();const silent=sources.length;audio.playSound('win');expect(sources.length).toBe(silent);
+  audio.audioPreferences.sound=true;await nextTick();audio.playSound('treasure');expect(sources.length).toBeGreaterThan(silent);
   audio.setAudioActive(false);expect(vi.getTimerCount()).toBe(0);expect(context.suspend).toHaveBeenCalled();
   audio.setAudioActive(true);await Promise.resolve();expect(vi.getTimerCount()).toBe(1);
   audio.setAudioActive(false);

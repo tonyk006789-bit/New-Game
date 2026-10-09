@@ -29,7 +29,8 @@ import {unlockAudio,playSound,setAudioActive,setMusicScene} from './audio';
 import MusicControls from './MusicControls.vue';
 import ResolutionControl from './ResolutionControl.vue';
 const loginNotice=ref('');
-const onGesture=(event:Event)=>{void unlockAudio();if((event.target as Element)?.closest('button'))playSound('click');};
+const onGesture=()=>{void unlockAudio();};
+const onControlSound=(event:Event)=>{const button=(event.target as Element)?.closest<HTMLButtonElement>('button');if(button&&!button.disabled&&!button.hasAttribute('data-own-sound'))playSound('click');};
 function passwordChanged(){clearAccount();loginNotice.value='Password changed. Sign in with your new password.';}
 import { api, session, refreshAccount, expiredSession, loadEnvironment, recoverRound, type Account } from './api';
 import { formatCredits } from '@new-game/domain';
@@ -42,23 +43,25 @@ const accountError = ref('');
 const creditHistory = ref<{id:string;kind:string;units:string;reason:string;created_at:string}[]>([]);
 const practiceHistory = ref<{result:{id:string;game:string;description:string};created_at:string}[]>([]);
 const credits = computed(() => formatCredits(creditPresentation.accountId===account.value?.id&&creditPresentation.held!==null?creditPresentation.held:account.value?.wallet.available || '0'));
-async function authenticated(){if(session.current?.role!=='PLAYER')return;account.value=session.current;if(account.value){restorePending(account.value.id);restoreFishPending(account.value.id);}entered.value=true;navigate('lobby');await loadHistory();}
+async function authenticated(){if(session.current?.role!=='PLAYER')return;account.value=session.current;if(account.value){restorePending(account.value.id);restoreFishPending(account.value.id);}entered.value=true;navigate('lobby');}
 async function loadHistory(){if(!account.value)return;try{[creditHistory.value,practiceHistory.value]=await Promise.all([api<typeof creditHistory.value>('history'),api<typeof practiceHistory.value>('practice/history')]);}catch(error){accountError.value=(error as Error).message;}}
-async function syncAccount(){if(!account.value||!ready.value)return;try{account.value=await refreshAccount();accountError.value='';}catch(error){accountError.value=(error as Error).message;if(expiredSession(error))clearAccount();}}
+let syncingAccount=false;
+async function syncAccount(){if(!account.value||!ready.value||syncingAccount)return;syncingAccount=true;try{account.value=await refreshAccount();accountError.value='';}catch(error){accountError.value=(error as Error).message;if(expiredSession(error))clearAccount();}finally{syncingAccount=false;}}
 function clearAccount(){revealCredits();session.current=null;stage.pending=null;stage.fishPending=[];stage.needsRecovery=false;stage.last=null;account.value=null;entered.value=false;activeGame.value=null;selectedTable.value=null;atFishTable.value=false;modal.value=null;creditHistory.value=[];practiceHistory.value=[];}
 let syncTimer:ReturnType<typeof setInterval>|undefined,recoveryTimer:ReturnType<typeof setInterval>|undefined,nextRecoveryAt=0;
 async function reconcileRound(){if(!ready.value||!account.value||!recovering.value||stage.busy||Date.now()<nextRecoveryAt)return;nextRecoveryAt=Date.now()+3000;try{await recoverRound();}catch(error){if(expiredSession(error))clearAccount();}}
 const recovering=computed(()=>stage.needsRecovery||stage.fishPending.some(p=>p.recover));
 const page = ref<Page>('lobby');
 const category = ref('All games');
-const lobbyView=ref<'shelf'|'floor'>('shelf');
+const lobbyView=ref<'shelf'|'floor'>('shelf'),shelfPage=ref(0);
 const query = ref('');
 const activeGame = ref<GameId | null>(null);
 const modal = ref<'about' | 'support' | 'share' | 'wheel' | 'rules' | null>(null);
 const selectedTable=ref<ReefRoom|null>(null),atFishTable=ref(false),fishLeaving=ref(false);
 function joinTable(room:ReefRoom|null){selectedTable.value=room;atFishTable.value=true;}
 async function leaveTable(){if(!atFishTable.value||fishLeaving.value)return;fishLeaving.value=true;try{if(selectedTable.value&&account.value&&online.value)await api('practice/reef/leave',{roomId:selectedTable.value.id});}catch{/* A disconnected seat expires on the server. */}finally{selectedTable.value=null;atFishTable.value=false;fishLeaving.value=false;}}
-async function backFromGame(){if(isFishGame(activeGame.value)&&atFishTable.value)await leaveTable();else activeGame.value=null;}
+let lobbyScroll=0,lastOpened:GameId|null=null;
+async function backFromGame(){playSound('back');if(isFishGame(activeGame.value)&&atFishTable.value)await leaveTable();else{activeGame.value=null;await nextTick();window.scrollTo({top:lobbyScroll,behavior:'instant'});if(lastOpened)document.querySelector<HTMLButtonElement>(`[data-game-id="${lastOpened}"]`)?.focus({preventScroll:true});}}
 const favorites = ref<string[]>([]);
 const reducedMotion = ref(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 const foreground = ref(!document.hidden);
@@ -85,10 +88,11 @@ const categories = [
  {label:'Favorites',title:'FAVORITES',subtitle:'YOUR COLLECTION',icon:'star',theme:'violet'}
 ];
 
-async function navigate(target: Page) { await leaveTable();page.value = target; activeGame.value = null; query.value = ''; }
-function chooseCategory(value: string) { navigate('lobby'); category.value = value; }
-function toggleFavorite(id: string) { favorites.value = favorites.value.includes(id) ? favorites.value.filter(item => item !== id) : [...favorites.value, id]; }
-function openGame(id: GameId) { if(!account.value)return; activeGame.value = id; window.scrollTo({ top: 0, behavior: 'instant' }); }
+async function navigate(target: Page) { await leaveTable();page.value = target; activeGame.value = null; }
+function chooseCategory(value: string) { if(category.value!==value)playSound('navigate');void navigate('lobby');query.value='';category.value = value; }
+function chooseLobbyView(value:'shelf'|'floor'){if(value!==lobbyView.value)playSound('navigate');lobbyView.value=value;}
+function toggleFavorite(id: string) {playSound('favorite');favorites.value = favorites.value.includes(id) ? favorites.value.filter(item => item !== id) : [...favorites.value, id]; }
+function openGame(id: GameId) { if(!account.value)return;if(!activeGame.value)lobbyScroll=window.scrollY;lastOpened=id;playSound('enter');activeGame.value = id; window.scrollTo({ top: 0, behavior: 'instant' }); }
 async function leavePreview() { await leaveTable();if(account.value){try{await api('auth/logout',{});}catch(error){if(!expiredSession(error)){accountError.value=(error as Error).message;return;}}}clearAccount();accountError.value=''; }
 const onVisibility = () => { foreground.value = !document.hidden; };
 const onNetwork = () => { online.value = navigator.onLine; };
@@ -115,7 +119,7 @@ onMounted(async () => {
     if (typeof saved.reducedMotion === 'boolean') reducedMotion.value = saved.reducedMotion;
   } catch { /* Optional presentation preferences, never credentials. */ }
   document.addEventListener('visibilitychange', onVisibility);
-  document.addEventListener('pointerdown',onGesture);document.addEventListener('keydown',onGesture);
+  document.addEventListener('pointerdown',onGesture,{passive:true});document.addEventListener('keydown',onGesture);document.addEventListener('click',onControlSound);
   window.addEventListener('online', onNetwork); window.addEventListener('offline', onNetwork); window.addEventListener('keydown', onKey);
   if (Capacitor.isNativePlatform()) {
     nativeListeners.push(await NativeApp.addListener('appStateChange', state => { foreground.value = state.isActive; }));
@@ -141,13 +145,13 @@ onBeforeUnmount(() => {
   clearInterval(syncTimer);
   clearInterval(recoveryTimer);
   document.removeEventListener('visibilitychange', onVisibility);
-  document.removeEventListener('pointerdown',onGesture);document.removeEventListener('keydown',onGesture);setAudioActive(false);
+  document.removeEventListener('pointerdown',onGesture);document.removeEventListener('keydown',onGesture);document.removeEventListener('click',onControlSound);setAudioActive(false);
   window.removeEventListener('online', onNetwork); window.removeEventListener('offline', onNetwork); window.removeEventListener('keydown', onKey);
   nativeListeners.forEach(listener => void listener.remove());
 });
 watch(ready,value=>setAudioActive(value));
 watch(activeGame,game=>setMusicScene(game||'lobby'),{immediate:true});
-watch(page,()=>{void syncAccount();void loadHistory();});
+watch(page,value=>{void syncAccount();if(value==='history'||value==='wallet')void loadHistory();});
 </script>
 <template>
   <div ref="depthRoot" class="arcade-app" :class="{ 'reduce-motion': reducedMotion, 'motion-paused':!ready, 'in-game': currentGame, 'at-login': !entered }">
@@ -161,7 +165,7 @@ watch(page,()=>{void syncAccount();void loadHistory();});
       <p v-if="accountError" class="connection-banner" role="alert">{{accountError}}</p><div v-if="!online" class="connection-banner" role="status"><Icon name="info" :size="16" />You’re offline. Games are paused until you reconnect.</div>
       <span v-if="recovering" class="round-sync-status" role="status">{{online?'Reconnecting…':'Waiting for connection…'}}</span>
       <GameViewport v-if="currentGame" :portrait="portraitGame" :identity="currentGame.id" @orientation-ready="orientationReady=$event" @back="navigate('lobby')" v-slot="screen"><main class="immersive-game" :class="{'portrait-cabinet':portraitGame}" :data-layout="portraitGame?'portrait':'wide'">
-        <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><ResolutionControl compact :portrait="portraitGame"/><button class="screen-fit-button" :aria-pressed="screen.autoFit" aria-label="Auto fit screen" @click="screen.toggleFit">{{screen.autoFit?'AUTO FIT':'ACTUAL SIZE'}}</button><button v-if="screen.fullscreenSupported" class="screen-fit-button screen-fullscreen" :aria-label="screen.fullscreen?'Exit full screen':'Full screen'" @click="screen.toggleFullscreen">⛶</button><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
+        <div class="game-topline"><button class="round-control" :aria-label="isFishGame(activeGame)&&atFishTable?'Back to fishing lobby':'Back to arcade'" :disabled="fishLeaving" data-own-sound @click="backFromGame"><Icon name="back" /></button><div><small>{{isFishGame(activeGame)&&!atFishTable?'THE OCEAN LOUNGE':'NEW GAME ORIGINAL'}}</small><h1>{{ currentGame.name }}</h1></div><span v-if="isFishGame(activeGame)&&atFishTable" class="four-player-badge">4 PLAYER TABLE</span><MusicControls /><ResolutionControl compact :portrait="portraitGame"/><button class="screen-fit-button" :aria-pressed="screen.autoFit" aria-label="Auto fit screen" @click="screen.toggleFit">{{screen.autoFit?'AUTO FIT':'ACTUAL SIZE'}}</button><button v-if="screen.fullscreenSupported" class="screen-fit-button screen-fullscreen" :aria-label="screen.fullscreen?'Exit full screen':'Full screen'" @click="screen.toggleFullscreen">⛶</button><button class="game-rules-button" @click="modal='rules'">RULES <Icon name="info" :size="16" /></button></div>
         <template v-if="isFishGame(activeGame)"><FishScene v-if="atFishTable" :game="activeGame!" :running="gameReady && !modal && !fishLeaving" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" :initial-room="selectedTable"/><FishingLobby v-else :game="activeGame!" :running="ready && !modal" :authenticated="!!account" @join="joinTable"/></template>
         <BlackjackGame :key="activeGame" :game="activeGame" @resume="openGame" v-else-if="isBlackjackGame(activeGame)" :running="gameReady&&!modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits"/><FeatureGame v-else-if="isFeatureGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
         <CabinetGame v-else-if="activeGame && isCabinetGame(activeGame)" :key="`${activeGame}-${stage.recovered}`" :game="activeGame" :running="cabinetReady && !modal" :reduced-motion="reducedMotion" :authenticated="!!account" :balance="credits" />
@@ -169,14 +173,14 @@ watch(page,()=>{void syncAccount();void loadHistory();});
 
       </main></GameViewport>
       <template v-else-if="page === 'lobby'">
-        <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
+        <nav class="district-nav" aria-label="Game categories"><button v-for="item in categories" :key="item.label" :class="[item.theme, { selected: category === item.label }]" :aria-label="item.label" :aria-pressed="category === item.label" data-own-sound @click="chooseCategory(item.label)"><span class="district-roof"></span><Icon :name="item.icon" :size="26" /><strong>{{ item.title }}</strong><small>{{ item.subtitle }}</small><span class="district-plinth"></span></button></nav>
         <main class="arcade-lobby"><div class="lobby-quick-actions"><span><i aria-hidden="true">✦</i> YOUR NEXT GREAT GAME</span><button @click="modal='wheel'"><b aria-hidden="true">✺</b> DAILY SPIN</button><button @click="modal='share'"><b aria-hidden="true">▦</b> SHARE</button></div><WinShowcase v-if="account&&stage.enabled" :account-id="account.id" :revision="stage.revision" :running="ready&&!modal" :reduced-motion="reducedMotion" @history="navigate('history')"/><PremiumSpotlight premium-only v-if="category==='Premium'" :running="ready&&!modal" @open="openGame" @premium="chooseCategory('Premium')"/>
           <div class="lobby-heading"><span class="heading-rule"></span><div><span>{{catalog.length}} ORIGINALS. ONE PRIVATE ARCADE.</span><h1>{{ category === 'Favorites' ? 'YOUR FAVORITES' : category === 'All games' ? 'CHOOSE YOUR GAME' : category==='New'?'NEW ARRIVALS':`${category.toUpperCase()} COLLECTION` }}</h1></div><span class="heading-rule"></span></div>
           <section class="collection-cabinet" aria-label="Game collection">
             <div class="neon-bar top"></div><div class="neon-bar bottom"></div>
             <div class="shelf-toolbar"><span><span class="live-spark">✦</span> NEW GAME ORIGINALS <small>{{ visibleGames.length }} / {{ catalog.length }}</small></span><label class="search-games"><Icon name="search" :size="15" /><input v-model="query" aria-label="Search games" placeholder="Find a game"><button v-if="query" aria-label="Clear game search" @click="query=''">✕</button></label></div>
-            <div class="lobby-view-switch" role="group" aria-label="Lobby view"><button :aria-pressed="lobbyView==='shelf'" @click="lobbyView='shelf'">GAME SHELF</button><button :aria-pressed="lobbyView==='floor'" @click="lobbyView='floor'">WALK THE FLOOR</button></div>
-            <GameShelf v-if="lobbyView==='shelf'" :games="visibleGames" :favorites="favorites" :running="ready && !modal" @open="openGame" @favorite="toggleFavorite"/>
+            <div class="lobby-view-switch" role="group" aria-label="Lobby view"><button :aria-pressed="lobbyView==='shelf'" data-own-sound @click="chooseLobbyView('shelf')">GAME SHELF</button><button :aria-pressed="lobbyView==='floor'" data-own-sound @click="chooseLobbyView('floor')">WALK THE FLOOR</button></div>
+            <GameShelf v-model:page="shelfPage" v-if="lobbyView==='shelf'" :games="visibleGames" :favorites="favorites" :running="ready && !modal" @open="openGame" @favorite="toggleFavorite"/>
             <ArcadeLobby v-else :games="visibleGames" :favorites="favorites" :running="ready && !modal" :reduced-motion="reducedMotion" :player-name="account?.displayName || 'YOU'" @open="openGame" @favorite="toggleFavorite" />
             <div class="shelf-bottom"><i></i><span>BLACKJACK • SLOTS • KENO • FISHING</span><i></i></div>
           </section>

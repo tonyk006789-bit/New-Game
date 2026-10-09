@@ -58,7 +58,7 @@ async function animate() {
     const reveal = () => {
       timer = setTimeout(() => {
         if (disposed || token !== generation) return;
-        drawn.value.push(numbers[step++]); playSound('click');
+        const number=numbers[step++];drawn.value.push(number);playSound(selected.value.includes(number)?'keno-match':'keno-draw');
         notice.value = `${step} of ${numbers.length} drawn · ${matched.value} matched`;
         if (step < numbers.length) reveal();
         else timer = setTimeout(() => { if (!disposed && token === generation) finish(); }, fast.value ? 250 : 500);

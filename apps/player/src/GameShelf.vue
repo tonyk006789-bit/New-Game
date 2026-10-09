@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import {computed,ref,watch} from 'vue';
+import {computed,watch} from 'vue';
 import {catalog,isPremiumGame,type GameId} from '@new-game/contracts';
 import GamePoster from './GamePoster.vue';
+import {playSound} from './audio';
 const props=defineProps<{games:readonly (typeof catalog)[number][];favorites:string[];running:boolean}>();
 const emit=defineEmits<{open:[id:GameId];favorite:[id:GameId]}>();
-const page=ref(0),pages=computed(()=>Math.max(1,Math.ceil(props.games.length/8)));
+const page=defineModel<number>('page',{default:0}),pages=computed(()=>Math.max(1,Math.ceil(props.games.length/8)));
 const visible=computed(()=>props.games.slice(page.value*8,page.value*8+8));
 watch(()=>props.games,()=>{page.value=0;});
-function change(direction:number){page.value=Math.max(0,Math.min(pages.value-1,page.value+direction));}
+function setPage(next:number){const value=Math.max(0,Math.min(pages.value-1,next));if(value!==page.value)playSound('page');page.value=value;}
+function change(direction:number){setPage(page.value+direction);}
 let startX=0,startY=0,swiped=false;
 function start(event:PointerEvent){startX=event.clientX;startY=event.clientY;swiped=false;}
 function end(event:PointerEvent){const dx=event.clientX-startX,dy=event.clientY-startY;if(Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.5){swiped=true;change(dx<0?1:-1);}}
@@ -18,17 +20,17 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
   <div class="shelf-lights" aria-hidden="true"><i v-for="n in 24" :key="n" :style="{'--bulb':n}"/></div>
   <div class="casino-shelf-grid">
    <article v-for="game in visible" :key="game.id" class="shelf-game" data-depth-card :style="{'--tile-color':game.color}">
-    <button class="shelf-play" :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
+    <button class="shelf-play" :data-game-id="game.id" data-own-sound :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
      <GamePoster :game="game.id" :name="game.name"/>
      <span v-if="isPremiumGame(game.id)" class="new-ribbon">PREMIUM</span>
      <span class="shelf-game-caption"><b>{{game.name}}</b><small>{{game.detail}}</small></span>
      <span class="shelf-enter">PLAY <span>▶</span></span>
     </button>
-    <button class="shelf-favorite" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" @click="emit('favorite',game.id)">{{favorites.includes(game.id)?'♥':'♡'}}</button>
+    <button class="shelf-favorite" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" data-own-sound @click="emit('favorite',game.id)">{{favorites.includes(game.id)?'♥':'♡'}}</button>
    </article>
   </div>
   <p v-if="!games.length" class="shelf-empty">No games in this collection. Try another category or search.</p>
-  <nav class="shelf-pagination" aria-label="Game shelf pages"><button aria-label="Previous game page" :disabled="page===0" @click="change(-1)">❮</button><span role="status">{{games.length ? page*8+1 : 0}}–{{Math.min((page+1)*8,games.length)}} OF {{games.length}}</span><button v-for="(_,index) in pages" :key="index" class="shelf-dot" :aria-label="`Game page ${index+1}`" :aria-current="page===index?'page':undefined" @click="page=index"><span/></button><button aria-label="Next game page" :disabled="page>=pages-1" @click="change(1)">❯</button></nav>
+  <nav class="shelf-pagination" aria-label="Game shelf pages"><button aria-label="Previous game page" :disabled="page===0" data-own-sound @click="change(-1)">❮</button><span role="status">{{games.length ? page*8+1 : 0}}–{{Math.min((page+1)*8,games.length)}} OF {{games.length}}</span><button v-for="(_,index) in pages" :key="index" class="shelf-dot" :aria-label="`Game page ${index+1}`" :aria-current="page===index?'page':undefined" data-own-sound @click="setPage(index)"><span/></button><button aria-label="Next game page" :disabled="page>=pages-1" data-own-sound @click="change(1)">❯</button></nav>
  </section>
 </template>
 <style scoped>

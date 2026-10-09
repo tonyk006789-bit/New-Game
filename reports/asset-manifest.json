@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T02:14:29.171Z",
+  "generatedAt": "2026-10-09T19:08:23.181Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -301,7 +301,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "954fd5784ecbe7753ac8568ff83c38d5bbab7ac5bfaab44c6cb8104a34686d86"
+      "sha256": "5f00f7b087976137554dcdb625d9014841a4fd313ef078080680baf7e3878e69"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -322,7 +322,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "ff37de2b11e789c2353baee4d2190fb5abf5a49e44d8ac2b3250804c03802f9b"
+      "sha256": "a73039b51f981102951fa60a3b0a2be8637c97d6ebc12b72fb6f2659b01b8303"
     },
     {
       "path": "apps/player/src/FishingLobby.vue",
@@ -343,7 +343,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "308c3e5b33b390c9629f8de1c327d3e658f17d8e14a4e3a527cdc1f7d7c997ec"
+      "sha256": "1f4cd80aa1267a7d9f482e8c6b1c4ac0acd39e8df0780770a0893c6e94ac545e"
     },
     {
       "path": "apps/player/src/arcade-v15.css",
@@ -406,7 +406,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "8d975dae866ac5471a8cb8b23b66b4cfd2bcb788e663105e8b9d38af886fd058"
+      "sha256": "14dc428a34e1a26cf93979f9c9842eb5af0cd25b2444529e06d66b6758e88db9"
     },
     {
       "path": "apps/player/src/arcade-v24.css",
@@ -434,7 +434,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "c5a779b963db692ff5bdc358f10e7eb79cc869217db453ab03169597f1bd0d71"
+      "sha256": "b971af52ea263a91104a46048011d2c08ca663257d5be0efc6bbe11b8e960702"
     },
     {
       "path": "apps/player/src/win-effects.ts",
@@ -617,6 +617,20 @@
       "source": "Repository-native musical scores and Vue; original V29 instrument bank, no third-party music",
       "license": "Project original",
       "sha256": "1e1d94098e310aa1f845ce0f0f4507f6600bbb420e3427e6435c55ef77c186a5"
+    },
+    {
+      "path": "apps/player/src/experience-v35.css",
+      "creator": "Original composition and interface authored for New Game",
+      "source": "Repository-native musical scores and Vue; original V29 instrument bank, no third-party music",
+      "license": "Project original",
+      "sha256": "3431364df33148f940561127970dc7e8550463b41d3cd3b39d04d0cccf237cc8"
+    },
+    {
+      "path": "apps/player/src/sound-design.ts",
+      "creator": "Original composition and interface authored for New Game",
+      "source": "Repository-native musical scores and Vue; original V29 instrument bank, no third-party music",
+      "license": "Project original",
+      "sha256": "5456ccd903561fff57f7a15455e817ef897ac333ddf1d62c44d37268feb5265c"
     },
     {
       "path": "apps/player/public/audio/v29/accordion.wav",
