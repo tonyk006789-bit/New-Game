@@ -38,7 +38,7 @@ Twelve-second desktop development samples, warm artwork, music muted, 1280×900 
 
 Active fish-table sample: rAF p95 8.5 ms, maximum 10.7 ms, no intervals over 34 ms. This is browser callback cadence, **not measured fish FPS** (fish rendering is capped at 60). These are small local diagnostic samples, not formal INP certification or a zero-lag guarantee. Occasional frame spikes remain; device, browser, network and first-load costs vary. The existing large artwork and legacy CSS still contribute to initial loading.
 
-Local evidence: `reports/screenshots/v35/baseline-categories.txt`, `updated-categories.txt`, `fish-frames.txt`, `fish-reentry.png`, `mobile-lobby.png`. Screenshots are ignored local artifacts. No physical Android/iPhone smoke test was available.
+Local evidence: `reports/screenshots/v35/baseline-categories.txt`, `updated-categories.txt`, `fish-frames.txt`, `fish-reentry.png`, `mobile-lobby.png`, `mobile-floor.png`, `neon-lobby.png`. Screenshots are ignored local artifacts. Phone header controls measured 44×44 pixels; page width stayed within the viewport. Walking-floor art measured about 91 pixels inside its 95-pixel screen, replacing the collapsed layout. No physical Android/iPhone smoke test was available.
 
 ## Sources and design rationale
 
@@ -50,4 +50,9 @@ None. Redeploy the previous player deployment or revert this presentation commit
 
 ## Publication
 
-Pending final release checks and deployment.
+- Source commit `c681665` pushed to GitHub main.
+- Player deployment `dpl_6TAmafB3TZCR8R54nQEqQauHFsJ8` is READY and aliased to https://new-game-test-topaz.vercel.app/.
+- `node .local/verify-v35-live.mjs` — 18 read-only route/asset checks passed: exact new player entry, unchanged operator entry, health, protected endpoint boundaries, all 30 catalog identities and approved profiles. Hosted paying-round setting remains revision 1 at 20%.
+- Browser loaded the published login screen with no captured console errors. Screenshot: `reports/screenshots/v35/live-login.png`. No hosted wagers, wallet actions or account changes were submitted. The logged-in gameplay screenshots and interaction checks above used the local fixture.
+- Final rebuilt deployment checks: four passed. Strengthened the rapid-audio test to explicitly enable effects and assert exactly 32 voices under 100 rapid calls; it passed. The development probe was again confirmed absent from the final release assets.
+- Operator deployment unchanged. Viewport override reset; local verification tab closed. Native assets copied, but native builds and device tests remain unavailable.
