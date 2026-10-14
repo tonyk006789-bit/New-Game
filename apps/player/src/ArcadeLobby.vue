@@ -4,12 +4,15 @@ import {playSound} from './audio';
 import {catalog,type GameId} from '@new-game/contracts';
 import Icon from '@new-game/ui/Icon.vue';
 import GamePoster from './GamePoster.vue';
+import {usePosterPrefetch} from './poster-prefetch';
+import assets from './presentation-assets.json';
 const props=defineProps<{games:readonly (typeof catalog)[number][];favorites:string[];running:boolean;reducedMotion:boolean;playerName:string}>();
 const emit=defineEmits<{open:[id:GameId];favorite:[id:GameId]}>();
 const floor=ref<HTMLElement>(),x=ref(50),y=ref(92),walking=ref(false),facing=ref(1),pose=ref(0),destination=ref({x:50,y:92}),selected=ref<GameId|null>(null);
 const spots=[{x:18,y:48},{x:39,y:45},{x:61,y:45},{x:82,y:48},{x:12,y:77},{x:34,y:74},{x:66,y:74},{x:88,y:77}];
 const floorPage=ref(0),floorPages=computed(()=>Math.max(1,Math.ceil(props.games.length/8)));
 const machines=computed(()=>props.games.slice(floorPage.value*8,floorPage.value*8+8).map((game,index)=>({...game,spot:spots[index]})));
+usePosterPrefetch(computed(()=>props.games.slice((floorPage.value+1)*8,(floorPage.value+2)*8).map(g=>g.id)),()=>props.running);
 let raf=0,last=0,walkTime=0;
 const status=computed(()=>selected.value?`Walking to ${catalog.find(game=>game.id===selected.value)?.name}`:walking.value?'Exploring the arcade':'Tap the floor to walk · Choose a cabinet to play');
 function arrive(){walking.value=false;pose.value=0;const id=selected.value;selected.value=null;if(id&&props.running)emit('open',id);}
@@ -40,7 +43,7 @@ onBeforeUnmount(()=>cancelAnimationFrame(raf));
 <template>
  <section class="interactive-hall" aria-label="Interactive arcade lobby">
   <div class="hall-marquee"><button aria-label="Previous arcade floor" :disabled="floorPage===0" @click="changeFloor(-1)">❮</button> NEW GAME GRAND ARCADE <small>{{floorPage+1}} / {{floorPages}}</small><button aria-label="Next arcade floor" :disabled="floorPage>=floorPages-1" @click="changeFloor(1)">❯</button></div>
-  <div ref="floor" class="hall-floor" tabindex="0" aria-label="Walk around the arcade with arrow keys or WASD. Enter plays the nearest cabinet." @pointerdown="walkFloor" @keydown="keyboard">
+  <div ref="floor" class="hall-floor" :style="{backgroundImage:`url('${assets['lobby-hall'].url}')`}" tabindex="0" aria-label="Walk around the arcade with arrow keys or WASD. Enter plays the nearest cabinet." @pointerdown="walkFloor" @keydown="keyboard">
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
     <button class="hall-cabinet-button" :data-game-id="game.id" data-own-sound :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
      <span class="machine-crown">{{game.detail}}</span>

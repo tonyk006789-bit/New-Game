@@ -1,0 +1,209 @@
+{
+  "sourceBytes": 1571886,
+  "entries": {
+    "corsair-cove": {
+      "url": "/art/delivery/corsair-cove-e5f22e221427.webp",
+      "bytes": 40680,
+      "sha256": "e5f22e221427a94a1707a5c3da0607f58e648c2f446dd5b1ebcb4ac222833c4d",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "cosmic-tides": {
+      "url": "/art/delivery/cosmic-tides-fe2042db4432.webp",
+      "bytes": 44018,
+      "sha256": "fe2042db443283440438937885abf578a8cef6abbb7b41eb6ba799b39d882bdb",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "double-deck-blackjack": {
+      "url": "/art/delivery/double-deck-blackjack-c04e7f7ed7f2.webp",
+      "bytes": 28484,
+      "sha256": "c04e7f7ed7f29711f1a68e6c513c8dde3aba2ee657a2d35c9f8f7e2a165f0565",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "european-blackjack": {
+      "url": "/art/delivery/european-blackjack-c49915bc821b.webp",
+      "bytes": 32748,
+      "sha256": "c49915bc821be376fa691657730af205799ff882332e7c98b2651aad2c12be1d",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "clockwork-vault": {
+      "url": "/art/delivery/clockwork-vault-3baa5a1c11a6.webp",
+      "bytes": 44602,
+      "sha256": "3baa5a1c11a6ac54fabf511da683c0ee885404f4afb3f8572aa1254fe4f0019b",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "phoenix-falls": {
+      "url": "/art/delivery/phoenix-falls-0d955aebba65.webp",
+      "bytes": 43216,
+      "sha256": "0d955aebba654fa701d436de547337e66753f6e573ea9d41564c42756362ff43",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "outlaw-sevens": {
+      "url": "/art/delivery/outlaw-sevens-47aa1d17941e.webp",
+      "bytes": 30926,
+      "sha256": "47aa1d17941e9238891179931e9b3787705f9486400273f54c7c4fc035d0e28e",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "celestial-wilds": {
+      "url": "/art/delivery/celestial-wilds-d90c90230155.webp",
+      "bytes": 36280,
+      "sha256": "d90c902301554901ef9bf4fe7aec028fe44bac6fb6b293c23b955f3124c6e847",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "meteor-keno": {
+      "url": "/art/delivery/meteor-keno-59d1fc20b769.webp",
+      "bytes": 43774,
+      "sha256": "59d1fc20b76939b6d3cb5d487c4ab9cdd8f7c773e6ecbaef9d2014eb0e06b36f",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "bamboo-keno": {
+      "url": "/art/delivery/bamboo-keno-1b4b769ea0ed.webp",
+      "bytes": 42922,
+      "sha256": "1b4b769ea0ed7b54452be7df7caecf9880d0389abbe8194ae2eda22cca112ce2",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "disco-diamonds": {
+      "url": "/art/delivery/disco-diamonds-6a5f40be364a.webp",
+      "bytes": 47570,
+      "sha256": "6a5f40be364a3f9441f75985bcd956feb93c495faac15c337e1aa36dedbad21b",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "midnight-express": {
+      "url": "/art/delivery/midnight-express-33943ce780da.webp",
+      "bytes": 51818,
+      "sha256": "33943ce780dae283dc70798dadc3944e3a87593a3f9b77b90f0f887620f5fc43",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "pirate-gold": {
+      "url": "/art/delivery/pirate-gold-249decaf8508.webp",
+      "bytes": 54200,
+      "sha256": "249decaf85082bb598a34539386b6ab59cfc28afc190b1c1cbeca3a122d58bce",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "royal-blackjack": {
+      "url": "/art/delivery/royal-blackjack-625313aa8a8f.webp",
+      "bytes": 16140,
+      "sha256": "625313aa8a8f5483770ee901d8af8c24d473bc9a38f81bb79ea477585f115874",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "sunken-dynasty": {
+      "url": "/art/delivery/sunken-dynasty-be49c63afab7.webp",
+      "bytes": 53362,
+      "sha256": "be49c63afab763e923dda899060a334494cb7ea0fad172a1ef1c4f33619740f4",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "polar-odyssey": {
+      "url": "/art/delivery/polar-odyssey-907683f98edf.webp",
+      "bytes": 38932,
+      "sha256": "907683f98edf0c80a52d27b1f206a3d66d3f44c2c1f37d3dec8975bea3c7f8a2",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "neon-numbers": {
+      "url": "/art/delivery/neon-numbers-6709f10dfc44.webp",
+      "bytes": 25752,
+      "sha256": "6709f10dfc44b63804f503879c97705cc02b0a2896d2f827670a7ebe90fb7dff",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "pearl-keno": {
+      "url": "/art/delivery/pearl-keno-66ed87a04cfc.webp",
+      "bytes": 28738,
+      "sha256": "66ed87a04cfc895a3750858bb49b9798e060a108f144302c63401ed13fd5b5c5",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "abyss-legends": {
+      "url": "/art/delivery/abyss-legends-ecdde3be07c3.webp",
+      "bytes": 46240,
+      "sha256": "ecdde3be07c3102e2094c0d50c27920725f485c55b82a2861285995c64193c72",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "ruby-rush": {
+      "url": "/art/delivery/ruby-rush-26e4c6ba436b.webp",
+      "bytes": 57380,
+      "sha256": "26e4c6ba436b59eda37c32eb2e56cec0bc7926211f7311d6866148fa6c764406",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "sapphire-crown": {
+      "url": "/art/delivery/sapphire-crown-f6c3cedf08e7.webp",
+      "bytes": 75258,
+      "sha256": "f6c3cedf08e762d69bb1732524ee522149e0a7b460e21716929a0cdb70c65954",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "solar-fortune": {
+      "url": "/art/delivery/solar-fortune-230d11d8a27f.webp",
+      "bytes": 65628,
+      "sha256": "230d11d8a27f4cc0ace7a1ef3d255830ab31014ef8bce4e6d815de3ca8cc9bc8",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "neon-sevens": {
+      "url": "/art/delivery/neon-sevens-2868e7e6c9cc.webp",
+      "bytes": 44288,
+      "sha256": "2868e7e6c9ccea309776d5f8fd3d12cf2c74601b0063cacece7463645c7f06ed",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "jade-fortune": {
+      "url": "/art/delivery/jade-fortune-76c0d09fbba7.webp",
+      "bytes": 57460,
+      "sha256": "76c0d09fbba719f52d5e2df40e9cc2718a76d1199bcfa370b766cf4dfac9b2ee",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "coin-carnival": {
+      "url": "/art/delivery/coin-carnival-a6464a5a725e.webp",
+      "bytes": 46890,
+      "sha256": "a6464a5a725e9fa3342f3e7cfd4088d7cc58f1891e1f29ac6ca8155c0415276c",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "aurora-vault": {
+      "url": "/art/delivery/aurora-vault-b7a3f0d5180c.webp",
+      "bytes": 56132,
+      "sha256": "b7a3f0d5180c1e868b4915b337be6d5a5edccb16f87a8ff6cdc146027a4d5c97",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "ember-relics": {
+      "url": "/art/delivery/ember-relics-8f95a4234374.webp",
+      "bytes": 48758,
+      "sha256": "8f95a423437463e290537064dcb7dd58ff20b48ff5f5169e0183bbcc4a6f8277",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "temple-lights": {
+      "url": "/art/delivery/temple-lights-1cfb4427b193.webp",
+      "bytes": 52604,
+      "sha256": "1cfb4427b193f019cf365dd20214b4f3d356b52d78d68abdced0a924be1b41c4",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "orchard-numbers": {
+      "url": "/art/delivery/orchard-numbers-3633a358b88d.webp",
+      "bytes": 29572,
+      "sha256": "3633a358b88d265429526723322b6483e299b6ef59f9805c4447647028582c20",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "reef-party": {
+      "url": "/art/delivery/reef-party-4a9b62f33877.webp",
+      "bytes": 56524,
+      "sha256": "4a9b62f3387774bf1a77b22e8ba449b04cdac787598c5ca2d3f856a8f8e58e21",
+      "source": "reports/screenshots/v39/poster-source.png"
+    },
+    "dealer-royal": {
+      "url": "/art/delivery/dealer-royal-7a44660c277c.webp",
+      "bytes": 51922,
+      "sha256": "7a44660c277cf13bb373ec6242f4a6c776a60a3cc2a5dcf1b75ffeb16f448531",
+      "source": "apps/player/public/art/blackjack-dealer-v37.png"
+    },
+    "dealer-double": {
+      "url": "/art/delivery/dealer-double-fe1a76a7518c.webp",
+      "bytes": 52970,
+      "sha256": "fe1a76a7518c9050b3704b05e2346cb3dcb4fba1a5ae5443cdab389505f35f3a",
+      "source": "apps/player/public/art/blackjack-double-dealer-v38.png"
+    },
+    "dealer-european": {
+      "url": "/art/delivery/dealer-european-a9c226073434.webp",
+      "bytes": 52212,
+      "sha256": "a9c2260734344faefc91a52f8f898b9dd27de78f62abeb2b505211e9fd30299d",
+      "source": "apps/player/public/art/blackjack-european-dealer-v38.png"
+    },
+    "lobby-hall": {
+      "url": "/art/delivery/lobby-hall-f59dca862fe7.webp",
+      "bytes": 201424,
+      "sha256": "f59dca862fe7d15d8ab0480a8e8e7ec18dc42fd433713e7b9c40dbd328c62ba3",
+      "source": "apps/player/public/art/arcade-hall-v7.png"
+    }
+  }
+}

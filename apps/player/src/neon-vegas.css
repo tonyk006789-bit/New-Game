@@ -143,7 +143,7 @@ body { background:#080615; }
 
 /* Login, settings and dialogs: the same theme, not a separate green skin. */
 .simple-login {
-  background:radial-gradient(ellipse at 22% 20%,#c83f983b,transparent 55%),radial-gradient(ellipse at 85% 75%,#444cec33,transparent 55%),linear-gradient(#140823cc,#080b20e8),url('/art/arcade-hall-v7.png') center/cover;
+  background:radial-gradient(ellipse at 22% 20%,#c83f983b,transparent 55%),radial-gradient(ellipse at 85% 75%,#444cec33,transparent 55%),linear-gradient(#140823cc,#080b20e8),url('/art/delivery/lobby-hall-f59dca862fe7.webp') center/cover;
   color:#ebdff7;
 }
 .simple-login-card[data-depth-card] {

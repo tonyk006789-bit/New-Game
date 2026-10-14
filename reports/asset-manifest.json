@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T16:42:41.075Z",
+  "generatedAt": "2026-10-14T17:18:55.712Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -308,7 +308,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "4bf9d22106ca00678f8fb60ff716155ce486dc8c1679e717013f4a7fb9f4a8e2"
+      "sha256": "2103188aa092437da79031dc833652652430c527c5651c60fa851fc8f199c10d"
     },
     {
       "path": "apps/player/src/arcade-v4.css",
@@ -336,14 +336,14 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "6884784a46c6c3396f1e43b50428e48f4d82ff2fa154772f464b18fc4876dc6c"
+      "sha256": "38ff27fe4adaa6a9f9d8a44946a7421ba3ef95d98d9838d194e287194b0e85d3"
     },
     {
       "path": "apps/player/src/ArcadeLobby.vue",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "a73039b51f981102951fa60a3b0a2be8637c97d6ebc12b72fb6f2659b01b8303"
+      "sha256": "90185a8fce900f618fa0ee92541ca3a2a0313029d57e89c047c1300d0e2c72ec"
     },
     {
       "path": "apps/player/src/FishingLobby.vue",
@@ -357,14 +357,14 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "6f0249fd10f5713810082800b70e4fe5e77b7dbb90aa78edd57cbe15871a479a"
+      "sha256": "7995919afb148f799d66e205313381f128f69f4bc5544e9d52a54f642eb51542"
     },
     {
       "path": "apps/player/src/GameShelf.vue",
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "1f4cd80aa1267a7d9f482e8c6b1c4ac0acd39e8df0780770a0893c6e94ac545e"
+      "sha256": "64b2c09ed9bb37ab4ee15352f86a2072d8848d2ad9263b25ababb94fd1f02b75"
     },
     {
       "path": "apps/player/src/arcade-v15.css",
@@ -476,7 +476,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "b134674187e5c1e981ffa3bd9468c3b5b819458035e64a26820977d3aced447b"
+      "sha256": "49be4072f828a3e9ff8373ee80546806d874d2de2c51347f5998ccdbf5891d53"
     },
     {
       "path": "apps/player/src/GameCharacter.vue",
@@ -532,14 +532,14 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "478c1ec43251d11eb5332dc7c81315670c71aa7bd91937eba6e1675818f985ff"
+      "sha256": "ca8426014c3d676f0b4580bfe43476e0ba793cf9c4625e12d2143952af148e98"
     },
     {
       "path": "apps/player/src/blackjack-v37.css",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "453cce29bef4de20343489d88c2289ed3260976e9d75f13053ba84231fc81698"
+      "sha256": "582f96c3c18d87178a011ebda9dacc72dc5b796cf5961646f1dfdc06ccb32b2f"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",
@@ -890,6 +890,244 @@
       "source": "scripts/render-music-v29.py; independent V29 synthesis, no third-party recordings",
       "license": "Project original",
       "sha256": "a7c1fb326a90909e73851ec097e6fb08a1cf6651b67a5e6e0586db48a00b70d6"
+    },
+    {
+      "path": "apps/player/public/art/delivery/corsair-cove-e5f22e221427.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "e5f22e221427a94a1707a5c3da0607f58e648c2f446dd5b1ebcb4ac222833c4d"
+    },
+    {
+      "path": "apps/player/public/art/delivery/cosmic-tides-fe2042db4432.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "fe2042db443283440438937885abf578a8cef6abbb7b41eb6ba799b39d882bdb"
+    },
+    {
+      "path": "apps/player/public/art/delivery/double-deck-blackjack-c04e7f7ed7f2.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "c04e7f7ed7f29711f1a68e6c513c8dde3aba2ee657a2d35c9f8f7e2a165f0565"
+    },
+    {
+      "path": "apps/player/public/art/delivery/european-blackjack-c49915bc821b.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "c49915bc821be376fa691657730af205799ff882332e7c98b2651aad2c12be1d"
+    },
+    {
+      "path": "apps/player/public/art/delivery/clockwork-vault-3baa5a1c11a6.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "3baa5a1c11a6ac54fabf511da683c0ee885404f4afb3f8572aa1254fe4f0019b"
+    },
+    {
+      "path": "apps/player/public/art/delivery/phoenix-falls-0d955aebba65.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "0d955aebba654fa701d436de547337e66753f6e573ea9d41564c42756362ff43"
+    },
+    {
+      "path": "apps/player/public/art/delivery/outlaw-sevens-47aa1d17941e.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "47aa1d17941e9238891179931e9b3787705f9486400273f54c7c4fc035d0e28e"
+    },
+    {
+      "path": "apps/player/public/art/delivery/celestial-wilds-d90c90230155.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "d90c902301554901ef9bf4fe7aec028fe44bac6fb6b293c23b955f3124c6e847"
+    },
+    {
+      "path": "apps/player/public/art/delivery/meteor-keno-59d1fc20b769.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "59d1fc20b76939b6d3cb5d487c4ab9cdd8f7c773e6ecbaef9d2014eb0e06b36f"
+    },
+    {
+      "path": "apps/player/public/art/delivery/bamboo-keno-1b4b769ea0ed.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "1b4b769ea0ed7b54452be7df7caecf9880d0389abbe8194ae2eda22cca112ce2"
+    },
+    {
+      "path": "apps/player/public/art/delivery/disco-diamonds-6a5f40be364a.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "6a5f40be364a3f9441f75985bcd956feb93c495faac15c337e1aa36dedbad21b"
+    },
+    {
+      "path": "apps/player/public/art/delivery/midnight-express-33943ce780da.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "33943ce780dae283dc70798dadc3944e3a87593a3f9b77b90f0f887620f5fc43"
+    },
+    {
+      "path": "apps/player/public/art/delivery/pirate-gold-249decaf8508.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "249decaf85082bb598a34539386b6ab59cfc28afc190b1c1cbeca3a122d58bce"
+    },
+    {
+      "path": "apps/player/public/art/delivery/royal-blackjack-625313aa8a8f.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "625313aa8a8f5483770ee901d8af8c24d473bc9a38f81bb79ea477585f115874"
+    },
+    {
+      "path": "apps/player/public/art/delivery/sunken-dynasty-be49c63afab7.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "be49c63afab763e923dda899060a334494cb7ea0fad172a1ef1c4f33619740f4"
+    },
+    {
+      "path": "apps/player/public/art/delivery/polar-odyssey-907683f98edf.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "907683f98edf0c80a52d27b1f206a3d66d3f44c2c1f37d3dec8975bea3c7f8a2"
+    },
+    {
+      "path": "apps/player/public/art/delivery/neon-numbers-6709f10dfc44.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "6709f10dfc44b63804f503879c97705cc02b0a2896d2f827670a7ebe90fb7dff"
+    },
+    {
+      "path": "apps/player/public/art/delivery/pearl-keno-66ed87a04cfc.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "66ed87a04cfc895a3750858bb49b9798e060a108f144302c63401ed13fd5b5c5"
+    },
+    {
+      "path": "apps/player/public/art/delivery/abyss-legends-ecdde3be07c3.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "ecdde3be07c3102e2094c0d50c27920725f485c55b82a2861285995c64193c72"
+    },
+    {
+      "path": "apps/player/public/art/delivery/ruby-rush-26e4c6ba436b.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "26e4c6ba436b59eda37c32eb2e56cec0bc7926211f7311d6866148fa6c764406"
+    },
+    {
+      "path": "apps/player/public/art/delivery/sapphire-crown-f6c3cedf08e7.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "f6c3cedf08e762d69bb1732524ee522149e0a7b460e21716929a0cdb70c65954"
+    },
+    {
+      "path": "apps/player/public/art/delivery/solar-fortune-230d11d8a27f.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "230d11d8a27f4cc0ace7a1ef3d255830ab31014ef8bce4e6d815de3ca8cc9bc8"
+    },
+    {
+      "path": "apps/player/public/art/delivery/neon-sevens-2868e7e6c9cc.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "2868e7e6c9ccea309776d5f8fd3d12cf2c74601b0063cacece7463645c7f06ed"
+    },
+    {
+      "path": "apps/player/public/art/delivery/jade-fortune-76c0d09fbba7.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "76c0d09fbba719f52d5e2df40e9cc2718a76d1199bcfa370b766cf4dfac9b2ee"
+    },
+    {
+      "path": "apps/player/public/art/delivery/coin-carnival-a6464a5a725e.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "a6464a5a725e9fa3342f3e7cfd4088d7cc58f1891e1f29ac6ca8155c0415276c"
+    },
+    {
+      "path": "apps/player/public/art/delivery/aurora-vault-b7a3f0d5180c.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "b7a3f0d5180c1e868b4915b337be6d5a5edccb16f87a8ff6cdc146027a4d5c97"
+    },
+    {
+      "path": "apps/player/public/art/delivery/ember-relics-8f95a4234374.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "8f95a423437463e290537064dcb7dd58ff20b48ff5f5169e0183bbcc4a6f8277"
+    },
+    {
+      "path": "apps/player/public/art/delivery/temple-lights-1cfb4427b193.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "1cfb4427b193f019cf365dd20214b4f3d356b52d78d68abdced0a924be1b41c4"
+    },
+    {
+      "path": "apps/player/public/art/delivery/orchard-numbers-3633a358b88d.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "3633a358b88d265429526723322b6483e299b6ef59f9805c4447647028582c20"
+    },
+    {
+      "path": "apps/player/public/art/delivery/reef-party-4a9b62f33877.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "reports/screenshots/v39/poster-source.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "4a9b62f3387774bf1a77b22e8ba449b04cdac787598c5ca2d3f856a8f8e58e21"
+    },
+    {
+      "path": "apps/player/public/art/delivery/dealer-royal-7a44660c277c.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/blackjack-dealer-v37.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "7a44660c277cf13bb373ec6242f4a6c776a60a3cc2a5dcf1b75ffeb16f448531"
+    },
+    {
+      "path": "apps/player/public/art/delivery/dealer-double-fe1a76a7518c.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/blackjack-double-dealer-v38.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "fe1a76a7518c9050b3704b05e2346cb3dcb4fba1a5ae5443cdab389505f35f3a"
+    },
+    {
+      "path": "apps/player/public/art/delivery/dealer-european-a9c226073434.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/blackjack-european-dealer-v38.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "a9c2260734344faefc91a52f8f898b9dd27de78f62abeb2b505211e9fd30299d"
+    },
+    {
+      "path": "apps/player/public/art/delivery/lobby-hall-f59dca862fe7.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/arcade-hall-v7.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "f59dca862fe7d15d8ab0480a8e8e7ec18dc42fd433713e7b9c40dbd328c62ba3"
     }
   ]
 }

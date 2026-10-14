@@ -293,3 +293,7 @@ The owner requested a decent male or female 3D character at the opposite side of
 ## 14 October 2026 — distinct blackjack characters (V38)
 
 The owner corrected the shared character: each blackjack game needs its own dealer. Royal keeps the brown-haired woman in black/gold; Double Deck receives a dark-haired, bearded man in burgundy; European receives a different woman with a black bun and navy uniform. Each has an original transparent four-pose atlas selected by game identity. Retain V37 motion, rules, credits and all preview restrictions. Continue the existing authorized Vercel player release. Evidence: `../reports/REFINEMENT_V38.md`.
+
+## 14 October 2026 — fluid dealers and faster thumbnails (V39)
+
+Owner reported character glitches during card distribution and slow picture thumbnails throughout the catalog. Replace full-body pose swapping with continuous deformation of each existing distinct character, align card delivery and improve lifecycle/mobile controls. Deliver compact cached copies of the existing full artwork for all 30 shelf/floor games. Preserve accepted hands, credit timing, all mathematics and preview restrictions. Continue the existing authorized Vercel player release. Evidence: `../reports/REFINEMENT_V39.md`.

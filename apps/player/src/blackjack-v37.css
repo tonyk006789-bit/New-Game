@@ -1,4 +1,4 @@
-/* Each table loads its own original RGBA pose atlas. Motion uses transforms/opacity. */
+/* Each table keeps one original character mesh; only the dealing arm moves. */
 .blackjack-cabinet{--dealer-accent:#dcbd72;--dealer-room:#251b3e;--table-light:#2e375e;--table-dark:#11182b}
 .blackjack-cabinet[data-game="double-deck-blackjack"]{--dealer-accent:#e7a4cf;--dealer-room:#381c36;--table-light:#533052;--table-dark:#221728}
 .blackjack-cabinet[data-game="european-blackjack"]{--dealer-accent:#a9d8ed;--dealer-room:#112b42;--table-light:#254c66;--table-dark:#101e32}
@@ -11,14 +11,9 @@
 .dealer-table-edge{position:absolute;z-index:2;inset:41% -5% -30%;border:7px solid #14131e;border-top:8px solid #a89060;border-radius:50% 50% 0 0/15% 15% 0 0;background:radial-gradient(ellipse at 50% 0%,var(--table-light),var(--table-dark) 77%);box-shadow:0 -9px 0 #17141d,0 -12px 0 #d3b98266,inset 0 12px 26px #0008;pointer-events:none}
 .dealer-character{position:absolute;z-index:3;top:-1%;left:50%;height:55%;aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
 .dealer-halo{position:absolute;inset:20% 10% 4%;border-radius:50%;background:radial-gradient(ellipse,#c99b5940,transparent 69%)}
-.dealer-figure{position:absolute;inset:0;transform-origin:50% 90%;mask-image:linear-gradient(#000 0 var(--dealer-fade,84%),transparent 99%)}
-.dealer-character[data-game="double-deck-blackjack"],.dealer-character[data-game="european-blackjack"]{--dealer-fade:94%}
-.dealer-pose{position:absolute;inset:0;opacity:0;background-size:200% 200%;background-repeat:no-repeat;transition:opacity 100ms linear}
-.dealer-pose.pose-active{opacity:1}
-.dealer-resting .dealer-figure{animation:dealer-breathe 5s ease-in-out infinite}
-.dealer-paused .dealer-figure{animation:none}
-.dealer-paused .dealer-pose{transition:none}
-.dealer-nameplate{position:absolute;z-index:4;top:25%;left:13%;display:grid;gap:7px;text-align:center;color:var(--dealer-accent);font-size:14px;letter-spacing:2px}
+.dealer-figure{position:absolute;inset:0;transform-origin:50% 90%;mask-image:linear-gradient(#000 0 94%,transparent 99%);animation:dealer-breathe 6s ease-in-out infinite}
+.dealer-still,.dealer-mesh,.dealer-mesh canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.dealer-covered{visibility:hidden}.dealer-paused .dealer-figure{animation-play-state:paused}.dealer-nameplate{position:absolute;z-index:4;top:25%;left:13%;display:grid;gap:7px;text-align:center;color:var(--dealer-accent);font-size:14px;letter-spacing:2px}
 .dealer-nameplate small{font-size:10px;letter-spacing:1px;color:#e4d6b9}
 .blackjack-cabinet .card-shoe{position:absolute;z-index:4;top:42%;right:22%;left:auto;bottom:auto;width:82px;height:47px;transform:rotate(-15deg) skewX(-5deg);border:3px solid #cfb983;background:repeating-linear-gradient(0deg,#eee1bf 0 2px,#8c846f 2px 3px);border-radius:5px;box-shadow:8px 8px 12px #0007;opacity:1;display:grid;place-items:center}
 .blackjack-cabinet .card-shoe span{background:#29213d;border:1px solid #dbcaa0;color:#e4cda2;position:absolute;inset:0;display:grid;place-items:center;font-size:23px}
@@ -58,9 +53,18 @@
 .blackjack-cabinet .blackjack-return small{font-size:9px}
 .blackjack-cabinet .blackjack-return strong{font-size:26px}
 .fixed-game-frame .blackjack-controls{height:96px;min-height:96px}
-.dealer-flying-card{position:absolute;top:0;left:0;z-index:8;width:var(--flight-width);height:var(--flight-height);display:grid;place-items:center;border:4px solid #f2e4bf;border-radius:5px;background:repeating-linear-gradient(45deg,#322444 0 3px,#51415f 3px 5px);box-shadow:3px 9px 10px #0005;color:#ead8ad;font:26px Georgia;pointer-events:none;animation:dealer-slide 370ms cubic-bezier(.2,.65,.3,1) both;will-change:transform}
-@keyframes dealer-slide{0%{transform:translate(var(--from-x),var(--from-y)) rotate(-12deg) scale(.65)}60%{transform:translate(var(--to-x),var(--to-y)) rotate(4deg) scale(1.03)}100%{transform:translate(var(--to-x),var(--to-y)) rotate(0) scale(1)}}
+.dealer-flying-card{position:absolute;top:0;left:0;z-index:8;width:var(--flight-width);height:var(--flight-height);display:grid;place-items:center;border:4px solid #f2e4bf;border-radius:5px;background:repeating-linear-gradient(45deg,#322444 0 3px,#51415f 3px 5px);box-shadow:3px 9px 10px #0005;color:#ead8ad;font:26px Georgia;pointer-events:none;animation:dealer-slide var(--flight-duration) cubic-bezier(.2,.65,.3,1) both;will-change:transform}
+@keyframes dealer-slide{0%{transform:translate(var(--shoe-x),var(--shoe-y)) rotate(-15deg) scale(.65)}37.288%{transform:translate(var(--from-x),var(--from-y)) rotate(-8deg) scale(.72)}100%{transform:translate(var(--to-x),var(--to-y)) rotate(0) scale(1)}}
 @keyframes dealer-turn{from{transform:rotateY(-90deg)}to{transform:rotateY(0)}}
 @keyframes dealer-breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1px) scale(1.008)}}
 @container (max-height:460px){.blackjack-cabinet .playing-card{width:50px;min-width:50px;height:70px}.blackjack-cabinet .playing-card strong{font-size:25px}.blackjack-cabinet .hand-result{bottom:-10px}.blackjack-cabinet .felt-lettering{top:68%}.blackjack-cabinet .blackjack-player-hands{top:76%}}
-@media(prefers-reduced-motion:reduce){.dealer-figure,.dealer-pose,.dealer-flying-card{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){.dealer-figure,.dealer-flying-card{animation:none!important;transition:none!important}}
+/* Physical viewport media rules must not wrap controls inside the scaled 1280px stage. */
+.fixed-game-frame .blackjack-controls{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:22px;padding:10px 24px}
+.fixed-game-frame .blackjack-controls .blackjack-actions{flex:1;min-width:0;display:flex;flex-wrap:nowrap;justify-content:center;gap:12px}
+.fixed-game-frame .blackjack-actions button{min-width:110px;height:58px;font-size:16px;padding:8px 15px}
+.fixed-game-frame .blackjack-meter{min-width:150px}.fixed-game-frame .blackjack-meter strong{font-size:29px}
+.fixed-game-frame .blackjack-controls label{font-size:11px}.fixed-game-frame .blackjack-controls select{width:100px;font-size:20px}
+.fixed-game-frame .blackjack-status{height:24px;min-height:24px;font-size:12px;padding:4px;margin:0;flex:none}
+.blackjack-cabinet .playing-card.dealer-flying-card{width:var(--flight-width);height:var(--flight-height);min-width:0;animation:dealer-slide var(--flight-duration) cubic-bezier(.2,.65,.3,1) both;display:block;border:2px solid #e9d69f;background:linear-gradient(120deg,#fffbe8,#e0d8bb);color:#242134;transform-origin:center}
+.blackjack-cabinet .dealer-flying-card.red{color:#b92744}.blackjack-cabinet .dealer-flying-card.back{display:grid;background:repeating-linear-gradient(45deg,#322444 0 3px,#51415f 3px 5px);color:#ead8ad}

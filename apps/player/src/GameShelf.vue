@@ -3,10 +3,12 @@ import {computed,watch} from 'vue';
 import {catalog,isPremiumGame,type GameId} from '@new-game/contracts';
 import GamePoster from './GamePoster.vue';
 import {playSound} from './audio';
+import {usePosterPrefetch} from './poster-prefetch';
 const props=defineProps<{games:readonly (typeof catalog)[number][];favorites:string[];running:boolean}>();
 const emit=defineEmits<{open:[id:GameId];favorite:[id:GameId]}>();
 const page=defineModel<number>('page',{default:0}),pages=computed(()=>Math.max(1,Math.ceil(props.games.length/8)));
 const visible=computed(()=>props.games.slice(page.value*8,page.value*8+8));
+usePosterPrefetch(computed(()=>props.games.slice((page.value+1)*8,(page.value+2)*8).map(g=>g.id)),()=>props.running);
 watch(()=>props.games,()=>{page.value=0;});
 function setPage(next:number){const value=Math.max(0,Math.min(pages.value-1,next));if(value!==page.value)playSound('page');page.value=value;}
 function change(direction:number){setPage(page.value+direction);}
@@ -19,9 +21,9 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
  <section class="casino-shelf" aria-label="Game shelf" :class="{'shelf-paused':!running}" @pointerdown="start" @pointerup="end" @keydown.left.prevent="change(-1)" @keydown.right.prevent="change(1)">
   <div class="shelf-lights" aria-hidden="true"><i v-for="n in 24" :key="n" :style="{'--bulb':n}"/></div>
   <div class="casino-shelf-grid">
-   <article v-for="game in visible" :key="game.id" class="shelf-game" data-depth-card :style="{'--tile-color':game.color}">
+   <article v-for="(game,index) in visible" :key="game.id" class="shelf-game" data-depth-card :style="{'--tile-color':game.color}">
     <button class="shelf-play" :data-game-id="game.id" data-own-sound :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
-     <GamePoster :game="game.id" :name="game.name"/>
+     <GamePoster :game="game.id" :name="game.name" :priority="index<4"/>
      <span v-if="isPremiumGame(game.id)" class="new-ribbon">PREMIUM</span>
      <span class="shelf-game-caption"><b>{{game.name}}</b><small>{{game.detail}}</small></span>
      <span class="shelf-enter">PLAY <span>▶</span></span>
