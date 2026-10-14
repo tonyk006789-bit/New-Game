@@ -29,6 +29,12 @@ All three table layouts inspected at a landscape phone viewport (844×390); Roya
 
 ## Publication and rollback
 
-Player publication pending final route/asset verification. Operator remains on V36. No hosted play, new service, credentials transfer or hosted wallet adjustment is needed.
+Source commit `73ec8a7` pushed to the existing GitHub main branch. Player deployment `dpl_22YXwMYTVyQCQqHWHsidd97Fp4FJ` completed READY and is aliased at https://new-game-test-topaz.vercel.app/. Operator remains on V36. No hosted play, new service, credentials transfer or hosted wallet adjustment was submitted.
+
+- Publication used the existing configuration and official CLI: `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli" --scope tonyk006789-7532 --no-color`.
+- `node .local/verify-v37-live.mjs` — **21 read-only route/asset checks passed**, including the new dealer PNG (200), exact player entry `index-B2GYUBlD.js`, unchanged operator entry `index-BPWS4sI-.js`, uncached entry HTML, protected APIs and unchanged approved settings/catalog.
+- Public browser loaded that exact player entry with no console errors. Local desktop and phone screenshots, plus the public login screenshot and route-check JSON, are saved under `reports/screenshots/v37/`.
+- Opening an already settled Royal hand no longer replays its win particle burst. The final local desktop screenshot shows the new dealer and the accepted result, with no animation pending.
+- Temporary viewport override reset; local verification tab closed. Both existing Vercel links remain open as deliverables. Refresh an old phone tab once to receive the update.
 
 Rollback: redeploy previous player `dpl_ATPZp86cttqNdyvpehr5W8pJGdof`, or revert V37 and rebuild. Preserve all database balances and accepted rounds; no schema rollback.
