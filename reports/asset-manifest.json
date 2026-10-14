@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T17:18:55.712Z",
+  "generatedAt": "2026-10-14T17:27:21.536Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -532,7 +532,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "ca8426014c3d676f0b4580bfe43476e0ba793cf9c4625e12d2143952af148e98"
+      "sha256": "fa546870b4ca8d1b57f8df4284e88b81f967f4306ed843860b8c25b7f8da33da"
     },
     {
       "path": "apps/player/src/blackjack-v37.css",

@@ -14,6 +14,8 @@ All 30 full-art thumbnail compositions are now flattened into individual 480×48
 - `apps/player/tools/`: development-only export surface preserving the former thumbnail composition. Not shipped by Vite/Vercel. Capture its full page with CUA, save tile coordinates, then run `scripts/optimize-presentation-assets.mjs` with Sharp available as `SHARP_MODULE`. This is format/size optimization of existing original artwork; no external assets or new ImageGen artwork.
 - Vercel packaging and delivery-budget/continuous-mesh regression tests.
 
+Live verification also caught a cold-start CSP fallback. The final dealer imports the same static-uniform adapter as the fish renderer (`pixi.js/unsafe-eval`, which removes the eval requirement); CSP is unchanged. The live canvas must report `data-renderer="mesh"`, not merely display the fallback image.
+
 No game math, ledger, passwords, hierarchy, database or operator changes. Double Deck and European retain their free-preview restrictions. No migration or accounting rollback is needed.
 
 ## Acceptance
@@ -21,7 +23,7 @@ No game math, ledger, passwords, hierarchy, database or operator changes. Double
 - `node node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.json` — passed.
 - `node node_modules/eslint/bin/eslint.js apps packages tests netlify/functions --max-warnings 0` — passed.
 - `node node_modules/vitest/vitest.mjs run tests/unit tests/integration` — 35 files / **248 tests passed**, including continuous mesh bounds, no mesh folding, pinned face, complete catalog coverage, asset hashes and size budgets. Existing accepted-card/hidden-card/split/European sequencing tests remain green. After the final flight adjustment, the 11 dealer/delivery tests were rerun and passed.
-- `node node_modules/vite/bin/vite.js build --config apps/player/vite.config.ts` — passed; entry `index-C8djQbe4.js`, stylesheet `index-jroGmsS9.css`.
+- `node node_modules/vite/bin/vite.js build --config apps/player/vite.config.ts` — passed; entry `index-CaS0d07b.js`, stylesheet `index-jroGmsS9.css`.
 - `node scripts/vercel-build.mjs` and `node --test tests/deployment/vercel.test.mjs` — passed; **4 deployment tests** including immutable delivery assets and exclusion of local export tools.
 - From `apps/mobile`, `node node_modules/@capacitor/cli/bin/capacitor copy` — Android/iOS/web copy passed. Initial sandbox copy returned EPERM; the authorized workspace-only retry succeeded. This is asset copying, not native compilation or physical-device certification.
 - `node scripts/asset-manifest.mjs` — 161 assets recorded.

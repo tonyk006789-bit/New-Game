@@ -29,7 +29,10 @@ function begin(){
 }
 onMounted(async()=>{
  try{
-  const {Application,Assets,MeshPlane}=await import('pixi.js');if(disposed)return;
+  const {Application,Assets,MeshPlane}=await import('pixi.js');
+  // This adapter replaces generated uniform functions with static equivalents.
+  // It supports our strict CSP; it does not enable eval or weaken the policy.
+  await import('pixi.js/unsafe-eval');if(disposed)return;
   const instance=new Application();app=instance;
   await instance.init({width:640,height:640,resolution:1,backgroundAlpha:0,antialias:true,autoStart:false,preference:'webgl',powerPreference:'low-power'});
   if(disposed){disposeRenderer();return;}
@@ -38,14 +41,14 @@ onMounted(async()=>{
   instance.stage.addChild(plane);host.value?.append(instance.canvas);draw(0);instance.render();painted.value=true;imageReady();
   instance.canvas.addEventListener('webglcontextlost',()=>{if(disposed||destroyed)return;painted.value=false;instance.stop();});
   instance.ticker.add(()=>{const elapsed=performance.now()-started;draw(dealerReach(elapsed));if(elapsed>=DEAL_STEP)instance.stop();});
- }catch{if(!disposed){painted.value=false;imageReady();}disposeRenderer();/* A static fallback remains available. */}
+ }catch(error){if(!disposed){console.warn('Dealer renderer unavailable; using static artwork.',error);painted.value=false;imageReady();}disposeRenderer();}
 });
 watch(()=>props.cue,begin);
 watch(()=>props.active&&props.running&&!props.reducedMotion,enabled=>{if(!enabled)stop();});
 onBeforeUnmount(()=>{disposed=true;disposeRenderer();});
 </script>
 <template>
- <div class="dealer-character" :data-game="game" :class="{'dealer-paused':!running||reducedMotion}" role="img" :aria-label="dealer.description">
+ <div class="dealer-character" :data-game="game" :data-renderer="painted?'mesh':'still'" :class="{'dealer-paused':!running||reducedMotion}" role="img" :aria-label="dealer.description">
   <div class="dealer-halo" aria-hidden="true"></div>
   <div class="dealer-figure" aria-hidden="true"><img class="dealer-still" :class="{'dealer-covered':painted}" :src="dealer.art" alt="" decoding="async" fetchpriority="high"/><div ref="host" class="dealer-mesh"/></div>
  </div>
