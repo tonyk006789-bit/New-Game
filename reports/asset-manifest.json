@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T12:52:16.206Z",
+  "generatedAt": "2026-10-14T16:42:41.075Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -71,6 +71,20 @@
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v37.json",
       "license": "Project original; owner review pending",
       "sha256": "cd90ddb5da12dec403720a47de069ed020b1ef547c209629ab9e3b78ea0f0b64"
+    },
+    {
+      "path": "apps/player/public/art/blackjack-double-dealer-v38.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v38.json",
+      "license": "Project original; owner review pending",
+      "sha256": "e671575790322c898ed6c70b5ed9157f1b82330561ee6051ee5a8be9b4ad4f0b"
+    },
+    {
+      "path": "apps/player/public/art/blackjack-european-dealer-v38.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v38.json",
+      "license": "Project original; owner review pending",
+      "sha256": "9acedba63a2c7f1f9e513899f9b8d9fb3ec1e902ad08b2ebed781b47c2f7ab92"
     },
     {
       "path": "apps/player/public/art/cabinet-posters-v15.png",
@@ -518,14 +532,14 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "e6b19ecd2ee7f62581a197ff575d36ed20067cab6bf87b2dee7950fd11850a0a"
+      "sha256": "478c1ec43251d11eb5332dc7c81315670c71aa7bd91937eba6e1675818f985ff"
     },
     {
       "path": "apps/player/src/blackjack-v37.css",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "0d758e47e5f5b4be792f33f5a0e4df500af2eec239e421915d0a67260b84fb65"
+      "sha256": "453cce29bef4de20343489d88c2289ed3260976e9d75f13053ba84231fc81698"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",

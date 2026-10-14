@@ -289,3 +289,7 @@ The owner supplied an old operator form demanding 12-character passwords and con
 ## 14 October 2026 — animated blackjack dealer (V37)
 
 The owner requested a decent male or female 3D character at the opposite side of every blackjack table, distributing cards as a real dealer would. Add an original, professionally dressed female dealer as a transparent 3D-rendered pose atlas, with lightweight card delivery, hole-card reveal and idle motion. Royal, Double Deck and European share the dealer, with table-specific lighting and felt. Motion follows the accepted hand; restore, reduced motion and pause complete presentation safely. Keep existing stake/award timing, card rules and preview restrictions. No new game engine, database migration, operator changes or mathematics approval. Continue the existing authorized player Vercel release workflow. Evidence: `../reports/REFINEMENT_V37.md`.
+
+## 14 October 2026 — distinct blackjack characters (V38)
+
+The owner corrected the shared character: each blackjack game needs its own dealer. Royal keeps the brown-haired woman in black/gold; Double Deck receives a dark-haired, bearded man in burgundy; European receives a different woman with a black bun and navy uniform. Each has an original transparent four-pose atlas selected by game identity. Retain V37 motion, rules, credits and all preview restrictions. Continue the existing authorized Vercel player release. Evidence: `../reports/REFINEMENT_V38.md`.

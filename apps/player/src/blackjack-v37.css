@@ -1,4 +1,4 @@
-/* A single original RGBA pose atlas. Motion uses transforms/opacity, no render loop. */
+/* Each table loads its own original RGBA pose atlas. Motion uses transforms/opacity. */
 .blackjack-cabinet{--dealer-accent:#dcbd72;--dealer-room:#251b3e;--table-light:#2e375e;--table-dark:#11182b}
 .blackjack-cabinet[data-game="double-deck-blackjack"]{--dealer-accent:#e7a4cf;--dealer-room:#381c36;--table-light:#533052;--table-dark:#221728}
 .blackjack-cabinet[data-game="european-blackjack"]{--dealer-accent:#a9d8ed;--dealer-room:#112b42;--table-light:#254c66;--table-dark:#101e32}
@@ -11,8 +11,9 @@
 .dealer-table-edge{position:absolute;z-index:2;inset:41% -5% -30%;border:7px solid #14131e;border-top:8px solid #a89060;border-radius:50% 50% 0 0/15% 15% 0 0;background:radial-gradient(ellipse at 50% 0%,var(--table-light),var(--table-dark) 77%);box-shadow:0 -9px 0 #17141d,0 -12px 0 #d3b98266,inset 0 12px 26px #0008;pointer-events:none}
 .dealer-character{position:absolute;z-index:3;top:-1%;left:50%;height:55%;aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
 .dealer-halo{position:absolute;inset:20% 10% 4%;border-radius:50%;background:radial-gradient(ellipse,#c99b5940,transparent 69%)}
-.dealer-figure{position:absolute;inset:0;transform-origin:50% 90%;mask-image:linear-gradient(#000 0 84%,transparent 99%)}
-.dealer-pose{position:absolute;inset:0;opacity:0;background-image:url('/art/blackjack-dealer-v37.png');background-size:200% 200%;background-repeat:no-repeat;transition:opacity 100ms linear}
+.dealer-figure{position:absolute;inset:0;transform-origin:50% 90%;mask-image:linear-gradient(#000 0 var(--dealer-fade,84%),transparent 99%)}
+.dealer-character[data-game="double-deck-blackjack"],.dealer-character[data-game="european-blackjack"]{--dealer-fade:94%}
+.dealer-pose{position:absolute;inset:0;opacity:0;background-size:200% 200%;background-repeat:no-repeat;transition:opacity 100ms linear}
 .dealer-pose.pose-active{opacity:1}
 .dealer-resting .dealer-figure{animation:dealer-breathe 5s ease-in-out infinite}
 .dealer-paused .dealer-figure{animation:none}
