@@ -32,6 +32,7 @@ Pinned Node 24.19 runtime; direct executable entry points. Windows sandbox initi
 - `node scripts/vercel-build.mjs` and `node scripts/vercel-operator-build.mjs` — passed.
 - `node --test tests/deployment/vercel.test.mjs tests/deployment/vercel-operator.test.mjs math-reference/game-math.test.mjs policy-reference/product-policy.test.mjs` — **58 passed**. Historical illustrative math tests are not production mathematics approval.
 - From `apps/mobile`, `node node_modules/@capacitor/cli/bin/capacitor copy` — Android/iOS/web copies succeeded. Native compilation, signing and physical-device performance are not claimed.
+- `node --env-file=.local/staging/runtime.env scripts/reconcile.mjs` — 56 local wallets / 1,370 transactions; **zero mismatched wallets and zero unbalanced transactions** after browser testing.
 
 Browser verification used the local nonredeemable-credit fixture, not hosted wagering or account changes. At 844×390, Outlaw Sevens showed 987.90 → 987.65 as spinning started and retained 987.65 afterward. Orchard Numbers showed 987.65 → 987.40 before draw completion. Royal Blackjack showed 987.40 → 986.90 on deal and 987.90 after its committed 1.00 return. Reef Party updated costs and caught awards while firing, reaching 978.15 after all pending reveals; the balance carried back to the lobby. These are sampled game-family checks, not a manual playthrough of all 30 games or a physical-phone certification.
 
@@ -41,6 +42,13 @@ Local screenshots: `reports/screenshots/v36/operator-create-phone.png`, `keno-st
 
 ## Publication and rollback
 
-Publication verification is recorded below after deploying both existing authorized Vercel projects. One refresh of an old open phone tab is required to load V36.
+Source commit `eb0ce45` pushed to the existing GitHub main branch. Both prebuilt deployments completed READY using the existing project configurations, encrypted settings and official Vercel CLI gateway. No new credentials, services, hosted wagers or balance adjustments were submitted.
+
+- Player: `dpl_ATPZp86cttqNdyvpehr5W8pJGdof`, https://new-game-test-topaz.vercel.app/.
+- Operator: `dpl_BL3BJDd5cZNe8ZPBCJvpqoAUSmvW`, https://new-game-operator.vercel.app/.
+- Deployment command from the root: `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli" --scope tonyk006789-7532 --no-color`. Operator used the same CLI/options from `.local/vercel-operator` with `../../` gateway and CLI paths.
+- `node .local/verify-v36-live.mjs` — **20 read-only route/asset checks passed**. Exact new entry hashes, health endpoints, role/API protection, catalog 30, unchanged approved profile setting (revision 1 / 20%), six-character operator policy, optional Nickname and no old 12-character constraint. Both `/` and `/index.html` return `Cache-Control: no-store`.
+- Browser loaded both public login pages, confirmed their exact new entry hashes and captured no console errors. Evidence: `reports/screenshots/v36/live-route-checks.json`, `live-player-login.png`, `live-operator-login.png`.
+- Viewport override reset. Local verification tabs closed; both live links retained as deliverables. One refresh of an old open phone tab is required to load V36.
 
 Rollback: redeploy the preceding player `dpl_6TAmafB3TZCR8R54nQEqQauHFsJ8` and operator `dpl_5fCtaKqFxrrPi5s5YDkvxmQ7egXi`, or revert this source change and rebuild. Preserve all database receipts and balances; no schema rollback or password reset is needed.
