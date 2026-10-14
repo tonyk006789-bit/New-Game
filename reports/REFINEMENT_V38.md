@@ -30,6 +30,11 @@ Local browser checks confirmed different faces, hair, clothing and selected imag
 
 ## Publication and rollback
 
-Publication verification pending. Operator remains on V36; no hosted credit actions are required.
+Source `015a668` pushed to the existing GitHub main branch. Player deployment `dpl_Bt91tBbqdRaRwbmKEUEV2ueFihee` is READY at https://new-game-test-topaz.vercel.app/. Operator remains on V36; no hosted credit actions were submitted.
+
+- Publication used the existing Vercel project and encrypted configuration via the same `deploy --prebuilt --prod --yes` official CLI workflow recorded in V37.
+- `node .local/verify-v38-live.mjs` — **23 read-only checks passed**. New player entry `index-DdiSPBRo.js`; unchanged operator entry `index-BPWS4sI-.js`; all three PNG content types and SHA-256 hashes match the workspace. Entry HTML remains uncached, protected API routes remain protected, and approved settings/catalog remain unchanged.
+- The public browser loaded the new entry through the existing safe Reload update control. Refresh an old phone tab once to receive this version.
+- Both new characters were also verified on the public Vercel tables without dealing a hosted hand. Public screenshots: `reports/screenshots/v38/live-double-deck.png` and `live-european.png`; no browser console errors. Temporary viewport override was reset and the local verification tab closed. The public European table remains open as the deliverable.
 
 Rollback: redeploy player `dpl_22YXwMYTVyQCQqHWHsidd97Fp4FJ`, or revert V38 and rebuild. No database rollback.
