@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T17:27:21.536Z",
+  "generatedAt": "2026-10-14T18:46:52.277Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -532,14 +532,14 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "fa546870b4ca8d1b57f8df4284e88b81f967f4306ed843860b8c25b7f8da33da"
+      "sha256": "39ca2dbd563cd3e071732161383245277f2ff9d375fdbb17eb8202237ede8053"
     },
     {
       "path": "apps/player/src/blackjack-v37.css",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "582f96c3c18d87178a011ebda9dacc72dc5b796cf5961646f1dfdc06ccb32b2f"
+      "sha256": "a916615e055ff554012e2729a82a75c70b65258c281858a7ea136ea6496152c3"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",
@@ -1128,6 +1128,48 @@
       "source": "apps/player/public/art/arcade-hall-v7.png; scripts/optimize-presentation-assets.mjs; no new external art",
       "license": "Project original; owner review pending",
       "sha256": "f59dca862fe7d15d8ab0480a8e8e7ec18dc42fd433713e7b9c40dbd328c62ba3"
+    },
+    {
+      "path": "apps/player/public/art/dealers/female-ac42aeadcdfc.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Base Characters/Godot - UE/Superhero_Female_FullBody.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "ac42aeadcdfc06a7701d6b134a4ecdbc18d0bc4c2cb88cbd85594b1daeb3f6a8"
+    },
+    {
+      "path": "apps/player/public/art/dealers/male-568d923e631a.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Base Characters/Godot - UE/Superhero_Male_FullBody.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "568d923e631aef3ba1b773b32ae623878e1e1eea4d68f1fd7770ad3df504bc45"
+    },
+    {
+      "path": "apps/player/public/art/dealers/Hair_Long-664e9ef1488d.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Hairstyles/Origin at 0/glTF (Godot)/Hair_Long.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "664e9ef1488d768b3af1cc6b86422f4cddb3bcc74f4abfcfd9d0433bdbb41d81"
+    },
+    {
+      "path": "apps/player/public/art/dealers/Hair_Buns-e1b0771d061f.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Hairstyles/Origin at 0/glTF (Godot)/Hair_Buns.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "e1b0771d061f44106a04b9aa69a5a6a9b983b1a63750609018e492ccbecfd0ef"
+    },
+    {
+      "path": "apps/player/public/art/dealers/Hair_SimpleParted-fe233c04214a.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Hairstyles/Origin at 0/glTF (Godot)/Hair_SimpleParted.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "fe233c04214addb2eb3e2fddc88c6b3d8d94f354e423f643187df54858095ce7"
+    },
+    {
+      "path": "apps/player/public/art/dealers/Hair_Beard-bdb04e7025b5.glb",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/universalbasecharacters.html; Hairstyles/Origin at 0/glTF (Godot)/Hair_Beard.gltf; scripts/prepare-dealer-models.mjs",
+      "license": "CC0-1.0",
+      "sha256": "bdb04e7025b5a7922fabe3db1fcabcc1d89e35732348a21e549bcea9da467caf"
     }
   ]
 }

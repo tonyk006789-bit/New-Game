@@ -1,0 +1,51 @@
+{
+  "creator": "Quaternius",
+  "source": "https://quaternius.com/packs/universalbasecharacters.html",
+  "download": "https://quaternius.itch.io/universal-base-characters",
+  "license": "CC0-1.0",
+  "changes": "Compact GLB delivery, shirt/waistcoat materials, original casino styling and procedural joint animation",
+  "assets": [
+    {
+      "key": "female",
+      "url": "/art/dealers/female-ac42aeadcdfc.glb",
+      "bytes": 1775740,
+      "sha256": "ac42aeadcdfc06a7701d6b134a4ecdbc18d0bc4c2cb88cbd85594b1daeb3f6a8",
+      "original": "Base Characters/Godot - UE/Superhero_Female_FullBody.gltf"
+    },
+    {
+      "key": "male",
+      "url": "/art/dealers/male-568d923e631a.glb",
+      "bytes": 1554716,
+      "sha256": "568d923e631aef3ba1b773b32ae623878e1e1eea4d68f1fd7770ad3df504bc45",
+      "original": "Base Characters/Godot - UE/Superhero_Male_FullBody.gltf"
+    },
+    {
+      "key": "Hair_Long",
+      "url": "/art/dealers/Hair_Long-664e9ef1488d.glb",
+      "bytes": 233100,
+      "sha256": "664e9ef1488d768b3af1cc6b86422f4cddb3bcc74f4abfcfd9d0433bdbb41d81",
+      "original": "Hairstyles/Origin at 0/glTF (Godot)/Hair_Long.gltf"
+    },
+    {
+      "key": "Hair_Buns",
+      "url": "/art/dealers/Hair_Buns-e1b0771d061f.glb",
+      "bytes": 249008,
+      "sha256": "e1b0771d061f44106a04b9aa69a5a6a9b983b1a63750609018e492ccbecfd0ef",
+      "original": "Hairstyles/Origin at 0/glTF (Godot)/Hair_Buns.gltf"
+    },
+    {
+      "key": "Hair_SimpleParted",
+      "url": "/art/dealers/Hair_SimpleParted-fe233c04214a.glb",
+      "bytes": 137484,
+      "sha256": "fe233c04214addb2eb3e2fddc88c6b3d8d94f354e423f643187df54858095ce7",
+      "original": "Hairstyles/Origin at 0/glTF (Godot)/Hair_SimpleParted.gltf"
+    },
+    {
+      "key": "Hair_Beard",
+      "url": "/art/dealers/Hair_Beard-bdb04e7025b5.glb",
+      "bytes": 130728,
+      "sha256": "bdb04e7025b5a7922fabe3db1fcabcc1d89e35732348a21e549bcea9da467caf",
+      "original": "Hairstyles/Origin at 0/glTF (Godot)/Hair_Beard.gltf"
+    }
+  ]
+}
