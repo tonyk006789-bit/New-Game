@@ -20,6 +20,8 @@ test('separate deployment contains only operator assets and preserves API routin
  const base='.local/vercel-operator/.vercel/output';
  const config=JSON.parse(await readFile(base+'/config.json','utf8'));assert.equal(config.routes[1].dest,'/operator?__route=$1');
  assert.equal(config.routes.at(-1).dest,'/index.html');
+ assert.equal(config.routes.at(-1).headers['Cache-Control'],'no-store');
+ assert.ok(config.routes.some(route=>route.src==='/(index\\.html)?'&&route.headers?.['Cache-Control']==='no-store'&&route.continue));
  const html=await readFile(base+'/static/index.html','utf8');assert.match(html,/Operator console/);
  const metadata=JSON.parse(await readFile(base+'/functions/operator.func/.vc-config.json','utf8'));assert.equal(metadata.runtime,'nodejs24.x');
 });

@@ -7,7 +7,7 @@ import {formatCredits} from '@new-game/domain';
 import WinMeter from './WinMeter.vue';
 const props=defineProps<{game:string;ready:boolean;authenticated:boolean;busy?:boolean;reducedMotion?:boolean;continuous?:boolean}>();
 const disabled=computed(()=>!props.ready||props.busy||stage.busy||!!stage.pending||stage.fishPending.length>0||(!props.continuous&&creditPresentation.held!==null));
-function reveal(){if(!props.continuous)revealCredits(props.game);}
+function reveal(){if(!props.continuous&&!stage.pending)revealCredits(props.game);}
 onBeforeUnmount(()=>revealCredits(props.game));
 const options=computed(()=>stakesForGame(props.game));
 watch(()=>props.game,()=>{if(!options.value.includes(stage.stake))stage.stake=options.value[0];},{immediate:true});

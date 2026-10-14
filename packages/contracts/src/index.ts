@@ -8,6 +8,7 @@ export const PositiveUnits = Units.pipe(z.string().refine(value => BigInt(value)
 export const Role = z.enum(['MAIN_ADMIN', 'SUB_DISTRIBUTOR', 'AGENT', 'PLAYER']);
 export const credentialHint='At least 6 characters, including a letter and a number.';
 export const credentialPattern='(?=.*[A-Za-z])(?=.*[0-9]).{6,256}';
+export const credentialInputAttributes={minlength:6,maxlength:256,pattern:credentialPattern,title:credentialHint} as const;
 export const NewPassword=z.string().min(6,credentialHint).max(256).regex(/[A-Za-z]/,credentialHint).regex(/[0-9]/,credentialHint);
 export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
  z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));

@@ -43,7 +43,18 @@ function present(value:View,animate=true){
   revealTimer=setTimeout(finishReveal,resultAt+1200);
  }else revealTimer=setTimeout(finishReveal,750);
 }
-async function sync(){if(!staked.value||!props.running||busy.value||pending.value||revealing.value)return;try{const result=await api<{hand:View|null}>('blackjack');if(!disposed&&result.hand&&(!hand.value||result.hand.id!==hand.value.id||result.hand.revision!==hand.value.revision||result.hand.settled!==hand.value.settled))present(result.hand);}catch(e){if(!disposed)error.value=(e as Error).message;}}
+let syncing=false;
+async function sync(animate=true){
+ if(!staked.value||!props.running||busy.value||pending.value||revealing.value||syncing)return;
+ syncing=true;const previous=hand.value;
+ try{
+  const result=await api<{hand:View|null}>('blackjack');
+  // A slow poll cannot replace a hand changed by a more recent player action.
+  if(disposed||hand.value!==previous||busy.value||pending.value||revealing.value)return;
+  if(result.hand&&(!hand.value||result.hand.id!==hand.value.id||result.hand.revision!==hand.value.revision||result.hand.settled!==hand.value.settled))present(result.hand,animate);
+ }catch(e){if(!disposed&&hand.value===previous&&!busy.value&&!pending.value)error.value=(e as Error).message;}
+ finally{syncing=false;}
+}
 async function act(action:string){
  if(!props.running||!navigator.onLine||document.hidden||busy.value||revealing.value||stage.busy||stage.pending||stage.fishPending.length)return;
  busy.value=true;error.value='';
@@ -62,7 +73,7 @@ async function act(action:string){
  finally{busy.value=false;}
 }
 const canAct=(action:string)=>!foreignHand.value&&props.running&&!loading.value&&!busy.value&&!revealing.value&&!pending.value&&(!active.value?action==='DEAL':hand.value!.actions.includes(action))&&(!staked.value||!['DEAL','DOUBLE','SPLIT'].includes(action)||available.value>=BigInt(action==='DEAL'?stake.value:hand.value!.hands[hand.value!.active].stake));
-onMounted(async()=>{if(staked.value){try{pending.value=JSON.parse(localStorage.getItem(key())||'null');}catch{/* Optional saved transport request. */}if(pending.value){const savedGame=blackjackGameForProfile(pending.value.profileId);if(savedGame!==props.game){foreignHand.value=savedGame;pending.value=null;}else await act(pending.value.action);}else await sync();}loading.value=false;poll=setInterval(()=>{now.value=Date.now();if(!pending.value)void sync();else if(props.running&&!busy.value)void act(pending.value.action);},2000);});
+onMounted(async()=>{if(staked.value){try{pending.value=JSON.parse(localStorage.getItem(key())||'null');}catch{/* Optional saved transport request. */}if(pending.value){const savedGame=blackjackGameForProfile(pending.value.profileId);if(savedGame!==props.game){foreignHand.value=savedGame;pending.value=null;}else await act(pending.value.action);}else await sync(false);}loading.value=false;poll=setInterval(()=>{now.value=Date.now();if(!pending.value)void sync();else if(props.running&&!busy.value)void act(pending.value.action);},2000);});
 watch(()=>props.running,r=>{if(!r)finishReveal();else void sync();});watch(()=>props.reducedMotion,r=>{if(r)finishReveal();});
 onBeforeUnmount(()=>{disposed=true;clearInterval(poll);finishReveal();});
 </script>

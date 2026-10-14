@@ -1,13 +1,17 @@
 import { Capacitor } from '@capacitor/core';
+import {reactive} from 'vue';
 import {isFishGame,configuredGameProfileId,type RoundPolicy} from '@new-game/game-math';
 import {stage,savePending,clearPending,restorePending,restoreFishPending,saveFishPending,clearFishPending,type Pending,type FishPending} from './staging-state';
 import {holdStake,holdAward,revealCredits} from './credit-presentation';
 export interface Account {id:string;username:string;displayName:string;role:string;csrf:string;wallet:{settled:string;reserved:string;available:string;version:string}}
-export const session: {current:Account|null} = {current:null};
+// Every meter and affordability check observes the same versioned wallet.
+export const session = reactive<{current:Account|null}>({current:null});
+let sessionGeneration=0;
+export function clearPlayerSession(){sessionGeneration++;session.current=null;}
 export const expiredSession=(error:unknown):boolean=>error instanceof Error && 'status' in error && error.status===401;
 async function request<T>(path:string,body?:unknown):Promise<T>{
  if(Capacitor.isNativePlatform())throw new Error('Account play is not available in this device build yet. Use the hosted player website.');
- const response=await fetch(`/v1/${path}`,{method:body===undefined?'GET':'POST',credentials:'include',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/json',...(session.current?{'X-CSRF-Token':session.current.csrf}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
+ const response=await fetch(`/v1/${path}`,{method:body===undefined?'GET':'POST',credentials:'include',cache:'no-store',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/json',...(session.current?{'X-CSRF-Token':session.current.csrf}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
  const result=await response.json();if(!response.ok)throw Object.assign(new Error(result.message||result.code||'The service is unavailable.'),{status:response.status,code:result.code});return result as T;
 }
 export async function api<T>(path:string,body?:unknown):Promise<T>{
@@ -76,5 +80,12 @@ async function recoverFish(pending:Pending){
  clearFishPending(pending);if(receipt.result){applyWallet(receipt.result,pending.accountId);stage.last=receipt.result;}stage.revision++;stage.recovered++;
 }
 export async function loadEnvironment(){const info=await request<{staging:boolean;roundPolicy?:RoundPolicy;sampleLogin?:{username:string;password:string};profile?:typeof stage.profile}>('environment');stage.enabled=info.staging&&info.profile?.id===stage.profile.id;stage.roundPolicy=info.roundPolicy||null;stage.sampleLogin=stage.enabled?info.sampleLogin||null:null;}
-export async function refreshAccount(){const account=await api<Account>('me');if(session.current?.id===account.id&&BigInt(session.current.wallet.version)>BigInt(account.wallet.version))account.wallet=session.current.wallet;session.current=account;return account;}
-export async function signIn(username:string,password:string,code?:string){await api('auth/login',{username,password,...(code?{code}:{})});const account=await refreshAccount();restorePending(account.id);restoreFishPending(account.id);return account;}
+export async function refreshAccount(){
+ const generation=sessionGeneration,previousId=session.current?.id;
+ const account=await api<Account>('me');
+ if(generation!==sessionGeneration||previousId&&session.current?.id!==previousId)throw new Error('Session changed while refreshing.');
+ if(previousId&&account.id!==previousId)throw Object.assign(new Error('The signed-in account changed. Please sign in again.'),{status:401,code:'SESSION_CHANGED'});
+ if(session.current?.id===account.id&&BigInt(session.current.wallet.version)>BigInt(account.wallet.version))account.wallet=session.current.wallet;
+ session.current=account;return session.current;
+}
+export async function signIn(username:string,password:string,code?:string){clearPlayerSession();await api('auth/login',{username,password,...(code?{code}:{})});const account=await refreshAccount();restorePending(account.id);restoreFishPending(account.id);return account;}

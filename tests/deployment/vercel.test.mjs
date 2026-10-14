@@ -28,6 +28,8 @@ test('Vercel preserves the public path and rejects mismatched or extra routing i
 test('API routing precedes SPA fallback and static output excludes privileged application',async()=>{
  const config=JSON.parse(await readFile('.vercel/output/config.json','utf8'));
  assert.equal(config.version,3);assert.equal(config.routes[1].src,'/v1/(.*)');assert.equal(config.routes.at(-1).dest,'/index.html');
+ assert.equal(config.routes.at(-1).headers['Cache-Control'],'no-store');
+ assert.ok(config.routes.some(route=>route.src==='/(index\\.html)?'&&route.headers?.['Cache-Control']==='no-store'&&route.continue));
  const html=await readFile('.vercel/output/static/index.html','utf8');assert.match(html,/New Game/);assert.doesNotMatch(html,/admin\/src/);
  const staticFiles=await readdir('.vercel/output/static');assert.ok(!staticFiles.includes('motion-check.html'));assert.ok(!staticFiles.includes('win-check.html'));
  const entry=html.match(/src="(\/assets\/index-[^"]+\.js)"/)?.[1];assert.ok(entry);

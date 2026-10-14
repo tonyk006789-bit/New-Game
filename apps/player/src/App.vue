@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ClientUpdateNotice from "@new-game/ui/ClientUpdateNotice.vue";
 import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { App as NativeApp } from '@capacitor/app';
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
@@ -32,22 +33,22 @@ const loginNotice=ref('');
 const onGesture=()=>{void unlockAudio();};
 const onControlSound=(event:Event)=>{const button=(event.target as Element)?.closest<HTMLButtonElement>('button');if(button&&!button.disabled&&!button.hasAttribute('data-own-sound'))playSound('click');};
 function passwordChanged(){clearAccount();loginNotice.value='Password changed. Sign in with your new password.';}
-import { api, session, refreshAccount, expiredSession, loadEnvironment, recoverRound, type Account } from './api';
+import { api, session, refreshAccount, clearPlayerSession, expiredSession, loadEnvironment, recoverRound } from './api';
 import { formatCredits } from '@new-game/domain';
 import {stage,restorePending,restoreFishPending} from './staging-state';
 const FishScene = defineAsyncComponent(() => import('./FishScene.vue'));
 type Page = 'lobby' | 'history' | 'wallet' | 'settings';
 const entered = ref(false);
-const account = ref<Account|null>(null);
+const account = computed(()=>session.current);
 const accountError = ref('');
 const creditHistory = ref<{id:string;kind:string;units:string;reason:string;created_at:string}[]>([]);
 const practiceHistory = ref<{result:{id:string;game:string;description:string};created_at:string}[]>([]);
 const credits = computed(() => formatCredits(creditPresentation.accountId===account.value?.id&&creditPresentation.held!==null?creditPresentation.held:account.value?.wallet.available || '0'));
-async function authenticated(){if(session.current?.role!=='PLAYER')return;account.value=session.current;if(account.value){restorePending(account.value.id);restoreFishPending(account.value.id);}entered.value=true;navigate('lobby');}
+async function authenticated(){if(session.current?.role!=='PLAYER')return;if(account.value){restorePending(account.value.id);restoreFishPending(account.value.id);}entered.value=true;navigate('lobby');}
 async function loadHistory(){if(!account.value)return;try{[creditHistory.value,practiceHistory.value]=await Promise.all([api<typeof creditHistory.value>('history'),api<typeof practiceHistory.value>('practice/history')]);}catch(error){accountError.value=(error as Error).message;}}
 let syncingAccount=false;
-async function syncAccount(){if(!account.value||!ready.value||syncingAccount)return;syncingAccount=true;try{account.value=await refreshAccount();accountError.value='';}catch(error){accountError.value=(error as Error).message;if(expiredSession(error))clearAccount();}finally{syncingAccount=false;}}
-function clearAccount(){revealCredits();session.current=null;stage.pending=null;stage.fishPending=[];stage.needsRecovery=false;stage.last=null;account.value=null;entered.value=false;activeGame.value=null;selectedTable.value=null;atFishTable.value=false;modal.value=null;creditHistory.value=[];practiceHistory.value=[];}
+async function syncAccount(){if(!account.value||!ready.value||syncingAccount)return;syncingAccount=true;const id=account.value.id;try{await refreshAccount();accountError.value='';}catch(error){if(account.value?.id===id){accountError.value=(error as Error).message;if(expiredSession(error))clearAccount();}}finally{syncingAccount=false;}}
+function clearAccount(){revealCredits();clearPlayerSession();stage.pending=null;stage.fishPending=[];stage.needsRecovery=false;stage.last=null;entered.value=false;activeGame.value=null;selectedTable.value=null;atFishTable.value=false;modal.value=null;creditHistory.value=[];practiceHistory.value=[];}
 let syncTimer:ReturnType<typeof setInterval>|undefined,recoveryTimer:ReturnType<typeof setInterval>|undefined,nextRecoveryAt=0;
 async function reconcileRound(){if(!ready.value||!account.value||!recovering.value||stage.busy||Date.now()<nextRecoveryAt)return;nextRecoveryAt=Date.now()+3000;try{await recoverRound();}catch(error){if(expiredSession(error))clearAccount();}}
 const recovering=computed(()=>stage.needsRecovery||stage.fishPending.some(p=>p.recover));
@@ -104,7 +105,6 @@ function trapFocus(event: KeyboardEvent) {
   if (!event.shiftKey && event.target === items.at(-1)) { event.preventDefault(); items[0]?.focus(); }
 }
 const nativeListeners: PluginListenerHandle[] = [];
-watch(()=>stage.revision,()=>{if(session.current?.id===account.value?.id&&session.current)account.value={...session.current};else void syncAccount();});
 watch(()=>[recovering.value,stage.busy,ready.value,account.value?.id],()=>void reconcileRound());
 onMounted(async () => {
 
@@ -149,11 +149,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('online', onNetwork); window.removeEventListener('offline', onNetwork); window.removeEventListener('keydown', onKey);
   nativeListeners.forEach(listener => void listener.remove());
 });
-watch(ready,value=>setAudioActive(value));
+watch(ready,value=>{setAudioActive(value);if(value)void syncAccount();});
 watch(activeGame,game=>setMusicScene(game||'lobby'),{immediate:true});
 watch(page,value=>{void syncAccount();if(value==='history'||value==='wallet')void loadHistory();});
 </script>
 <template>
+  <ClientUpdateNotice :safe="entered&&!currentGame&&!stage.pending&&!stage.fishPending.length&&!stage.busy&&!modal&&page!=='settings'"/>
   <div ref="depthRoot" class="arcade-app" :class="{ 'reduce-motion': reducedMotion, 'motion-paused':!ready, 'in-game': currentGame, 'at-login': !entered }">
     <LoginScreen v-if="!entered" :notice="loginNotice" @authenticated="authenticated" @help="modal = 'support'" />
     <template v-else>

@@ -1,7 +1,14 @@
 import {describe,it,expect} from 'vitest';
-import {NewPassword,NewUsername} from '@new-game/contracts';
+import {NewPassword,NewUsername,credentialInputAttributes} from '@new-game/contracts';
 import {reefAssistedOutcome,reefBotSeats,reefTier,reefTierProfile,reefTarget,stagingMultiplier} from '@new-game/game-math';
 describe('simple six-character credentials',()=>{
+ it('uses the same browser constraints and server policy for six-character credentials',()=>{
+  expect(credentialInputAttributes.minlength).toBe(6);
+  const browserPattern=new RegExp(`^(?:${credentialInputAttributes.pattern})$`,'v');
+  for(const value of ['abc123','ABC123','Ab1234','randy78','A1!@#$','short','abcdef','123456']){
+   expect(browserPattern.test(value)).toBe(NewPassword.safeParse(value).success);
+  }
+ });
  it('accepts either case and optional punctuation without requiring special characters',()=>{
   for(const value of ['abc123','ABC123','A1!@#$','name + 123','a'.repeat(255)+'1']){expect(NewUsername.safeParse(value).success).toBe(true);expect(NewPassword.safeParse(value).success).toBe(true);}
   expect(NewUsername.parse('  ABC123  ')).toBe('abc123');expect(NewPassword.parse('ABC123')).toBe('ABC123');
