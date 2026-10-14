@@ -50,9 +50,17 @@ export class DealerRig{
  }
  async load(){
   const style=identity[this.game],loader=new GLTFLoader();
+  // Embedded images use <img> decoding under img-src blob:, not bitmap fetch
+  // under connect-src. Keep the hosted CSP unchanged.
+  loader.register(parser=>({name:'DEALER_CSP_IMAGES',beforeRoot:async()=>{parser.textureLoader=new T.TextureLoader(parser.options.manager);}}));
   const loaded=await Promise.allSettled([loader.loadAsync(models[style.body]),...style.hair.map(h=>loader.loadAsync(models[h]))]);
   if(this.disposed||loaded.some(r=>r.status==='rejected')){for(const r of loaded)if(r.status==='fulfilled')this.disposeObject(r.value.scene);if(!this.disposed)throw new Error('Dealer model unavailable');return;}
   const results=loaded.map(r=>(r as PromiseFulfilledResult<Awaited<ReturnType<GLTFLoader['loadAsync']>>>).value);
+  let missingTexture=false;
+  for(const g of results)g.scene.traverse(o=>{if(o instanceof T.Mesh)for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof T.MeshStandardMaterial&&!m.map)missingTexture=true;});
+  // GLTFLoader can resolve a model after swallowing a failed image. Never show
+  // that incomplete white character as a successfully loaded dealer.
+  if(missingTexture){for(const g of results)this.disposeObject(g.scene);throw new Error('Dealer textures unavailable');}
   this.body=results[0].scene;this.scene.add(this.body);this.body.updateMatrixWorld(true);
   const clip=new T.Plane(new T.Vector3(0,1,0),-1.105);
   this.body.traverse(o=>{if(!(o instanceof T.Mesh))return;o.frustumCulled=false;
