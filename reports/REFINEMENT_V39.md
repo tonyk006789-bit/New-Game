@@ -36,6 +36,10 @@ Local evidence: `reports/screenshots/v39/` contains source thumbnail capture, pe
 
 ## Publication / rollback
 
-Publish to the existing owner-authorized player project. Keep the operator project unchanged. Deployment confirmation and live asset checks are recorded below after publication.
+Source commits `e4720d1` and `16334d5` were pushed to main. Final deployment `dpl_8bVFxkE975xCoVmcvTyyv1DbxSCB` is READY at https://new-game-test-topaz.vercel.app/. The operator project remains on V36.
+
+`node .local/verify-v39-live.mjs` passed **57 read-only live checks**, including the final `index-CaS0d07b.js` entry, protected routes, unchanged 30-game catalog/approved policies, all 34 optimized image byte counts/SHA-256 hashes/WebP types, and immutable cache headers. The public cold-start Double Deck view reports `data-renderer="mesh"`, contains its active canvas, and enables DEAL; no console warnings/errors were reported. The first-page thumbnails also decoded successfully on Vercel. No hosted deal or wallet change was submitted. The owner's existing European preview hand was preserved in its original tab.
+
+Live screenshot: `reports/screenshots/v39/live-double.png`. The first V39 deployment was superseded after live visual verification detected the CSP fallback; only the final deployment above is the verified release.
 
 Rollback: redeploy V38 player `dpl_Bt91tBbqdRaRwbmKEUEV2ueFihee`, or revert V39 and rebuild. No database rollback.
