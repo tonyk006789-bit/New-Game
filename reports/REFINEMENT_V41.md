@@ -29,7 +29,13 @@ Motion now derives palm orientation and finger flex axes from each model's skele
 - From `apps/mobile`, `node node_modules/@capacitor/cli/bin/capacitor copy` — Android, iOS and web copy passed after providing access to replace the existing generated directories. No native build/signing/device validation is claimed.
 - Final focused asset/motion run: `node node_modules/vitest/vitest.mjs run tests/unit/dealer-rig.test.ts tests/unit/blackjack-dealing.test.ts` — **14 passed**.
 
-Publication verification is pending. Evidence files are kept in ignored `reports/screenshots/v41/`.
+## Publication verification
+
+- Source commit `c15f495` was pushed to `main`. Player deployment `dpl_2xr62emSEyAZYSvxHXdp4myDMwUR` is READY at [the public test link](https://new-game-test-topaz.vercel.app/) and [its immutable deployment URL](https://new-game-test-a70cg6zx0-tonyk006789-7532.vercel.app/).
+- Final entry `index-Cuh0LR5K.js`, stylesheet `index-DOnYYtLt.css`, lazy dealer renderer `dealer-rig-C_i7GDYd.js`. The final Capacitor Android/iOS/web copy used this build.
+- `node .local/verify-v41-live.mjs` — **63 live checks passed**, covering routes, API guards, unchanged catalog images, hashed models/posters, cache headers and the unchanged operator deployment. Results are in `reports/screenshots/v41/live-route-checks.json`.
+- The published Double Deck table displayed the new textured human model, `data-renderer="jointed-3d"`, one dealer canvas and the final entry script. A free-preview opening deal and STAND completed, revealed dealer 18 against player 15, and re-enabled DEAL. Displayed credits remained **1,597.30** before and after. No hosted credit-staked play was performed. Browser console error/warning capture was empty.
+- Public screenshot: `reports/screenshots/v41/live-double.png`. Local close-up, landscape and performance evidence is also kept in ignored `reports/screenshots/v41/`.
 
 ## Limits and rollback
 
