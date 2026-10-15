@@ -23,7 +23,13 @@ The approach uses bounded joint rotations and damped responses rather than a gen
 - Inspected all three characters in the local close-up fixture at grip, release and recovery. Pinch endpoint error in the inspected hold pose was approximately 0.7 mm per pad. No console errors/warnings were recorded.
 - Local evidence in ignored `reports/screenshots/v42/`: `double-grip.png`, `european-grip.png`, and a six-second `double-hand-motion.webm` (674,301 bytes). These are desktop-browser checks, not physical-phone evidence or a zero-glitch guarantee.
 
-Deployment and final live verification pending.
+## Publication
+
+- Source commit `9b6d1c3` pushed to `main`. Deployment `dpl_4qR8wLdJcrKxjCnyzfeqe3zDkVEQ` is READY at [the existing player link](https://new-game-test-topaz.vercel.app/) and [its immutable deployment URL](https://new-game-test-gx0s9uwqf-tonyk006789-7532.vercel.app/).
+- `node scripts/vercel-build.mjs` and `node --test tests/deployment/vercel.test.mjs` — **4 deployment tests passed**.
+- From `apps/mobile`, `node node_modules/@capacitor/cli/bin/capacitor copy` — Android, iOS and web copy passed. This is asset copying, not native compilation, signing or physical-device testing.
+- `node .local/verify-v42-live.mjs` — **7 live checks passed**: uncached final entry, exact deployed entry/renderer hashes, immutable model delivery and API health. Evidence: `reports/screenshots/v42/live-checks.json`.
+- The live Double Deck table loaded `index-D89imd7_.js` and the jointed 3D renderer. A free-preview opening deal and STAND completed: player 19 against dealer 18, preview return 1.00, DEAL re-enabled. Credits stayed **1,597.30** before and after. No hosted credit-staked action was performed and the console error/warning capture was empty. Screenshot: `reports/screenshots/v42/live-double.png`.
 
 ## Migration and rollback
 
