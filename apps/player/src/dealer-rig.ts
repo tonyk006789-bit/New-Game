@@ -2,8 +2,10 @@ import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import type {BlackjackGame,Card} from '@new-game/game-math';
 import models from './dealer-models.json';
-import {dealerPose,dealerLife,CARD_PICKUP,HAND_RELEASE,type Point3} from './dealer-motion';
+import {dealerPose,dealerLife,cardFlight,CARD_PICKUP,HAND_RELEASE,type Point3} from './dealer-motion';
 import {CARD_RELEASE,CARD_LAND} from './blackjack-dealing';
+import {DealerHand} from './dealer-hand';
+import handCalibrations from './dealer-hands.json';
 
 export type DealerDelivery={id:number;startedAt?:number;kind:'deal'|'turn';card:Card|null;target:{x:number;y:number;width:number;height:number}};
 const identity={
@@ -19,16 +21,17 @@ export function elbowFor(shoulder:T.Vector3,target:T.Vector3,pole:T.Vector3,uppe
  const side=pole.clone().sub(shoulder);side.addScaledVector(axis,-side.dot(axis)).normalize();
  return {elbow:shoulder.clone().addScaledVector(axis,along).addScaledVector(side,Math.sqrt(Math.max(0,upper*upper-along*along))),wrist:shoulder.clone().addScaledVector(axis,distance)};
 }
-type Arm={upper:T.Object3D;lower:T.Object3D;hand:T.Object3D;upperLength:number;lowerLength:number;upperRest:T.Quaternion;lowerRest:T.Quaternion;upperAxis:T.Vector3;lowerAxis:T.Vector3;handOffset:T.Quaternion;cardOffset:T.Vector3};
+type Arm={upper:T.Object3D;lower:T.Object3D;hand:T.Object3D;upperLength:number;lowerLength:number;upperRest:T.Quaternion;lowerRest:T.Quaternion;upperAxis:T.Vector3;lowerAxis:T.Vector3;handOffset:T.Quaternion};
 export class DealerRig{
  readonly scene=new T.Scene();readonly camera=new T.OrthographicCamera();readonly renderer:T.WebGLRenderer;
  private body?:T.Group;private arms:Arm[]=[];private head?:T.Object3D;private headRest?:T.Quaternion;
  private spine?:T.Object3D;private spineRest?:T.Quaternion;private shadows:T.Mesh[]=[];
- private fingers:{bone:T.Object3D;rest:T.Quaternion;axis:T.Vector3;finger:number;joint:number;dealing:boolean}[]=[];
+ readonly hands:DealerHand[]=[];
  private faces:T.Mesh[]=[];
  private disposed=false;private width=1280;private height=500;
  private card:T.Mesh<T.PlaneGeometry,T.MeshStandardMaterial>;private cardFace?:T.CanvasTexture;private back:T.CanvasTexture;
  private target=new T.Vector3();private release=new T.Vector3();private reach:Point3=[...HAND_RELEASE];
+ private releaseVelocity=new T.Vector3();
  private heldQuaternion=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.PI/2);
  private delivery:DealerDelivery|null=null;
  constructor(private host:HTMLElement,private game:BlackjackGame){
@@ -73,7 +76,7 @@ export class DealerRig{
   });
   this.head=this.body.getObjectByName('Bip01_Head')!;this.headRest=this.head.quaternion.clone();
   this.spine=this.body.getObjectByName('Bip01_Spine2')!;this.spineRest=this.spine.quaternion.clone();
-  for(const side of ['L','R']){
+  for(const side of ['L','R'] as const){
    const bone=(suffix:string)=>this.body!.getObjectByName('Bip01_'+side+'_'+suffix)!;
    const upper=bone('UpperArm'),lower=bone('Forearm'),hand=bone('Hand');
    const a=upper.getWorldPosition(new T.Vector3()),b=lower.getWorldPosition(new T.Vector3()),c=hand.getWorldPosition(new T.Vector3());
@@ -82,14 +85,8 @@ export class DealerRig{
    const normal=forward.clone().cross(lateral).normalize();
    const palm=new T.Quaternion().setFromRotationMatrix(new T.Matrix4().makeBasis(lateral,normal,forward));
    const handOffset=palm.invert().multiply(hand.getWorldQuaternion(new T.Quaternion()));
-   const cardOffset=hand.worldToLocal(index.clone().addScaledVector(forward,.035).addScaledVector(normal,.006));
-   this.arms.push({upper,lower,hand,upperLength:a.distanceTo(b),lowerLength:b.distanceTo(c),upperRest:upper.getWorldQuaternion(new T.Quaternion()),lowerRest:lower.getWorldQuaternion(new T.Quaternion()),upperAxis:b.clone().sub(a).normalize(),lowerAxis:c.clone().sub(b).normalize(),handOffset,cardOffset});
-   for(let finger=0;finger<5;finger++)for(let joint=0;joint<3;joint++){
-    const f=bone('Finger'+finger+(joint||''));if(!f)continue;
-    const worldAxis=finger===0?normal.clone().multiplyScalar(-1):lateral.clone().multiplyScalar(-1);
-    const axis=worldAxis.applyQuaternion(f.getWorldQuaternion(new T.Quaternion()).invert()).normalize();
-    this.fingers.push({bone:f,rest:f.quaternion.clone(),axis,finger,joint,dealing:side==='L'});
-   }
+   this.arms.push({upper,lower,hand,upperLength:a.distanceTo(b),lowerLength:b.distanceTo(c),upperRest:upper.getWorldQuaternion(new T.Quaternion()),lowerRest:lower.getWorldQuaternion(new T.Quaternion()),upperAxis:b.clone().sub(a).normalize(),lowerAxis:c.clone().sub(b).normalize(),handOffset});
+   this.hands.push(new DealerHand(hand,this.body,side,handCalibrations[this.game][side]));
   }
   this.resize();this.render(0,0);
  }
@@ -104,24 +101,18 @@ export class DealerRig{
   q.premultiply(new T.Quaternion().setFromAxisAngle(forward,roll*side));
   this.orient(arm.hand,q.multiply(arm.handOffset));
  }
- private fingerPose(grip:number){
-  for(const f of this.fingers){const g=f.dealing?grip:.1;
-   // Index/thumb pinch the edge; the remaining fingers keep a relaxed curved arc.
-   const curl=f.finger===0?g*.26:f.joint===0?g*.08:g*(f.finger===1?.18:.32);
-   f.bone.quaternion.copy(f.rest).multiply(new T.Quaternion().setFromAxisAngle(f.axis,curl));
-  }
- }
- private heldPosition(){return this.arms[0].hand.localToWorld(this.arms[0].cardOffset.clone());}
+ private heldPosition(){return this.hands[0].cardPosition();}
  start(delivery:DealerDelivery){
   this.delivery=delivery;this.cardFace?.dispose();this.cardFace=this.cardTexture(delivery.card);this.card.material.map=this.cardFace;this.card.material.needsUpdate=true;
   const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(delivery.target.x*2-1,1-delivery.target.y*2),this.camera);ray.ray.intersectPlane(new T.Plane(Y,-1.115),this.target);
   this.reach=[T.MathUtils.clamp(this.target.x,-.06,.26),1.16,.34];
-  this.pose(CARD_RELEASE,delivery.startedAt??0);this.release.copy(this.heldPosition());this.pose(0,delivery.startedAt??0);
+  this.pose(CARD_RELEASE-1,delivery.startedAt??0);this.releaseVelocity.copy(this.heldPosition());
+  this.pose(CARD_RELEASE,delivery.startedAt??0);this.release.copy(this.heldPosition());this.releaseVelocity.subVectors(this.release,this.releaseVelocity);this.heldQuaternion.copy(this.hands[0].cardQuaternion());this.pose(0,delivery.startedAt??0);
  }
  private pose(ms:number,clock:number){if(!this.body)return;const p=dealerPose(ms,this.reach,this.delivery?.kind==='turn'),life=dealerLife(clock,identity[this.game].phase);
   this.spine!.quaternion.copy(this.spineRest!).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),p.follow*.5+life.breath));this.body.updateMatrixWorld(true);
   this.arm(this.arms[0],new T.Vector3(...p.wrist),1,p.roll);this.arm(this.arms[1],new T.Vector3(-.27,1.155,.19),-1,-.04);
-  this.fingerPose(p.grip);
+  this.hands[0].pose(ms,!!this.delivery,1.108);this.hands[1].pose(0,false,1.108);
   this.head!.quaternion.copy(this.headRest!).multiply(new T.Quaternion().setFromEuler(new T.Euler(life.look*.3,p.follow*2,life.look+p.follow)));
   for(const face of this.faces)for(const [name,index] of Object.entries(face.morphTargetDictionary!)){
    face.morphTargetInfluences![index]=name.includes('Blink')?life.blink:name.includes('LookDown')?p.grip*.22:name.includes('Smile')?.1:0;
@@ -133,8 +124,8 @@ export class DealerRig{
   if(this.disposed)return;this.pose(ms,clock);const p=dealerPose(ms),d=this.delivery;
   this.card.visible=!!d&&d.kind==='deal'&&ms>=CARD_PICKUP&&ms<CARD_LAND;
   if(this.card.visible){
-   if(ms<CARD_RELEASE){this.card.position.copy(this.heldPosition());this.card.quaternion.copy(this.heldQuaternion).premultiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),p.roll));this.card.scale.set(.076,.108,1);}
-   else{this.card.position.lerpVectors(this.release,this.target,p.flight);this.card.position.y+=.012*Math.sin(p.flight*Math.PI);this.card.quaternion.slerpQuaternions(this.heldQuaternion,this.camera.quaternion,p.flight);const finalW=d!.target.width*1.8*this.width/this.height,finalH=d!.target.height*1.8;this.card.scale.set(T.MathUtils.lerp(.076,finalW,p.flight),T.MathUtils.lerp(.108,finalH,p.flight),1);}
+   if(ms<CARD_RELEASE){this.card.position.copy(this.heldPosition());this.card.quaternion.copy(this.hands[0].cardQuaternion());this.card.scale.set(.076,.108,1);}
+   else{this.card.position.fromArray(cardFlight(this.release.toArray(),this.target.toArray(),this.releaseVelocity.toArray(),ms));this.card.quaternion.slerpQuaternions(this.heldQuaternion,this.camera.quaternion,p.flight);const finalW=d!.target.width*1.8*this.width/this.height,finalH=d!.target.height*1.8;this.card.scale.set(T.MathUtils.lerp(.076,finalW,p.flight),T.MathUtils.lerp(.108,finalH,p.flight),1);}
   }
   this.renderer.render(this.scene,this.camera);
  }
