@@ -1,0 +1,106 @@
+{
+  "creator": "Microsoft / Rocketbox",
+  "source": "https://github.com/microsoft/Microsoft-Rocketbox",
+  "license": "MIT",
+  "changes": "Game-ready GLB conversion; selected facial shapes; indexed geometry; compressed skin/fabric/normal maps; original dealing animation and lighting.",
+  "assets": [
+    {
+      "key": "royal-blackjack",
+      "url": "/art/dealers/royal-blackjack-v41-87d8d6dcd5e9.glb",
+      "bytes": 2070052,
+      "sha256": "87d8d6dcd5e95eafbb5754f9756f6699016b33c7a8f80c52270d59a990a09194",
+      "original": "Assets/Avatars/Professions/Business_Female_04",
+      "sourceFbxSha256": "3f2365c9e74c9c341d6656b80ce512f4131a5fa6450057d6ffe07a637134e00e",
+      "sourceTextures": [
+        {
+          "file": "f020_body_color.tga",
+          "sha256": "5bf0a4789c1bd3f73c63062c68dacc70c09144b0be48c08095e35ddbbb6f060a"
+        },
+        {
+          "file": "f020_body_normal.tga",
+          "sha256": "a4b3cf6c1098f5b639b5a31b4c4be46896cc9fa1239b51d063ef221c4dad136c"
+        },
+        {
+          "file": "f020_head_color.tga",
+          "sha256": "b2ea878de23e30d80ce5a1097b1a51b3736a4deee4c6b20dc8b3c996ac9a91a5"
+        },
+        {
+          "file": "f020_head_normal.tga",
+          "sha256": "2f703a3d84582605d61adc6d604a85bda6c91b0fd775614e9e98b4f823426960"
+        },
+        {
+          "file": "f020_opacity_color.tga",
+          "sha256": "d6bb4ddde05c1dcddd829db99e0f0ef4416d05cdb94e1e6770779724aa3f696f"
+        }
+      ]
+    },
+    {
+      "key": "double-deck-blackjack",
+      "url": "/art/dealers/double-deck-blackjack-v41-f7fcece44242.glb",
+      "bytes": 2282880,
+      "sha256": "f7fcece442423a1068ece0dea34ce537255df0f76fc9b4883b5d4df6c096c390",
+      "original": "Assets/Avatars/Professions/Business_Male_03",
+      "sourceFbxSha256": "f6fa4873d9f4a923fef7e6174556cbc0b9c7e70f214779fd93cfa8674614970d",
+      "sourceTextures": [
+        {
+          "file": "m020_body_color.tga",
+          "sha256": "fc5b3f2b9f54c720365b6f7feffe48e6a3bf8b923087a1b9983ce9304f4030f6"
+        },
+        {
+          "file": "m020_body_normal.tga",
+          "sha256": "62db1e8829feeb12721a86d28e97049505181044606022d6f3381e2707127a41"
+        },
+        {
+          "file": "m020_head_color.tga",
+          "sha256": "a2991d6c6a313ed9e8483ba94e0d5fc16c981a09873a792adebde5b8736bc3c5"
+        },
+        {
+          "file": "m020_head_normal.tga",
+          "sha256": "d8285d5ea2ad747a3d8659f4c33a7283926f853d0b427f5e5f12d076318f6270"
+        },
+        {
+          "file": "m020_opacity_color.tga",
+          "sha256": "bdf589201336169ca659fac8652fc2b4105fc1634363a5cc461c8a8fa32679a2"
+        }
+      ]
+    },
+    {
+      "key": "european-blackjack",
+      "url": "/art/dealers/european-blackjack-v41-31591fb04b34.glb",
+      "bytes": 3001628,
+      "sha256": "31591fb04b34ab75bcaec25d5bde70c4d03923532a180a0e1011dc396eaa3f6e",
+      "original": "Assets/Avatars/Professions/Business_Female_02",
+      "sourceFbxSha256": "04dcae60a2386a2e2b2799aeafc6335c532db7c4b322db3e50fbea4b056556a6",
+      "sourceTextures": [
+        {
+          "file": "f015_body_color.tga",
+          "sha256": "60b84f3ba5315a76d324569e4ebee6d6bd7a461344158e5b0ef782d667db8285"
+        },
+        {
+          "file": "f015_body_normal.tga",
+          "sha256": "104603dc18c9569e44592c6f168fe7d28e666d1bd1439d72035fe006a6d917ba"
+        },
+        {
+          "file": "f015_head_color.tga",
+          "sha256": "0df4e3f107cb1b06576894617121e53642e5b2d480b88c2a321ba2c4632a1014"
+        },
+        {
+          "file": "f015_head_normal.tga",
+          "sha256": "7ff5ade4f86f7fd2f4425f7417515c50491bfefcaada01a11563c9c5e068c65d"
+        },
+        {
+          "file": "f015_opacity_color.tga",
+          "sha256": "15cff3cd49521da8679ee0087c8aa2b8414c2b3a0cc9ec775c5225ef1dec6b81"
+        },
+        {
+          "file": "f015_glasses_opacity_color.tga",
+          "sha256": "f9ece0a65d4771eaf9b6db864bb5898519f84fc23345ad0fa05b9dadb47d3555"
+        },
+        {
+          "file": "f015_glasses_normal.tga",
+          "sha256": "1b40b39bff1898c79e9ddbc0fea240018f0c0950c0ea90d759eb0fd68cb5c4c5"
+        }
+      ]
+    }
+  ]
+}

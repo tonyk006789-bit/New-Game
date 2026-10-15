@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T18:46:52.277Z",
+  "generatedAt": "2026-10-15T05:06:27.510Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -532,14 +532,14 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "39ca2dbd563cd3e071732161383245277f2ff9d375fdbb17eb8202237ede8053"
+      "sha256": "5aad5739180356e200cf50e3a55d13047b74e0ac33d5acd2480a572abd65ab30"
     },
     {
       "path": "apps/player/src/blackjack-v37.css",
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "a916615e055ff554012e2729a82a75c70b65258c281858a7ea136ea6496152c3"
+      "sha256": "9e2b1143a931fdade9f856603f77fd1121ee781e526e18487b5adfc18e5e02d9"
     },
     {
       "path": "apps/player/public/audio/v23/bass.wav",
@@ -1170,6 +1170,48 @@
       "source": "https://quaternius.com/packs/universalbasecharacters.html; Hairstyles/Origin at 0/glTF (Godot)/Hair_Beard.gltf; scripts/prepare-dealer-models.mjs",
       "license": "CC0-1.0",
       "sha256": "bdb04e7025b5a7922fabe3db1fcabcc1d89e35732348a21e549bcea9da467caf"
+    },
+    {
+      "path": "apps/player/public/art/dealers/royal-blackjack-v41-87d8d6dcd5e9.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v41.json",
+      "license": "MIT",
+      "sha256": "87d8d6dcd5e95eafbb5754f9756f6699016b33c7a8f80c52270d59a990a09194"
+    },
+    {
+      "path": "apps/player/public/art/dealers/double-deck-blackjack-v41-f7fcece44242.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v41.json",
+      "license": "MIT",
+      "sha256": "f7fcece442423a1068ece0dea34ce537255df0f76fc9b4883b5d4df6c096c390"
+    },
+    {
+      "path": "apps/player/public/art/dealers/european-blackjack-v41-31591fb04b34.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v41.json",
+      "license": "MIT",
+      "sha256": "31591fb04b34ab75bcaec25d5bde70c4d03923532a180a0e1011dc396eaa3f6e"
+    },
+    {
+      "path": "apps/player/public/art/dealers/royal-blackjack-poster-798050e2a87d.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v41.json; reports/dealer-posters-v41.json",
+      "license": "MIT",
+      "sha256": "798050e2a87d2bcf7e9c0f6a78cecec3c9fceff06df3a431ad62a962123718a1"
+    },
+    {
+      "path": "apps/player/public/art/dealers/double-deck-blackjack-poster-b65f56607181.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v41.json; reports/dealer-posters-v41.json",
+      "license": "MIT",
+      "sha256": "b65f566071816bd94c9bcf9ef8f0b8b28a2de059170005356b4177113d0a0ae6"
+    },
+    {
+      "path": "apps/player/public/art/dealers/european-blackjack-poster-64a37755639b.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v41.json; reports/dealer-posters-v41.json",
+      "license": "MIT",
+      "sha256": "64a37755639bf801f77e77fc145f935b9f23029d5422e2d0db63597832292650"
     }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "creator": "Microsoft / Rocketbox; New Game render",
+  "license": "MIT",
+  "source": "reports/dealer-models-v41.json",
+  "assets": [
+    {
+      "key": "royal-blackjack",
+      "url": "/art/dealers/royal-blackjack-poster-798050e2a87d.webp",
+      "bytes": 33006,
+      "sha256": "798050e2a87d2bcf7e9c0f6a78cecec3c9fceff06df3a431ad62a962123718a1"
+    },
+    {
+      "key": "double-deck-blackjack",
+      "url": "/art/dealers/double-deck-blackjack-poster-b65f56607181.webp",
+      "bytes": 32834,
+      "sha256": "b65f566071816bd94c9bcf9ef8f0b8b28a2de059170005356b4177113d0a0ae6"
+    },
+    {
+      "key": "european-blackjack",
+      "url": "/art/dealers/european-blackjack-poster-64a37755639b.webp",
+      "bytes": 52492,
+      "sha256": "64a37755639bf801f77e77fc145f935b9f23029d5422e2d0db63597832292650"
+    }
+  ]
+}

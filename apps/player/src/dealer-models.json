@@ -1,8 +1,5 @@
 {
-  "female": "/art/dealers/female-ac42aeadcdfc.glb",
-  "male": "/art/dealers/male-568d923e631a.glb",
-  "Hair_Long": "/art/dealers/Hair_Long-664e9ef1488d.glb",
-  "Hair_Buns": "/art/dealers/Hair_Buns-e1b0771d061f.glb",
-  "Hair_SimpleParted": "/art/dealers/Hair_SimpleParted-fe233c04214a.glb",
-  "Hair_Beard": "/art/dealers/Hair_Beard-bdb04e7025b5.glb"
+  "royal-blackjack": "/art/dealers/royal-blackjack-v41-87d8d6dcd5e9.glb",
+  "double-deck-blackjack": "/art/dealers/double-deck-blackjack-v41-f7fcece44242.glb",
+  "european-blackjack": "/art/dealers/european-blackjack-v41-31591fb04b34.glb"
 }

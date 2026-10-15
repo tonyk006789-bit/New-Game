@@ -63,7 +63,7 @@
 /* V40: true skeletal dealer occupies the same felt coordinate system as the cards. */
 .blackjack-cabinet .dealer-character{inset:0;left:0;top:0;width:100%;height:100%;aspect-ratio:auto;transform:none;z-index:6;pointer-events:none}
 .blackjack-cabinet .dealer-mesh,.blackjack-cabinet .dealer-mesh canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.blackjack-cabinet .dealer-fallback{position:absolute;top:-1%;left:50%;height:55%;aspect-ratio:1;transform:translateX(-50%)}
+.blackjack-cabinet .dealer-fallback{position:absolute;top:5%;left:50%;height:40%;aspect-ratio:1;transform:translateX(-50%)}
 .blackjack-cabinet .dealer-fallback img{width:100%;height:100%;object-fit:contain}
 .blackjack-cabinet:has([data-renderer="jointed-3d"]) .card-shoe{display:none}
 /* Complete the hole-card turn before the reveal class is removed at CARD_LAND. */
