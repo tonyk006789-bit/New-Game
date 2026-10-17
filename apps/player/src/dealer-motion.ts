@@ -14,6 +14,21 @@ export function dealerLife(ms:number,phase=0){
  const blink=blinkPhase<.18?Math.sin(Math.PI*blinkPhase/.18)**2:0;
  return {breath:Math.sin(seconds*1.35)*.003,look:Math.sin(seconds*.63)*.008,blink};
 }
+// A glance settles, holds, then shifts; eyes do not orbit continuously. Both eyes
+// share one gaze direction, with the accepted card carry getting their attention.
+const gazeStops=[{x:0,y:0},{x:.12,y:.025},{x:0,y:0},{x:-.09,y:.04},{x:.035,y:-.035},{x:0,y:0}] as const;
+export function dealerExpression(name:string,ms:number,phase=0,grip=0){
+ const t=Math.max(0,ms)/1000+phase,cycle=t/3.7,index=Math.floor(cycle)%gazeStops.length;
+ const from=gazeStops[(index+gazeStops.length-1)%gazeStops.length],to=gazeStops[index],blend=ease((cycle%1)*3.7/.18);
+ const x=(from.x+(to.x-from.x)*blend)*(1-grip),y=from.y+(to.y-from.y)*blend+grip*.22;
+ if(name.includes('Blink'))return dealerLife(ms,phase).blink;
+ if(name.includes('LookDown'))return Math.max(0,y);
+ if(name.includes('LookUp'))return Math.max(0,-y);
+ if(name.includes('LookInLeft')||name.includes('LookOutRight'))return Math.max(0,x);
+ if(name.includes('LookInRight')||name.includes('LookOutLeft'))return Math.max(0,-x);
+ if(name.includes('Smile'))return .065+.018*Math.sin(t*.38+(name.endsWith('Left')?0:.3));
+ return 0;
+}
 /** Release inherits the hand's velocity and brakes smoothly at its card slot. */
 export function cardFlight(start:Point3,end:Point3,velocity:Point3,ms:number):Point3{
  const duration=CARD_LAND-CARD_RELEASE,u=Math.max(0,Math.min(1,(ms-CARD_RELEASE)/duration));

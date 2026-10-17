@@ -1,6 +1,6 @@
 {
   "royal-blackjack": {
-    "sha256": "87d8d6dcd5e95eafbb5754f9756f6699016b33c7a8f80c52270d59a990a09194",
+    "sha256": "400c3de2f176648e7d60d1b1bd3b9377baa09b86f13f16237414ff8766bbea5c",
     "L": {
       "contact": [
         11.4979006082249,
@@ -85,7 +85,7 @@
     }
   },
   "double-deck-blackjack": {
-    "sha256": "f7fcece442423a1068ece0dea34ce537255df0f76fc9b4883b5d4df6c096c390",
+    "sha256": "7090041bbeac74fc6421db766ed01e123e5ecca51f8a557ab4b8fe82234d6cc1",
     "L": {
       "contact": [
         9.956614837381144,
@@ -170,7 +170,7 @@
     }
   },
   "european-blackjack": {
-    "sha256": "31591fb04b34ab75bcaec25d5bde70c4d03923532a180a0e1011dc396eaa3f6e",
+    "sha256": "3fdd15e36781dba3a4d7766dd5fde693164c18543e6c7ef45aa5fbe8c2b937a8",
     "L": {
       "contact": [
         11.497902657365891,

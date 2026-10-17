@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-15T05:06:27.510Z",
+  "generatedAt": "2026-10-17T05:27:52.147Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -1212,6 +1212,48 @@
       "source": "reports/dealer-models-v41.json; reports/dealer-posters-v41.json",
       "license": "MIT",
       "sha256": "64a37755639bf801f77e77fc145f935b9f23029d5422e2d0db63597832292650"
+    },
+    {
+      "path": "apps/player/public/art/dealers/royal-blackjack-v44-400c3de2f176.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v44.json",
+      "license": "MIT",
+      "sha256": "400c3de2f176648e7d60d1b1bd3b9377baa09b86f13f16237414ff8766bbea5c"
+    },
+    {
+      "path": "apps/player/public/art/dealers/double-deck-blackjack-v44-7090041bbeac.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v44.json",
+      "license": "MIT",
+      "sha256": "7090041bbeac74fc6421db766ed01e123e5ecca51f8a557ab4b8fe82234d6cc1"
+    },
+    {
+      "path": "apps/player/public/art/dealers/european-blackjack-v44-3fdd15e36781.glb",
+      "creator": "Microsoft / Rocketbox",
+      "source": "https://github.com/microsoft/Microsoft-Rocketbox; reports/dealer-models-v44.json",
+      "license": "MIT",
+      "sha256": "3fdd15e36781dba3a4d7766dd5fde693164c18543e6c7ef45aa5fbe8c2b937a8"
+    },
+    {
+      "path": "apps/player/public/art/dealers/royal-blackjack-poster-dc4c70374bc1.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v44.json; reports/dealer-posters-v44.json",
+      "license": "MIT",
+      "sha256": "dc4c70374bc1da0ad86bbddf3171226b18f415a59be01b275580c9d6a05d6eb5"
+    },
+    {
+      "path": "apps/player/public/art/dealers/double-deck-blackjack-poster-b4f83f684656.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v44.json; reports/dealer-posters-v44.json",
+      "license": "MIT",
+      "sha256": "b4f83f6846566947a39e055faa79b657698723cfcca771fbf04c558df91fb230"
+    },
+    {
+      "path": "apps/player/public/art/dealers/european-blackjack-poster-ca342ea276f6.webp",
+      "creator": "Microsoft / Rocketbox; New Game render",
+      "source": "reports/dealer-models-v44.json; reports/dealer-posters-v44.json",
+      "license": "MIT",
+      "sha256": "ca342ea276f623a312168a829a8c3f132873eb027e498d464619b1fe6d372a0a"
     }
   ]
 }

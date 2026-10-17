@@ -29,6 +29,6 @@ for(const asset of Object.values(JSON.parse(await readFile('apps/player/src/pres
 }
 const dealers=JSON.parse(await readFile('reports/dealer-models-v40.json','utf8'));
 for(const asset of dealers.assets){const path=`apps/player/public${asset.url}`;assets.push({path,creator:dealers.creator,source:`${dealers.source}; ${asset.original}; scripts/prepare-dealer-models.mjs`,license:dealers.license,sha256:createHash('sha256').update(await readFile(path)).digest('hex')});}
-for(const file of ['reports/dealer-models-v41.json','reports/dealer-posters-v41.json']){const catalog=JSON.parse(await readFile(file,'utf8'));for(const asset of catalog.assets){const path=`apps/player/public${asset.url}`;assets.push({path,creator:catalog.creator,source:`${catalog.source}; ${file}`,license:catalog.license,sha256:createHash('sha256').update(await readFile(path)).digest('hex')});}}
+for(const file of ['reports/dealer-models-v41.json','reports/dealer-posters-v41.json','reports/dealer-models-v44.json','reports/dealer-posters-v44.json']){const catalog=JSON.parse(await readFile(file,'utf8'));for(const asset of catalog.assets){const path=`apps/player/public${asset.url}`;assets.push({path,creator:catalog.creator,source:`${catalog.source}; ${file}`,license:catalog.license,sha256:createHash('sha256').update(await readFile(path)).digest('hex')});}}
 await writeFile('reports/asset-manifest.json', JSON.stringify({ generatedAt: new Date().toISOString(), privateReferencesShipped: false, assets }, null, 2) + '\n');
 console.log(`Recorded ${assets.length} original or licensed art assets.`);

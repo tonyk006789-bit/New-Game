@@ -1,8 +1,9 @@
 import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import type {BlackjackGame,Card} from '@new-game/game-math';
 import models from './dealer-models.json';
-import {dealerPose,dealerLife,cardFlight,CARD_PICKUP,HAND_RELEASE,type Point3} from './dealer-motion';
+import {dealerPose,dealerLife,dealerExpression,cardFlight,CARD_PICKUP,HAND_RELEASE,type Point3} from './dealer-motion';
 import {CARD_RELEASE,CARD_LAND} from './blackjack-dealing';
 import {DealerHand} from './dealer-hand';
 import handCalibrations from './dealer-hands.json';
@@ -28,6 +29,7 @@ export class DealerRig{
  private spine?:T.Object3D;private spineRest?:T.Quaternion;private shadows:T.Mesh[]=[];
  readonly hands:DealerHand[]=[];
  private faces:T.Mesh[]=[];
+ private environment?:T.WebGLRenderTarget;
  private disposed=false;private width=1280;private height=500;
  private card:T.Mesh<T.PlaneGeometry,T.MeshStandardMaterial>;private cardFace?:T.CanvasTexture;private back:T.CanvasTexture;
  private target=new T.Vector3();private release=new T.Vector3();private reach:Point3=[...HAND_RELEASE];
@@ -36,14 +38,18 @@ export class DealerRig{
  private delivery:DealerDelivery|null=null;
  constructor(private host:HTMLElement,private game:BlackjackGame){
   this.renderer=new T.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
-  this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));this.renderer.setClearColor(0,0);this.renderer.outputColorSpace=T.SRGBColorSpace;
+  this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.setClearColor(0,0);this.renderer.outputColorSpace=T.SRGBColorSpace;
   this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.03;this.renderer.localClippingEnabled=true;host.append(this.renderer.domElement);
   this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFShadowMap;
   this.camera.position.set(0,3,6.25);this.camera.lookAt(0,1,.25);
-  this.scene.add(new T.HemisphereLight(0xe8efff,0x342a33,1.1));
-  const key=new T.DirectionalLight(0xffeddf,2.25);key.position.set(-1.5,3,3);key.target.position.set(0,1.4,0);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-1;key.shadow.camera.right=1;key.shadow.camera.top=1;key.shadow.camera.bottom=-1;key.shadow.camera.near=.1;key.shadow.camera.far=7;key.shadow.normalBias=.005;key.shadow.bias=-.0001;this.scene.add(key,key.target);
-  const fill=new T.DirectionalLight(0xc3d7ff,.75);fill.position.set(3,2,2);this.scene.add(fill);
-  const rim=new T.DirectionalLight(identity[game].rim,1.4);rim.position.set(0,3,-2);this.scene.add(rim);
+  // Prefilter room illumination once. Broad reflections keep skin and cloth
+  // dimensional without adding runtime lights, bloom or full-screen passes.
+  const room=new RoomEnvironment(),pmrem=new T.PMREMGenerator(this.renderer);
+  this.environment=pmrem.fromScene(room,.04,.1,100,{size:128});this.scene.environment=this.environment.texture;this.scene.environmentIntensity=.22;room.dispose();pmrem.dispose();
+  this.scene.add(new T.HemisphereLight(0xe8efff,0x342a33,.18));
+  const key=new T.DirectionalLight(0xfff2e7,2.1);key.position.set(-2.2,3.1,3);key.target.position.set(0,1.4,0);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-1;key.shadow.camera.right=1;key.shadow.camera.top=1;key.shadow.camera.bottom=-1;key.shadow.camera.near=.1;key.shadow.camera.far=7;key.shadow.normalBias=.003;key.shadow.bias=-.0001;this.scene.add(key,key.target);
+  const fill=new T.DirectionalLight(0xd8e4ff,.2);fill.position.set(3,2,2);this.scene.add(fill);
+  const rim=new T.DirectionalLight(identity[game].rim,.85);rim.position.set(0,3,-2);this.scene.add(rim);
   this.back=this.cardTexture(null);
   this.card=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshStandardMaterial({map:this.back,roughness:.65,side:T.DoubleSide}));
   this.card.visible=false;this.card.renderOrder=3;this.scene.add(this.card);
@@ -67,9 +73,8 @@ export class DealerRig{
   this.body.traverse(o=>{if(!(o instanceof T.Mesh))return;o.frustumCulled=false;o.castShadow=true;o.receiveShadow=true;
    if(o.morphTargetDictionary)this.faces.push(o);
    for(const m of Array.isArray(o.material)?o.material:[o.material]){if(!(m instanceof T.MeshStandardMaterial))continue;
-    m.clippingPlanes=[clip];m.clipShadows=true;m.envMapIntensity=.35;
-    if(m.map)m.map.anisotropy=Math.min(4,this.renderer.capabilities.getMaxAnisotropy());
-    if(m.name.includes('head')){m.roughness=.62;m.normalScale.set(.55,.55);}
+    m.clippingPlanes=[clip];m.clipShadows=true;m.envMapIntensity=1;
+    for(const texture of [m.map,m.normalMap,m.roughnessMap])if(texture)texture.anisotropy=Math.min(4,this.renderer.capabilities.getMaxAnisotropy());
     if(m.name.includes('opacity')){m.alphaToCoverage=true;m.depthWrite=true;}
     if(m.name.includes('glasses')){m.transparent=true;m.depthWrite=false;m.alphaToCoverage=false;m.alphaTest=0;}
    }
@@ -88,9 +93,12 @@ export class DealerRig{
    this.arms.push({upper,lower,hand,upperLength:a.distanceTo(b),lowerLength:b.distanceTo(c),upperRest:upper.getWorldQuaternion(new T.Quaternion()),lowerRest:lower.getWorldQuaternion(new T.Quaternion()),upperAxis:b.clone().sub(a).normalize(),lowerAxis:c.clone().sub(b).normalize(),handOffset});
    this.hands.push(new DealerHand(hand,this.body,side,handCalibrations[this.game][side]));
   }
-  this.resize();this.render(0,0);
+  this.resize();this.pose(0,0);await this.renderer.compileAsync(this.scene,this.camera);if(!this.disposed)this.render(0,0);
  }
- resize(){this.width=this.host.clientWidth||1280;this.height=this.host.clientHeight||500;const aspect=this.width/this.height;this.camera.left=-aspect*.9;this.camera.right=aspect*.9;this.camera.top=.9;this.camera.bottom=-.9;this.camera.updateProjectionMatrix();this.renderer.setSize(this.width,this.height,false);}
+ resize(){this.width=this.host.clientWidth||1280;this.height=this.host.clientHeight||500;const aspect=this.width/this.height;this.camera.left=-aspect*.9;this.camera.right=aspect*.9;this.camera.top=.9;this.camera.bottom=-.9;this.camera.updateProjectionMatrix();
+  const displayedScale=this.host.getBoundingClientRect().width/this.width||1;
+  this.renderer.setPixelRatio(Math.min(2,Math.sqrt(2_100_000/(this.width*this.height)),Math.max(1,devicePixelRatio*displayedScale)));this.renderer.setSize(this.width,this.height,false);
+ }
  private orient(bone:T.Object3D,world:T.Quaternion){const parent=bone.parent!.getWorldQuaternion(new T.Quaternion());bone.quaternion.copy(parent.invert().multiply(world));bone.updateWorldMatrix(false,true);}
  private arm(arm:Arm,target:T.Vector3,side:number,roll:number){
   const shoulder=arm.upper.getWorldPosition(new T.Vector3()),solution=elbowFor(shoulder,target,new T.Vector3(side*.30,1.04,-.08),arm.upperLength,arm.lowerLength);
@@ -115,7 +123,7 @@ export class DealerRig{
   this.hands[0].pose(ms,!!this.delivery,1.108);this.hands[1].pose(0,false,1.108);
   this.head!.quaternion.copy(this.headRest!).multiply(new T.Quaternion().setFromEuler(new T.Euler(life.look*.3,p.follow*2,life.look+p.follow)));
   for(const face of this.faces)for(const [name,index] of Object.entries(face.morphTargetDictionary!)){
-   face.morphTargetInfluences![index]=name.includes('Blink')?life.blink:name.includes('LookDown')?p.grip*.22:name.includes('Smile')?.1:0;
+   face.morphTargetInfluences![index]=dealerExpression(name,clock,identity[this.game].phase,p.grip);
   }
   this.body.updateMatrixWorld(true);
   for(let i=0;i<2;i++){const hand=this.arms[i].hand.getWorldPosition(new T.Vector3());this.shadows[i].position.set(hand.x,1.111,hand.z+.08);}
@@ -138,5 +146,5 @@ export class DealerRig{
   const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;return texture;
  }
  private disposeObject(object:T.Object3D){const textures=new Set<T.Texture>();object.traverse(o=>{if(o instanceof T.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){for(const value of Object.values(m))if(value instanceof T.Texture)textures.add(value);m.dispose();}}});for(const texture of textures)texture.dispose();}
- dispose(){if(this.disposed)return;this.disposed=true;this.cardFace?.dispose();this.back.dispose();this.disposeObject(this.scene);this.scene.traverse(o=>{if(o instanceof T.DirectionalLight)o.shadow.dispose();});this.renderer.dispose();this.renderer.domElement.remove();}
+ dispose(){if(this.disposed)return;this.disposed=true;this.cardFace?.dispose();this.back.dispose();this.disposeObject(this.scene);this.scene.traverse(o=>{if(o instanceof T.DirectionalLight)o.shadow.dispose();});this.environment?.dispose();this.scene.environment=null;this.renderer.dispose();this.renderer.domElement.remove();}
 }
