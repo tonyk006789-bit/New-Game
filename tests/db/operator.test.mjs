@@ -257,7 +257,7 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
    const signed=await signin(username.toUpperCase(),'abc123');assert.equal((await wallet(response.data.id)).available,'0');
    if(username==='User12'){leaf=response.data.id;leafAuth=signed;break;}parent=response.data.id;auth=signed;
   }
-  for(const value of ['short','abcdef','123456']){
+  for(const value of ['short','12345','a'.repeat(257)]){
    assert.equal((await call('admin/accounts',{parentId:parent,username:value,displayName:'Invalid',password:'abc123'},auth)).status,400);
    assert.equal((await call('admin/accounts',{parentId:parent,username:'Valid1',displayName:'Invalid',password:value},auth)).status,400);
   }
@@ -280,22 +280,27 @@ test('agent console authorization and accounting in isolated PostgreSQL',async t
   assert.equal((await control.query('SELECT length(display_name) n FROM accounts WHERE id=$1',[r.data.id])).rows[0].n,100);
   assert.equal((await call('admin/accounts',{parentId:adminId,username:'BadName1',displayName:'x'.repeat(101),password:'abc123'},admin)).status,400);
  });
- await t.test('every parent resets six-character passwords and every role changes its own with no balance changes',async()=>{
+ await t.test('numeric-only credentials create, reset and change across every tier without balance changes',async()=>{
   let parentId=adminId,parentSession=admin;
-  for(const username of ['V36Sub','V36Agt','V36Usr']){
-   const created=await call('admin/accounts',{parentId,username,password:'abc123',requestKey:randomUUID()},parentSession);ok(created);
-   const id=created.data.id,before=await wallet(id),oldSession=await signin(username,'abc123');
-   ok(await call(`admin/accounts/${id}/manage`,{action:'RESET_PASSWORD',password:'def456',requestKey:randomUUID()},parentSession));
+  for(const [index,username] of ['000001','000002','000003'].entries()){
+   for(const body of [{username:'12345',password:'123456'},{username,password:'12345'}])assert.equal((await call('admin/accounts',{parentId,...body,requestKey:randomUUID()},parentSession)).status,400);
+   const created=await call('admin/accounts',{parentId,username,password:'123456',requestKey:randomUUID()},parentSession);ok(created);
+   assert.equal(created.data.username,username);assert.equal(created.data.role,['SUB_DISTRIBUTOR','AGENT','PLAYER'][index]);
+   const id=created.data.id,before=await wallet(id),oldSession=await signin(username,'123456');assert.equal(before.available,'0');
+   assert.equal((await call(`admin/accounts/${id}/manage`,{action:'RESET_PASSWORD',password:'12345',requestKey:randomUUID()},parentSession)).status,400);
+   ok(await call(`admin/accounts/${id}/manage`,{action:'RESET_PASSWORD',password:'654321',requestKey:randomUUID()},parentSession));
    assert.equal((await call('me',undefined,oldSession)).status,401);
-   const resetSession=await signin(username,'def456');
-   ok(await call('auth/password',{currentPassword:'def456',newPassword:'ghi789'},resetSession));
+   const resetSession=await signin(username,'654321');
+   assert.equal((await call('auth/password',{currentPassword:'654321',newPassword:'12345'},resetSession)).status,400);
+   ok(await call('auth/password',{currentPassword:'654321',newPassword:'000001'},resetSession));
    assert.equal((await call('me',undefined,resetSession)).status,401);
-   parentSession=await signin(username,'ghi789');parentId=id;assert.deepEqual(await wallet(id),before);
+   parentSession=await signin(username,'000001');parentId=id;assert.deepEqual(await wallet(id),before);
   }
   const before=await wallet(adminId);
-  ok(await call('auth/password',{currentPassword:adminPassword,newPassword:'Admin6'},admin));
-  Object.assign(admin,await signin('test.admin','Admin6'));
-  ok(await call('auth/password',{currentPassword:'Admin6',newPassword:adminPassword},admin));
+  assert.equal((await call('auth/password',{currentPassword:adminPassword,newPassword:'12345'},admin)).status,400);
+  ok(await call('auth/password',{currentPassword:adminPassword,newPassword:'123456'},admin));
+  Object.assign(admin,await signin('test.admin','123456'));
+  ok(await call('auth/password',{currentPassword:'123456',newPassword:adminPassword},admin));
   Object.assign(admin,await signin('test.admin',adminPassword));assert.deepEqual(await wallet(adminId),before);
  });
  await t.test('bigint balances survive paginated JSON without precision loss',async()=>{

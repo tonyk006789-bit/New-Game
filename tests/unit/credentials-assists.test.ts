@@ -5,17 +5,18 @@ describe('simple six-character credentials',()=>{
  it('uses the same browser constraints and server policy for six-character credentials',()=>{
   expect(credentialInputAttributes.minlength).toBe(6);
   const browserPattern=new RegExp(`^(?:${credentialInputAttributes.pattern})$`,'v');
-  for(const value of ['abc123','ABC123','Ab1234','randy78','A1!@#$','short','abcdef','123456']){
+  for(const value of ['abc123','ABC123','Ab1234','randy78','A1!@#$','short','abcdef','123456','000001','12345','a'.repeat(256),'a'.repeat(257)]){
    expect(browserPattern.test(value)).toBe(NewPassword.safeParse(value).success);
   }
  });
- it('accepts either case and optional punctuation without requiring special characters',()=>{
-  for(const value of ['abc123','ABC123','A1!@#$','name + 123','a'.repeat(255)+'1']){expect(NewUsername.safeParse(value).success).toBe(true);expect(NewPassword.safeParse(value).success).toBe(true);}
+ it('accepts numbers only, letters only, either case and optional punctuation',()=>{
+  for(const value of ['123456','000001','abcdef','ABCDEF','abc123','ABC123','A1!@#$','name + 123','a'.repeat(256)]){expect(NewUsername.safeParse(value).success).toBe(true);expect(NewPassword.safeParse(value).success).toBe(true);}
   expect(NewUsername.parse('  ABC123  ')).toBe('abc123');expect(NewPassword.parse('ABC123')).toBe('ABC123');
+  expect(NewUsername.parse('000001')).toBe('000001');expect(NewPassword.parse('000001')).toBe('000001');
  });
- it('rejects missing letters, missing digits, short or oversized credentials',()=>{
-  for(const value of ['ab123','abcdef','123456','     1','a1'+'x'.repeat(255),null,123456]){expect(NewUsername.safeParse(value).success).toBe(false);expect(NewPassword.safeParse(value).success).toBe(false);}
-  expect(NewUsername.safeParse(' abc1 ').success).toBe(false);
+ it('rejects short, oversized or non-string credentials and short normalized usernames',()=>{
+  for(const value of ['','ab123','abcde','12345','a'.repeat(257),null,123456]){expect(NewUsername.safeParse(value).success).toBe(false);expect(NewPassword.safeParse(value).success).toBe(false);}
+  for(const value of [' abc1 ','     1','      ','abc\u0000123'])expect(NewUsername.safeParse(value).success).toBe(false);
  });
 });
 describe('solo bot capture assists',()=>{
