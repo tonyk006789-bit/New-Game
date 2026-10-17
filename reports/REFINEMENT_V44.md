@@ -36,6 +36,12 @@ Visual checks inspected all three faces, clothing, glasses, grip and release in 
 
 ## Publication and rollback
 
-Continue the existing authorized player Vercel project. Live identity and verification will be appended after publication. No hosted credit-staked action or account mutation is needed.
+Source commit `c8199e7` was pushed to the existing GitHub main branch. Vercel deployment `dpl_J6RmNBvSEUBtfZB6PnuwSR5WKhVt` completed READY at https://new-game-test-topaz.vercel.app/ (immutable URL: https://new-game-test-elgrob73p-tonyk006789-7532.vercel.app/). Command: `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli" --scope tonyk006789-7532 --no-color`.
+
+`node .local/verify-v44-live.mjs` passed 11 live checks: exact code/model/portrait hashes, immutable caching, uncached HTML, API health and unchanged V43 operator entry `index-CeVeRnBD.js`. Evidence: `reports/screenshots/v44/live-checks.json`.
+
+The full local Double Deck preview completed its opening deal and STAND/reveal: player 17 versus dealer 20, controls restored, credits stayed 978.15. At an emulated 844×390 landscape viewport the table and controls fitted; the dealer canvas used 2,381×881 backing pixels (below the 2.1-million-pixel cap). The temporary viewport override was reset. Fresh full-game browser error/warning capture was empty.
+
+The public Double Deck preview loaded the final entry and one `jointed-3d` canvas. Its opening/reveal completed with natural blackjack against dealer 17, preview return 1.25 and DEAL enabled again. Credits stayed 1,575.30. No hosted credit-staked actions or account mutations occurred. Final public error/warning capture was empty; screenshot `reports/screenshots/v44/live-double.png`. Test tabs were closed and the published table left as the deliverable.
 
 Rollback: restore V43 player deployment `dpl_2Jf9tnCoqh7YWaoVBXJT1HZMYBqv` or revert this presentation revision and rebuild. Existing hashed V41 models/posters remain available. No database or ledger rollback is required.
