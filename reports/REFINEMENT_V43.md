@@ -30,6 +30,17 @@ Exact workspace commands, all successful:
 
 ## Publication and rollback
 
-Publish both existing Vercel projects using their existing encrypted configuration, with no hosted account or wallet mutations. Live verification and deployment identities are recorded below after publication.
+Source commit `21eb271` was pushed to the existing GitHub main branch. Both existing Vercel projects completed READY using their existing encrypted configuration, with no hosted account/password/wallet mutations:
+
+- Operator: `dpl_2N8fE49XWxy7EXAxYsBPVxHqU9EZ`, https://new-game-operator.vercel.app/; immutable URL https://new-game-operator-ec378lvmg-tonyk006789-7532.vercel.app/.
+- Player: `dpl_2Jf9tnCoqh7YWaoVBXJT1HZMYBqv`, https://new-game-test-topaz.vercel.app/; immutable URL https://new-game-test-1se3c2atu-tonyk006789-7532.vercel.app/.
+- Operator command, from `.local/vercel-operator`: `node --import ../vercel-web-gateway.mjs ../../.cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli" --scope tonyk006789-7532 --no-color`.
+- Player command, from root: `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config "C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli" --scope tonyk006789-7532 --no-color`.
+- An initial operator CLI invocation used a Windows absolute path for `--import`, which Node rejected before deployment. The relative module path above succeeded.
+- `node .local/verify-v43-live.mjs` — 8 live checks passed: both exact new entry hashes, uncached HTML, six-character policy text in both bundles, health endpoints and authentication protection of create/reset/change routes. Results: `reports/screenshots/v43/live-checks.json`. Unauthenticated requests are rejected before schema validation, so those route checks prove protection, not credential acceptance; actual credential acceptance is established by the isolated PostgreSQL tests.
+
+Browser verification inspected the local Main Admin Create account dialog without submitting credentials. Account, Password and Confirm password all have `minlength="6"`, `maxlength="256"`, `pattern=".{6,256}"`; Nickname is optional. The same component serves every operator role. Screenshot: `reports/screenshots/v43/create-account.png`. No browser console errors were captured in the local form or live login page. The saved hosted sample login was rejected, so no authenticated hosted account workflow is claimed or retried; live bundles and protected routes were checked directly. Screenshot and live-check JSON are ignored local evidence artifacts.
+
+Refresh an already open backend/player tab once to load the new entry. No physical-device certification is claimed.
 
 No schema rollback is needed. Reverting the shared validator and rebuilding restores the former requirements for newly set credentials; previously created numeric-only accounts would still sign in because login validation is unchanged. Preserve all accounts, credential hashes, balances and audit records.
