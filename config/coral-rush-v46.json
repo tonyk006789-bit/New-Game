@@ -1,0 +1,36 @@
+{
+  "id": "coral-rush",
+  "name": "Coral Rush",
+  "release": "coral-rush-v46",
+  "category": "Fish",
+  "orientation": "landscape",
+  "aspectRatio": "16:9",
+  "resolutions": ["1280x720", "1920x1080", "2560x1440"],
+  "tableCoordinates": {"width": 1200, "height": 600, "seats": 4},
+  "outcomeProfile": "reef-challenge-v31",
+  "ballistics": "reef-ballistics-v9",
+  "stakeUnits": {"minimum": 25, "maximum": 2000, "step": 25},
+  "tiers": {
+    "small": {"captureTickets": 1500, "tickets": 10000, "multiplier": 1},
+    "medium": {"captureTickets": 1000, "tickets": 10000, "multiplier": 3},
+    "large": {"captureTickets": 500, "tickets": 10000, "multiplier": 8},
+    "boss": {"captureTickets": 200, "tickets": 10000, "multiplier": 20}
+  },
+  "species": [65, 66, 67, 68, 69, 70, 71, 72],
+  "sharedBossSpecies": 48,
+  "controls": ["tap aim/fire", "auto", "target lock", "fast cadence", "stake", "species guide", "rules"],
+  "ai": {"label": "AI CREW", "independentTargets": true, "creditAwards": false, "soloAssistAttempts": 0},
+  "assets": {
+    "atlas": "/art/coral-atlas-v46.png",
+    "atlasRegions": "apps/player/src/fish-worlds.ts",
+    "background": "/art/coral-background-v46.webp",
+    "cover": "apps/player/src/presentation-assets.json#coral-rush",
+    "score": "Coral Current Carnival"
+  },
+  "referenceEvidence": {
+    "observed": ["Happy Fishing title in JUWA Fish lobby", "blue shark and marine creatures on card", "APP download badge"],
+    "suppliedScreenshots": "Earlier owner fish-table screenshots show four perimeter cannons, AUTO/LOCK/LASER labels, species rules, nets, coins and boss effects; these are not verified as Happy Fishing.",
+    "notVerified": ["Happy Fishing live play", "private payout logic", "exact timing and physics", "server metadata or original asset license"],
+    "implementation": "Original reference-informed game using owner-approved existing mechanics. No provider assets, credentials, runtime dependency or private metadata."
+  }
+}

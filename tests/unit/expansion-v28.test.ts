@@ -3,9 +3,9 @@ import {catalog,GameId,premiumGames} from '@new-game/contracts';
 import {expansionAliases,stagingOutcome,stagingMultiplier,stagingGameProfileId,storyboardRandom,blackjackShoe,blackjackDeal,blackjackAct,blackjackPublic,blackjackFinish,blackjackProfiles,fishGuide,reefTarget,reefTier,reefLeadAngle,reefFlight} from '@new-game/game-math';
 const shoe=(...ranks:number[])=>[...ranks,...Array(100).fill(10)].map((rank,i)=>({rank,suit:i%4}));
 describe('thirty-game expansion',()=>{
- it('contains thirty unique playable identities, six fish worlds, five kenos and three premium blackjack tables',()=>{
-  expect(catalog).toHaveLength(30);expect(new Set(catalog.map(g=>g.id)).size).toBe(30);
-  expect(catalog.filter(g=>g.category==='Fish')).toHaveLength(6);expect(catalog.filter(g=>g.category==='Keno')).toHaveLength(5);
+ it('contains 31 unique playable identities, seven fish worlds, five kenos and three premium blackjack tables',()=>{
+  expect(catalog).toHaveLength(31);expect(new Set(catalog.map(g=>g.id)).size).toBe(31);
+  expect(catalog.filter(g=>g.category==='Fish')).toHaveLength(7);expect(catalog.filter(g=>g.category==='Keno')).toHaveLength(5);
   expect(premiumGames).toHaveLength(3);for(const g of catalog)expect(GameId.parse(g.id)).toBe(g.id);
  });
  it('keeps reused profiles and their complete displayed outcomes equivalent without changing historical profile IDs',()=>{

@@ -5,7 +5,7 @@ import {catalog} from '@new-game/contracts';
 import assets from '../../apps/player/src/presentation-assets.json';
 describe('catalog delivery budget',()=>{
  it('ships a verified compact thumbnail for all 30 games',()=>{
-  let total=0;expect(catalog).toHaveLength(30);
+  let total=0;expect(catalog).toHaveLength(31);
   for(const game of catalog){const asset=assets[game.id],path=`apps/player/public${asset.url}`;const file=readFileSync(path);
    expect(file.subarray(8,12).toString()).toBe('WEBP');expect(statSync(path).size).toBe(asset.bytes);
    expect(createHash('sha256').update(file).digest('hex')).toBe(asset.sha256);

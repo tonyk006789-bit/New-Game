@@ -7,6 +7,7 @@ import {loadEnvironment} from './api';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 const props=defineProps<{game:StagingGame;staked:boolean}>();
 const instructions:Record<StagingGame,string[]>={
+ 'coral-rush':['Choose a coral cannon. Butterflyfish and shrimp are small; cuttlefish and turtles medium; marlins and eagle rays large. The cobalt hammerhead, jeweled hermit crab and moving wheel are bosses.','Tap to fire into the tidal lanes, use LOCK to lead a moving creature, or AUTO and FAST to set a cadence. Every valid paid hit gets one capture attempt. AI crew shoot other targets for separate points, never credits.'],
  'corsair-cove':['Choose one of four deck cannons. Copper sprats and pirate puffers are small; sailfins and octopuses medium; swordfish and anchor crabs large. The spectral captain and ghost galleon are bosses.','Aim along drifting convoys. AUTO, LOCK and FAST use the same approved catch rules as the other fish worlds.'],
  'cosmic-tides':['Choose one of four plasma cannons. Comet minnows and star shrimp are small; jellies and seahorses medium; mantas and nautiluses large. The cosmic leviathan and astral mermaid are bosses.','Lead the creatures through their orbital paths. The wheel pays the existing boss award when caught.'],
  'outlaw-sevens':['Three reels and five lines pay matching triples. See the exact symbol returns below.','The sheriff highlights each winning line after the reels slow to a stop.'],

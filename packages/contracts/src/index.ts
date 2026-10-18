@@ -12,7 +12,7 @@ export const credentialInputAttributes={minlength:6,maxlength:256,pattern:creden
 export const NewPassword=z.string().min(6,credentialHint).max(256);
 export const NewUsername=NewPassword.transform(value=>value.trim().toLowerCase()).pipe(
  z.string().min(6,credentialHint).regex(/^[^\x00-\x1f\x7f]+$/,'Control characters are not allowed.'));
-export const GameId = z.enum(['corsair-cove','cosmic-tides','double-deck-blackjack','european-blackjack','clockwork-vault','phoenix-falls','outlaw-sevens','celestial-wilds','meteor-keno','bamboo-keno','disco-diamonds','midnight-express','pirate-gold','sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
+export const GameId = z.enum(['coral-rush','corsair-cove','cosmic-tides','double-deck-blackjack','european-blackjack','clockwork-vault','phoenix-falls','outlaw-sevens','celestial-wilds','meteor-keno','bamboo-keno','disco-diamonds','midnight-express','pirate-gold','sunken-dynasty', 'polar-odyssey', 'royal-blackjack', 'neon-numbers', 'pearl-keno', 'temple-lights', 'orchard-numbers', 'reef-party', 'abyss-legends', 'aurora-vault', 'ember-relics', 'neon-sevens', 'jade-fortune', 'coin-carnival', 'ruby-rush', 'sapphire-crown', 'solar-fortune']);
 export type GameId = z.infer<typeof GameId>;
 export const WalletSnapshot = z.object({
   id: z.uuid(), settledUnits: Units, reservedUnits: Units, availableUnits: Units, version: Units
@@ -58,6 +58,7 @@ export const ErrorCode = z.enum(['GAME_MATH_NOT_APPROVED', 'AUTH_REQUIRED', 'SER
 export const premiumGames=['royal-blackjack','double-deck-blackjack','european-blackjack'] as const;
 export const isPremiumGame=(id:string)=>(premiumGames as readonly string[]).includes(id);
 export const catalog = [
+  {id:'coral-rush',name:'Coral Rush',category:'Fish',tagline:'Ride the reef current.',description:'Four coral cannons track butterflyfish schools, gliding rays and a golden-finned hammerhead in a sunlit lagoon.',detail:'4 seats · Coral lagoon',color:'#65e6ef'},
   ...expansionCatalog,
   { id: 'disco-diamonds', name: 'Disco Diamonds', category: 'Slots', tagline: 'Turn up the lights.', description: 'Three chrome reels, mirror diamonds and disco sevens across five active lines.', detail: '3 reels · 5 lines', color: '#ff65e2' },
   { id: 'midnight-express', name: 'Midnight Express', category: 'Slots', tagline: 'Your ticket to the midnight line.', description: 'A portrait railway cabinet with nine lines and a substituting locomotive wild.', detail: 'Portrait · 5 reels · Wilds', color: '#e9bb69' },

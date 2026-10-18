@@ -9,7 +9,6 @@ const fragment=`in vec2 vTextureCoord;uniform sampler2D uTexture;out vec4 finalC
 /** The atlas matte is removed by the GPU once, then all creatures share cached textures. */
 export async function reefTextures(app:Application,game:FishGame='reef-party'){
  const abyss=game==='abyss-legends',world=fishWorlds[game];
- const sources=await Promise.all(['/art/reef-creatures-v6.png',abyss?'/art/abyss-cannons-v18.png':'/art/reef-cannons-v6.png','/art/reef-legends-v10.png','/art/abyss-creatures-v17.png'].map(url=>Assets.load<Texture>(url)));
  const filter=new Filter({glProgram:GlProgram.from({vertex,fragment}),padding:0});
  function crop(source:Texture,x:number,y:number,width:number,height:number,key=true){
   const texture=new Texture({source:source.source,frame:new Rectangle(x,y,width,height)});
@@ -18,16 +17,26 @@ export async function reefTextures(app:Application,game:FishGame='reef-party'){
   if(key)sprite.filters=[filter];const target=RenderTexture.create({width,height,resolution:1});
   app.renderer.render({container:sprite,target,clear:true});sprite.destroy();texture.destroy();return target;
  }
+ // This world's complete roster lives in one atlas. Do not download other worlds.
+ if(game==='coral-rush'&&world){
+  const [atlas,wheel]=await Promise.all([Assets.load<Texture>(world.atlas),Assets.load<Texture>('/art/jackpot-target-v26.svg')]);
+  const creatures:Texture[]=[];
+  for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];creatures[world.first+i]=crop(atlas,x,y,w,h,!!world.key);}
+  creatures[48]=crop(wheel,0,0,wheel.width,wheel.height,false);
+  const cannons=world.regions.slice(8).map(([x,y,w,h])=>crop(atlas,x,y,w,h,!!world.key));
+  filter.destroy();return {creatures,cannons};
+ }
+ const sources=await Promise.all(['/art/reef-creatures-v6.png',abyss?'/art/abyss-cannons-v18.png':'/art/reef-cannons-v6.png','/art/reef-legends-v10.png','/art/abyss-creatures-v17.png'].map(url=>Assets.load<Texture>(url)));
  const regions=[[8,65,365,350],[392,75,368,310],[776,60,361,380],[1140,90,395,310],[5,490,384,440],[393,486,370,445],[779,490,350,445],[1130,510,405,405]];
  const creatures=regions.map(([x,y,w,h])=>crop(sources[0],x,y,w,h));
  const cellWidth=sources[2].width/4,cellHeight=sources[2].height/2;
  for(let i=0;i<8;i++)creatures.push(crop(sources[2],i%4*cellWidth,Math.floor(i/4)*cellHeight,cellWidth,cellHeight,false));
  for(const [x,y,w,h] of abyssRegions)creatures.push(crop(sources[3],x,y,w,h,false));
  const premium=world?await Assets.load<Texture>(world.atlas):null;
- if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];const previous=creatures[world.first+i];previous?.destroy(previous instanceof RenderTexture);creatures[world.first+i]=crop(premium,x,y,w,h,false);}
+ if(world&&premium)for(let i=0;i<8;i++){const [x,y,w,h]=world.regions[i];const previous=creatures[world.first+i];previous?.destroy(previous instanceof RenderTexture);creatures[world.first+i]=crop(premium,x,y,w,h,!!world.key);}
  const expansion=await Assets.load<Texture>(extraFishAtlas.atlas);
  for(let i=0;i<8;i++){const [x,y,w,h]=extraFishAtlas.regions[i];creatures[extraFishAtlas.first+i]=crop(expansion,x,y,w,h,false);}
  const wheel=await Assets.load<Texture>('/art/jackpot-target-v26.svg');creatures[48]=crop(wheel,0,0,wheel.width,wheel.height,false);
- const cannons=world&&premium?world.regions.slice(8).map(([x,y,w,h])=>crop(premium,x,y,w,h,false)):abyss?abyssCannons.regions.map(([x,y,w,h])=>crop(sources[1],x,y,w,h,false)):Array.from({length:4},(_,i)=>crop(sources[1],i%2*768,Math.floor(i/2)*512,768,512));
+ const cannons=world&&premium?world.regions.slice(8).map(([x,y,w,h])=>crop(premium,x,y,w,h,!!world.key)):abyss?abyssCannons.regions.map(([x,y,w,h])=>crop(sources[1],x,y,w,h,false)):Array.from({length:4},(_,i)=>crop(sources[1],i%2*768,Math.floor(i/2)*512,768,512));
  filter.destroy();return {creatures,cannons};
 }

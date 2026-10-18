@@ -202,5 +202,17 @@
     "bytes": 201424,
     "sha256": "f59dca862fe7d15d8ab0480a8e8e7ec18dc42fd433713e7b9c40dbd328c62ba3",
     "source": "apps/player/public/art/arcade-hall-v7.png"
+  },
+  "coral-rush": {
+    "url": "/art/delivery/coral-rush-8b0e99276c04.webp",
+    "bytes": 83416,
+    "sha256": "8b0e99276c041c729a6cdc3435c078d4e30e19bf910aa04e33c9b12ac61004b0",
+    "source": "apps/player/public/art/coral-cover-v46.png"
+  },
+  "coral-background": {
+    "url": "/art/coral-background-v46.webp",
+    "bytes": 385262,
+    "sha256": "2e922fa088c50c98a83db6fb209930aee6c62619631f63bca707a1bc69d0d248",
+    "source": "apps/player/public/art/coral-background-v46.png"
   }
 }

@@ -24,7 +24,8 @@ let player,playerAuth,peerAuth;
 async function create(parentId,username){const response=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword},await fixture.auth(parentId));assert.equal(response.status,201,JSON.stringify(response.data));return response.data.id;}
 async function wallet(id){return fixture.wallet(id);}
 async function adjust(id,direction,amount){assert.equal(direction,'ADD');return fixture.fund(id,amount);}
-const {blackjackDeal,blackjackProfile,stagingGameProfileId,stagingMultiplier,reefBallistics,reefFlight}=await import('../../packages/game-math/src/index.ts');
+const {blackjackDeal,blackjackProfile,configuredGameProfileId,stagingMultiplier,reefBallistics,reefFlight}=await import('../../packages/game-math/src/index.ts');
+const stagingGameProfileId=game=>configuredGameProfileId(game,{revision:'1',payingPercent:20});
 const {settleExpiredBlackjack}=await import('../../dist/server/apps/api/src/blackjack.js');
 const deal=(stake='50')=>({action:'DEAL',stake,profileId:blackjackProfile.id,requestKey:randomUUID()});
 const move=(hand,action)=>({action,id:hand.id,revision:hand.revision,profileId:blackjackProfile.id,requestKey:randomUUID()});
@@ -100,7 +101,7 @@ test('PostgreSQL blackjack reservations, receipts and premium variants',async t=
   assert.notEqual(ids[0],ids[1]);
  });
  await t.test('new fish worlds commit verified convoy/orbit impacts with one receipt',async()=>{
-  for(const game of ['corsair-cove','cosmic-tides']){
+  for(const game of ['corsair-cove','cosmic-tides','coral-rush']){
    const room=(await call('practice/reef/join',{newTable:true,game},playerAuth)).data;
    const firedAt=Date.now()-1500,time=(firedAt-Date.parse(room.startedAt))/1000;
    let flight;

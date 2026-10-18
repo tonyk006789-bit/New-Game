@@ -33,7 +33,7 @@ export async function stagingRound(req:Request,id:string,body:unknown){
    if(BigInt(wallet.settled_units)-BigInt(wallet.reserved_units)<BigInt(data.stake))fail(409,'INSUFFICIENT_AVAILABLE','Insufficient available play credits.');
    if(isFishGame(game)){
     // Burst allowance for manual clicks; the wallet lock still serializes debits.
-    if(Number((await db.query("SELECT count(*) n FROM staging_rounds WHERE account_id=$1 AND game_id IN ('reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides') AND created_at>clock_timestamp()-interval '1 second'",[actor.id])).rows[0].n)>=20)fail(429,'SLOW_DOWN','Too many shots arriving. Please pause briefly.');
+    if(Number((await db.query("SELECT count(*) n FROM staging_rounds WHERE account_id=$1 AND game_id IN ('reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides','coral-rush') AND created_at>clock_timestamp()-interval '1 second'",[actor.id])).rows[0].n)>=20)fail(429,'SLOW_DOWN','Too many shots arriving. Please pause briefly.');
    }else if((await db.query("SELECT id FROM staging_rounds WHERE account_id=$1 AND created_at>clock_timestamp()-interval '250 milliseconds'",[actor.id])).rowCount)fail(429,'SLOW_DOWN');
    let shotSeat:number|undefined;
    if(isFishGame(game)){

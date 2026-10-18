@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T05:27:52.147Z",
+  "generatedAt": "2026-10-18T16:25:38.440Z",
   "privateReferencesShipped": false,
   "assets": [
     {
@@ -120,6 +120,34 @@
       "source": "Built-in ImageGen; prompts in reports/art-prompts-v6.json",
       "license": "Project original; owner review pending",
       "sha256": "b91c55aa4f617903cab373f043eae9da3e9cfebd114c12f0a4ad9410706f1000"
+    },
+    {
+      "path": "apps/player/public/art/coral-atlas-v46.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v46.json",
+      "license": "Project original; owner review pending",
+      "sha256": "50686adce2ec30441cbb7c1a19856d78e882c945401152c36d323f6f78f13a7d"
+    },
+    {
+      "path": "apps/player/public/art/coral-background-v46.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v46.json",
+      "license": "Project original; owner review pending",
+      "sha256": "88e89e2bc72660f46c18004e6b21e3e1fc200833384a2166d0d7f84e3756cfad"
+    },
+    {
+      "path": "apps/player/public/art/coral-background-v46.webp",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Repository-native SVG; no third-party assets",
+      "license": "Project original; owner review pending",
+      "sha256": "2e922fa088c50c98a83db6fb209930aee6c62619631f63bca707a1bc69d0d248"
+    },
+    {
+      "path": "apps/player/public/art/coral-cover-v46.png",
+      "creator": "Original artwork authored for New Game in this workspace",
+      "source": "Built-in ImageGen; prompts in reports/art-prompts-v46.json",
+      "license": "Project original; owner review pending",
+      "sha256": "1de9d9a259b89b9efebbe54cc60701fa957285604542b3acc93bb9d53224cdf7"
     },
     {
       "path": "apps/player/public/art/corsair-background-v28.png",
@@ -322,7 +350,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "5f00f7b087976137554dcdb625d9014841a4fd313ef078080680baf7e3878e69"
+      "sha256": "7a289b5142fc0f27b88b997ce286fefc9c1cbbafa16831b1b17a7136bc79e938"
     },
     {
       "path": "apps/player/src/arcade-v6.css",
@@ -392,7 +420,7 @@
       "creator": "Original artwork authored for New Game in this workspace",
       "source": "Original ImageGen atlas rendering and repository-native CSS frames; no third-party assets",
       "license": "Project original; owner review pending",
-      "sha256": "3aa809781e1d3ec250d9c876d86a98bdc2cf6772d7f130a14d15116e9f72cddc"
+      "sha256": "e79e3558c9b9b679382deb7521cdb207a4dc11fc7385594605f44000fd3a854c"
     },
     {
       "path": "apps/player/src/FishRewardReveal.vue",
@@ -462,7 +490,7 @@
       "creator": "Original animation authored for New Game",
       "source": "Repository-native CSS, TypeScript and Vue; no third-party assets",
       "license": "Project original",
-      "sha256": "a50d8ab82792836a12844764ffaf88e9fc87489c6eecfaa1ac9aed873cad0427"
+      "sha256": "31db1afa31dc8cbb53300cae86be03b41df1dfca4028151dbe909203b8f22775"
     },
     {
       "path": "apps/player/src/arcade-v26.css",
@@ -1128,6 +1156,20 @@
       "source": "apps/player/public/art/arcade-hall-v7.png; scripts/optimize-presentation-assets.mjs; no new external art",
       "license": "Project original; owner review pending",
       "sha256": "f59dca862fe7d15d8ab0480a8e8e7ec18dc42fd433713e7b9c40dbd328c62ba3"
+    },
+    {
+      "path": "apps/player/public/art/delivery/coral-rush-8b0e99276c04.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/coral-cover-v46.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "8b0e99276c041c729a6cdc3435c078d4e30e19bf910aa04e33c9b12ac61004b0"
+    },
+    {
+      "path": "apps/player/public/art/coral-background-v46.webp",
+      "creator": "Original New Game artwork, optimized delivery copy",
+      "source": "apps/player/public/art/coral-background-v46.png; scripts/optimize-presentation-assets.mjs; no new external art",
+      "license": "Project original; owner review pending",
+      "sha256": "2e922fa088c50c98a83db6fb209930aee6c62619631f63bca707a1bc69d0d248"
     },
     {
       "path": "apps/player/public/art/dealers/female-ac42aeadcdfc.glb",

@@ -2,6 +2,7 @@ import {hasLowStake} from './stakes.ts';
 export {stakePolicy,lowStakeGames,hasLowStake,stakesForGame,validGameStake} from './stakes.ts';
 export * from './blackjack.ts';
 export const mathStatus = Object.freeze({
+ 'coral-rush': {approved:false,profileId:null,mathHash:null},
  'corsair-cove': {approved:false,profileId:null,mathHash:null},
  'cosmic-tides': {approved:false,profileId:null,mathHash:null},
  'double-deck-blackjack': {approved:false,profileId:null,mathHash:null},
@@ -233,7 +234,7 @@ export const reefTierProfile={id:'reef-tiers-v1',tiers:{
 }} as const;
 export function reefTier(species:number){
  if(!Number.isInteger(species)||species<0||species>=reefSpecies.length)throw new Error('Invalid reef species');
- return [7,8,9,19,23,30,31,38,39,48,55,56,63,64].includes(species)?'boss':[3,5,10,11,18,21,28,29,36,37,43,47,53,54,61,62].includes(species)?'large':[2,4,6,13,17,22,26,27,34,35,41,45,51,52,59,60].includes(species)?'medium':'small';
+ return [7,8,9,19,23,30,31,38,39,48,55,56,63,64,71,72].includes(species)?'boss':[3,5,10,11,18,21,28,29,36,37,43,47,53,54,61,62,69,70].includes(species)?'large':[2,4,6,13,17,22,26,27,34,35,41,45,51,52,59,60,67,68].includes(species)?'medium':'small';
 }
 export function reefOutcome(id:string,targetId:number,random:RandomIndex,game:FishGame='reef-party'):StagingVisual{
  const {species}=reefTarget(targetId,0,game),tier=reefTier(species),rule=reefTierProfile.tiers[tier],captured=random(10000)<rule.captureTickets;
@@ -312,7 +313,7 @@ export const newCabinetsProfile={id:'stage-cabinets-v23',baseProfiles:[stagingPr
 export const expansionAliases={...cabinetAliases28,...featureAliases,'meteor-keno':'orchard-numbers','bamboo-keno':'orchard-numbers'} as const;
 export const expansionProfile={id:'stage-expansion-v28',baseProfiles:[stagingProfile.id,classicReelsProfile.id],payingProbability:stagingProfile.payingProbability,aliases:expansionAliases} as const;
 export const expansionRules={'outlaw-sevens':classicReelsProfile.rules['neon-sevens'],'celestial-wilds':stagingProfile.rules['jade-fortune'].replace('Dragon','Moon'), 'clockwork-vault':stagingProfile.rules['aurora-vault'],'phoenix-falls':stagingProfile.rules['ember-relics'],'meteor-keno':stagingProfile.rules['orchard-numbers'],'bamboo-keno':stagingProfile.rules['orchard-numbers']} as const;
-export const stagingRules={...expansionRules,...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,...newCabinetsProfile.rules,'corsair-cove':currentFishRules,'cosmic-tides':currentFishRules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
+export const stagingRules={'coral-rush':currentFishRules,...expansionRules,...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,...newCabinetsProfile.rules,'corsair-cove':currentFishRules,'cosmic-tides':currentFishRules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
 export type StagingGame=keyof typeof stagingRules;
 export const premiumKenoProfile={id:'stage-keno-cabinets-v1',baseProfile:stagingProfile.id,aliases:{'neon-numbers':'orchard-numbers','pearl-keno':'orchard-numbers'}} as const;
 export function stagingGameProfileId(game:string){return Object.hasOwn(expansionAliases,game)?expansionProfile.id:Object.hasOwn(newCabinetAliases,game)?newCabinetsProfile.id:Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
@@ -355,13 +356,14 @@ export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,pic
  throw new Error('Experimental sampler exhausted; no round accepted.');
 }
 
-export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan','Ruby koi','Jade shrimp','Imperial lionfish','Pearl cuttlefish','Jade turtle','Golden sentinel crab','Dynasty dragon','Jade sea empress','Silver icefish','Crystal shrimp','Spotted seal','Aurora squid','Royal narwhal','Snow crab','Glacial serpent','Crystal orca','Mandarin fish','Ribbon eel','Vampire squid','Copper horseshoe crab','Jade axolotl','Golden arowana','Sea angel','Ice beluga','Jackpot wheel','Copper sprat','Pirate puffer','Sailfin corsair','Lantern octopus','Cutlass swordfish','Anchor crab','Spectral captain','Ghost galleon','Comet minnow','Star shrimp','Nebula jelly','Orbit seahorse','Solar manta','Prism nautilus','Cosmic leviathan','Astral mermaid'] as const;
-export const fishGames=['reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides'] as const;
+export const reefSpecies=['Clownfish','Blue tang','Golden koi','Reef shark','Sea turtle','Manta ray','Moon jelly','Golden dragon','Ember sea dragon','Pearl mermaid','Crown crab','Star manta','Jewel seahorse','Coral lobster','Silver sardine','Lemon reef fish','Lantern angler','Leafy seadragon','Armored hammerhead','Royal kraken','Pearl nautilus','Imperial lobster','Treasure chest','Abyss leviathan','Ruby koi','Jade shrimp','Imperial lionfish','Pearl cuttlefish','Jade turtle','Golden sentinel crab','Dynasty dragon','Jade sea empress','Silver icefish','Crystal shrimp','Spotted seal','Aurora squid','Royal narwhal','Snow crab','Glacial serpent','Crystal orca','Mandarin fish','Ribbon eel','Vampire squid','Copper horseshoe crab','Jade axolotl','Golden arowana','Sea angel','Ice beluga','Jackpot wheel','Copper sprat','Pirate puffer','Sailfin corsair','Lantern octopus','Cutlass swordfish','Anchor crab','Spectral captain','Ghost galleon','Comet minnow','Star shrimp','Nebula jelly','Orbit seahorse','Solar manta','Prism nautilus','Cosmic leviathan','Astral mermaid','Coral butterflyfish','Reef shrimp','Rose cuttlefish','Lagoon turtle','Blue marlin','Spotted eagle ray','Cobalt hammerhead','Jeweled hermit crab'] as const;
+export const fishGames=['coral-rush','reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides'] as const;
 export type FishGame=typeof fishGames[number];
 export const kenoGames=['orchard-numbers','neon-numbers','pearl-keno','meteor-keno','bamboo-keno'] as const;
 export function isKenoGame(game:unknown):game is typeof kenoGames[number]{return typeof game==='string'&&(kenoGames as readonly string[]).includes(game);}
 export function isFishGame(game:unknown):game is FishGame{return typeof game==='string'&&(fishGames as readonly string[]).includes(game);}
 export const fishSpeciesPools={
+ 'coral-rush':[65,65,66,65,67,68,65,66,69,65,70,67,66,68],
  'corsair-cove':[49,50,49,51,50,52,49,53,50,51,49,54,52,50],
  'cosmic-tides':[57,58,57,59,58,60,57,61,58,59,57,62,60,58],
  'reef-party':[14,15,0,2,1,4,12,3,16,6,20,13,17,5,10,22,11,40,41],
@@ -369,7 +371,7 @@ export const fishSpeciesPools={
  'polar-odyssey':[32,33,32,34,33,35,32,36,33,34,32,37,35,33,32,36,46,47],
  'abyss-legends':[16,20,17,18,16,22,20,21,6,17,16,20,18,22,21,5,42,43]
 } as const;
-export const fishBosses:Record<FishGame,readonly number[]>={'corsair-cove':[55,48,56],'cosmic-tides':[63,48,64],'reef-party':[8,48,9,7],'abyss-legends':[19,48,23],'sunken-dynasty':[30,48,31],'polar-odyssey':[38,48,39]};
+export const fishBosses:Record<FishGame,readonly number[]>={'coral-rush':[71,48,72],'corsair-cove':[55,48,56],'cosmic-tides':[63,48,64],'reef-party':[8,48,9,7],'abyss-legends':[19,48,23],'sunken-dynasty':[30,48,31],'polar-odyssey':[38,48,39]};
 export function fishGuide(game:FishGame){return [...new Set([...fishSpeciesPools[game],...fishBosses[game]])];}
 export const reefBallistics={speed:780,radius:5,lifetime:1.6,step:1/120,version:'reef-ballistics-v9'} as const;
 export function reefCannon(seat:number){return [{x:280,y:557},{x:920,y:557},{x:280,y:43},{x:920,y:43}][seat-1]||{x:280,y:557};}
@@ -411,12 +413,14 @@ export function reefTarget(id:number,time:number,game:FishGame='reef-party'){
  // Captured IDs remain unavailable for the lifetime of the shared room.
  const pattern=fishSpeciesPools[game],bosses=fishBosses[game];
  const species=id%20===5?bosses[Math.floor(id/20)%bosses.length]:pattern[(id-1)%pattern.length];
- const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88,13,36,14,48,13,35,9,59,72,10,14,26,30,56,47,85,98,10,12,29,25,54,48,100,84][species];
+ const tier=reefTier(species),radius=[12,15,26,53,29,49,25,88,100,80,46,56,13,32,8,10,11,28,56,94,14,48,36,98,12,9,28,30,55,50,98,84,11,9,31,28,57,48,96,88,13,36,14,48,13,35,9,59,72,10,14,26,30,56,47,85,98,10,12,29,25,54,48,100,84,12,11,29,31,55,54,96,88][species];
  const duration={small:42,medium:44,large:46,boss:29}[tier],spawnAt=(id-1)*1.5-42;
  const age=((time-spawnAt)%120+120)%120,active=time>=spawnAt&&age<duration;
  const direction=id%2===0?-1:1,progress=age/duration,edge=radius*2;
  const x=active?(direction===1?-edge+(1200+edge*2)*progress:1200+edge-(1200+edge*2)*progress):-10000;
  let y=125+((id*83)%340)+Math.sin(age*.32+id)*({small:15,medium:20,large:12,boss:8}[tier]);
+ // Coral schools follow paired tidal lanes; the same paths are validated by the server.
+ if(game==='coral-rush')y=135+Math.floor((id%12)/3)*103+Math.sin(age*.24+Math.floor(id/3))*32+Math.sin(age*.6+id)*6;
  if(game==='corsair-cove')y=135+Math.floor((id%12)/3)*105+Math.sin(age*.27+Math.floor(id/3))*24;
  if(game==='cosmic-tides')y=300+Math.sin(age*.18+id*.7)*(tier==='boss'?75:145)+Math.cos(age*.4+id)*20;
  return {x,y,direction,species,tier,radius,active,spawnAt,duration};

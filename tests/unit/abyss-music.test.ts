@@ -15,7 +15,7 @@ describe('distinct music and fish worlds',()=>{
    expect(track.melody.length).toBe(track.barSteps);expect(track.answer.length).toBe(track.barSteps);
    for(const ticks of [track.kick,track.snare,track.hat,track.bassHits,track.chordHits])expect(ticks.every(t=>t>=0&&t<track.barSteps)).toBe(true);
   }
-  expect(names.size).toBe(31);expect(rhythms.size).toBe(31);expect(melodies.size).toBe(31);
+  expect(names.size).toBe(32);expect(rhythms.size).toBe(32);expect(melodies.size).toBe(32);
   for(const game of catalog)expect(musicScores[game.id]).toBeDefined();
  });
  it('both games expose varied sizes, treasure targets, and a bounded shared population',()=>{

@@ -10,4 +10,4 @@ export const expansionCatalog = [
  {id:'meteor-keno',name:'Meteor Keno',category:'Keno',tagline:'Plot your constellation.',description:'Pick four to ten coordinates with a robot navigator and follow a twenty-meteor orbital reveal.',detail:'80 coordinates · Orbital draw',color:'#f9a865'},
  {id:'bamboo-keno',name:'Bamboo Keno',category:'Keno',tagline:'Follow the lantern trail.',description:'A red panda explorer lights your chosen numbers through a twenty-lantern bamboo reveal.',detail:'80 lanterns · Number garden',color:'#a6e59d'}
 ] as const;
-export const expansionIds = expansionCatalog.map(game=>game.id);
+export const expansionIds = ['coral-rush' as const,...expansionCatalog.map(game=>game.id)];

@@ -1,0 +1,24 @@
+{
+  "version": "coral-rush-v46",
+  "tool": "Built-in image_gen",
+  "reference": "JUWA Happy Fishing lobby card observed on 2026-10-18; live game not accessible in browser (APP badge). Owner approved continuing with available references and original art.",
+  "assets": [
+    {
+      "file": "apps/player/public/art/coral-atlas-v46.png",
+      "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an ORIGINAL bright underwater arcade fish game called Coral Rush, not any existing brand. Transparent background, landscape 1536x1024. Exact layout: four equal columns and three equal rows, with generous empty transparent padding between every sprite; one complete centered object per cell, no clipping. Row 1 left to right: tiny orange butterflyfish, tiny teal reef shrimp, medium pink cuttlefish, medium turquoise sea turtle. Row 2: large blue marlin, large spotted eagle ray, boss cobalt hammerhead shark with gold fin markings, boss jeweled giant hermit crab. All eight creatures viewed from above or side-above, facing RIGHT, distinct readable silhouettes, swimming horizontally. Row 3: four isolated ornate underwater cannons aimed straight UP, turquoise/brass, coral-red/brass, violet/brass, blue/brass, each with round base centered underneath barrel. Polished richly shaded 3D game rendering, luminous scales and realistic marine texture with expressive faces, high detail but readable small, clean alpha edges. No water, no scenery, no text, no labels, no watermark, no grid lines, no cast shadows beyond the individual objects. Keep each object entirely inside its own cell with minimum 30 pixel margins.",
+      "corrections": [
+        "Remove backdrop and request alpha (generator retained colored backdrop).",
+        "Switch to flat #00FF00 chroma-key background.",
+        "Shrink each object to 65%; four columns by three rows; maximum 270×250 bounding boxes with green padding. Final output uses runtime keying."
+      ]
+    },
+    {
+      "file": "apps/player/public/art/coral-background-v46.png",
+      "prompt": "Use case: stylized-concept. Asset type: original game playfield background Coral Rush. Create a panoramic 16:9 top-down underwater coral lagoon for a polished 3D arcade fishing game. A broad open turquoise and deep cobalt sandy-water clearing occupies central 75 percent of image, subtle moving-looking sun caustics, tranquil clean readable center so animated fish can be placed later. Around the perimeter only: sculptural red, peach and lavender coral, anemones, scattered pearls, small weathered Greek-like limestone arch fragments and sea grasses, lush dimensional edges. Upper left sun shafts, luminous aqua depth, rich vibrant colors but not noisy. No creatures, no cannons, no characters, no interface, no text, no logos. High quality 3D environmental game rendering; view from above. All four corners are clean enough for cannon overlays."
+    },
+    {
+      "file": "apps/player/public/art/coral-cover-v46.png",
+      "prompt": "Use case: stylized-concept. Asset type: square full-bleed 1024x1024 casino arcade game cover. Original game title CORAL RUSH in two words centered at bottom in large polished gold 3D lettering, perfectly readable. Main character a majestic cobalt-blue hammerhead shark with decorative gold fin streaks swimming out toward the viewer, anatomically readable hammer head. Surrounding it at different sizes: orange butterflyfish, teal sea turtle, a pink cuttlefish and a jeweled giant hermit crab among bright coral and blue lagoon sunbeams. Full detailed composition reaches every edge, no borders or empty margins. Rich glossy premium 3D game illustration, dynamic curved swimming composition and bubbles, cyan lagoon and warm gold colors. The only text is CORAL RUSH. No logos or existing brand characters."
+    }
+  ]
+}

@@ -3,6 +3,7 @@ type Style={motion:string;motif:string;color:string;accent:string;glyph:string};
 const style=(motion:string,motif:string,color:string,accent:string,glyph:string):Style=>({motion,motif,color,accent,glyph});
 /** Presentation only: these seeds arrange particles, never sample a game outcome. */
 export const winStyles:Record<string,Style>={
+ 'coral-rush':style('rise','pearl','#ffd888','#63f3ee','✺'),
  'corsair-cove':style('fountain','coin','#ffc879','#75e9da','⚓'),
  'cosmic-tides':style('orbit','crystal','#bfa0ff','#6af4ff','✧'),
  'double-deck-blackjack':style('royal','chip','#f1acdc','#917aff','♣'),

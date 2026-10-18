@@ -5,7 +5,7 @@ import {chooseBotFlight} from '../../apps/player/src/bot-targeting';
 
 describe('thirty-game collection and independent visual bots',()=>{
  it('contains thirty unique games and reserves Premium for Blackjack',()=>{
-  expect(catalog).toHaveLength(30);expect(new Set(catalog.map(g=>g.id)).size).toBe(30);
+  expect(catalog).toHaveLength(31);expect(new Set(catalog.map(g=>g.id)).size).toBe(31);
   expect(premiumGames).toEqual(['royal-blackjack','double-deck-blackjack','european-blackjack']);
  });
  it.each([['disco-diamonds','neon-sevens'],['midnight-express','jade-fortune'],['pirate-gold','coin-carnival']] as const)('%s preserves %s approved outcome math', (game,base)=>{

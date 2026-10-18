@@ -6,7 +6,7 @@ import {fishGames,fishGuide,reefTarget,reefTier,reefOutcome,reefLeadAngle,reefFl
 
 describe('bounded original win presentations',()=>{
  it('gives all thirty games a distinct effect composition',()=>{
-  expect(catalog).toHaveLength(30);expect(new Set(catalog.map(game=>JSON.stringify(winStyles[game.id]))).size).toBe(30);
+  expect(catalog).toHaveLength(31);expect(new Set(catalog.map(game=>JSON.stringify(winStyles[game.id]))).size).toBe(31);
   for(const game of catalog)expect(winStyles[game.id]).toBeDefined();
  });
  it('requires a positive recorded award, uses stable decoration and bounds particle count/lifetime',()=>{

@@ -30,6 +30,6 @@ describe('bounded richer reef migrations and tiered catches',()=>{
  });
  it('keeps legacy 3x receipts evaluable and rejects invented species',()=>{
   expect(stagingMultiplier({id:'old',game:'reef-party',description:'',captured:true})).toBe(3);
-  expect(()=>reefOutcome('bad',81,()=>0)).toThrow();expect(()=>reefTier(65)).toThrow();
+  expect(()=>reefOutcome('bad',81,()=>0)).toThrow();expect(()=>reefTier(73)).toThrow();
  });
 });

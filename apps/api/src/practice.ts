@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { actorFor, type Request, parse } from './auth.js';
 import { canonical, digest } from './security.js';
 import { fail, transaction } from './store.js';
-import { isFeatureGame, featurePractice, cabinetPractice, isCabinetGame, reefBotSeats, isKenoGame } from '@new-game/game-math';
+import { isFeatureGame, featurePractice, cabinetPractice, isCabinetGame, reefBotSeats, isKenoGame, fishGames } from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import type {PoolClient} from 'pg';
 const schema=z.object({requestKey:z.string().min(8).max(128),picks:z.array(z.number().int().min(1).max(80)).max(10).optional()}).strict();
@@ -34,7 +34,7 @@ export async function practiceRound(req:Request,game:string,body:unknown){
  });
 }
 export async function practiceHistory(req:Request){return transaction(async db=>{const actor=await actorFor(db,req);return (await db.query('SELECT result,created_at FROM practice_rounds WHERE account_id=$1 ORDER BY created_at DESC LIMIT 30',[actor.id])).rows;});}
-const joinSchema=z.object({roomId:z.uuid().optional(),seat:z.number().int().min(1).max(4).optional(),newTable:z.boolean().optional(),game:z.enum(['reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides']).default('reef-party')}).strict().refine(value=>!(value.roomId&&value.newTable));
+const joinSchema=z.object({roomId:z.uuid().optional(),seat:z.number().int().min(1).max(4).optional(),newTable:z.boolean().optional(),game:z.enum(fishGames).default('reef-party')}).strict().refine(value=>!(value.roomId&&value.newTable));
 async function cleanReef(db:PoolClient,branch:string){
  await db.query('UPDATE practice_rooms r SET expires_at=now() WHERE r.branch_id=$1 AND r.expires_at>now() AND EXISTS(SELECT 1 FROM practice_targets WHERE room_id=r.id) AND NOT EXISTS(SELECT 1 FROM practice_targets WHERE room_id=r.id AND captured_by IS NULL)',[branch]);
  await db.query("DELETE FROM practice_seats s USING practice_rooms r WHERE r.id=s.room_id AND r.branch_id=$1 AND (s.heartbeat_at < now()-interval '20 seconds' OR r.expires_at<=now())",[branch]);
@@ -70,7 +70,7 @@ export async function reefRoom(req:Request,join=false,body:unknown={}){const dat
  const seats=(await db.query("SELECT s.seat,a.display_name FROM practice_seats s JOIN accounts a ON a.id=s.account_id WHERE s.room_id=$1 AND s.heartbeat_at>now()-interval '20 seconds' ORDER BY seat",[seat.room_id])).rows;
  const targets=(await db.query('SELECT target_id,captured_by IS NOT NULL captured FROM practice_targets WHERE room_id=$1 ORDER BY target_id',[seat.room_id])).rows;
  const score=(await db.query('SELECT count(*)::integer score FROM practice_targets WHERE room_id=$1 AND captured_by=$2',[seat.room_id,actor.id])).rows[0].score;
- const impacts=stagingEnabled()?(await db.query("SELECT id,result->>'seat' seat,result->>'targetId' target_id,result->>'captured' captured,result->>'award' award,result->'flight' flight FROM staging_rounds WHERE result->>'roomId'=$1 AND game_id IN ('reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides') AND created_at>clock_timestamp()-interval '3 seconds' ORDER BY created_at DESC LIMIT 64",[seat.room_id])).rows.filter(r=>r.flight&&r.seat).map(r=>({id:r.id,seat:Number(r.seat),targetId:Number(r.target_id),captured:r.captured==='true',award:r.award,flight:r.flight})):[];
+ const impacts=stagingEnabled()?(await db.query("SELECT id,result->>'seat' seat,result->>'targetId' target_id,result->>'captured' captured,result->>'award' award,result->'flight' flight FROM staging_rounds WHERE result->>'roomId'=$1 AND game_id IN ('reef-party','abyss-legends','sunken-dynasty','polar-odyssey','corsair-cove','cosmic-tides','coral-rush') AND created_at>clock_timestamp()-interval '3 seconds' ORDER BY created_at DESC LIMIT 64",[seat.room_id])).rows.filter(r=>r.flight&&r.seat).map(r=>({id:r.id,seat:Number(r.seat),targetId:Number(r.target_id),captured:r.captured==='true',award:r.award,flight:r.flight})):[];
  const bots=stagingEnabled()?reefBotSeats(seats.map(s=>s.seat)).map(seat=>({seat,display_name:`Bot ${seat}`,kind:'BOT' as const})):[];
  return {id:seat.room_id,game:room.game_id,impacts,seat:seat.seat,seats,bots,targets,score,startedAt:room.created_at,expiresAt:room.expires_at,serverTime:Date.now(),mode:'PRACTICE',creditsChanged:false};
 });}
