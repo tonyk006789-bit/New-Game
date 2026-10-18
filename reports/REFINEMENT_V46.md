@@ -28,6 +28,14 @@ The signed-in JUWA lobby exposed Happy Fishing's title, blue-shark card and APP 
 
 ## Deployment and rollback
 
-Pending final package/live checks. Migration 022 changes no balances, account identities or historical receipts. Hosted application must be upgraded only after migration. Rollback uses the previous player/operator builds while retaining the additive schema and all new rooms/receipts; do not delete historical Coral Rush activity or reverse player credits.
+- `node scripts/vercel-build.mjs` and `node --test tests/deployment/vercel.test.mjs` — 4 passed.
+- `node node_modules/vite/bin/vite.js build --config apps/admin/vite.config.ts`, `node scripts/vercel-operator-build.mjs` and `node --test tests/deployment/vercel-operator.test.mjs` — build passed, 3 deployment tests passed.
+- Hosted migration 022 followed an encrypted consistent backup of 24 tables. All 22 wallet balances/versions and account identities remained unchanged.
+- Player published at https://new-game-test-topaz.vercel.app/; deployment `dpl_FBqBy1hJLqUdxedmFChLZJaYD1K1`, immutable URL https://new-game-test-3f2f31ylq-tonyk006789-7532.vercel.app/. Entry `index-DL5nALjY.js`.
+- Operator catalog published at https://new-game-operator.vercel.app/; deployment `dpl_4QD3urx2FJji7JA1XNJ1uT69zLGA`, immutable URL https://new-game-operator-1lnzwm2zx-tonyk006789-7532.vercel.app/. Entry `index-B89jzsvs.js`.
+- `.local/verify-v46-live.mjs` verified both live entry bundles against local SHA-256, no-store HTML, health endpoints, 31 catalog entries/seven fish games and exact new asset bytes. Unauthenticated joins and operator account reads returned 401. Live check evidence is saved in `screenshots/v46/live-checks.json`.
+- Local browser confirmed the new cabinet in Walk the Floor and the complete displayed tier table. Rules pause the table and disable firing.
+
+Migration 022 changes no balances, account identities or historical receipts. Rollback uses the previous player/operator builds while retaining the additive schema and all new rooms/receipts; do not delete historical Coral Rush activity or reverse player credits.
 
 Android/iOS builds, signing, physical devices and exact Happy Fishing live behavior remain unverified. Production mathematics remains unapproved.
