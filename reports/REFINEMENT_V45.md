@@ -32,6 +32,10 @@ Changed files:
 
 ## Publication and limits
 
-Publish only to the already authorized https://new-game-operator.vercel.app/ project. Live deployment evidence will be recorded after publication. The player site remains V44. No hosted accounts, passwords, wallets or database records were changed for these tests. Physical-device testing remains deferred; the browser screenshots are desktop checks. No claim is made that the user's particular missing account was inspected in the hosted database.
+Published to the already authorized https://new-game-operator.vercel.app/ project: deployment `dpl_JAsGFaEKXm745fsq2sS6ULa7SGUV`, immutable URL https://new-game-operator-2u6z3r7fr-tonyk006789-7532.vercel.app/. Source commit `053d310`.
+
+`node .local/verify-v45-live.mjs` passed at 2026-10-18 15:17:43 UTC: public HTML 200 and `no-store`, exact `index-VN7DJH2W.js` content matches the tested build (SHA-256 `7a7350f78f3984e360f9415b361ec3b4ed4a2540e5ed249079588ebee0e4e0a8`), health 200, unauthenticated account listing 401. Evidence saved to ignored `reports/screenshots/v45/live-checks.json`.
+
+The player site remains V44. No hosted accounts, passwords, wallets or database records were changed for these tests. Physical-device testing remains deferred; the browser screenshots are desktop checks. No claim is made that the user's particular missing account was inspected in the hosted database.
 
 No migration. Rollback is the preceding V43 operator deployment `dpl_2N8fE49XWxy7EXAxYsBPVxHqU9EZ`; retain the database and every accepted account/ledger event. Rolling back reintroduces the stale-list behavior but must not remove created accounts or restore old balances.
