@@ -63,7 +63,7 @@ async function load(){const account=await refreshAccount();if(account.role==='PL
 async function login(){await run(async()=>{await signIn(username.value,password.value);view.value='Home';expanded.value='Admin Management';password.value='';await load();await restorePending();});}
 async function logout(){await run(async()=>{await api('auth/logout',{});clearPrivateState();notice.value='';});}
 function navigate(next:View){if(busy.value)return;view.value=next;if(window.innerWidth<=600)menu.value=true;query.value='';page.value=1;status.value='ALL';from.value='';to.value='';notice.value='';editor.value='';gotoPage.value=1;void run(loadPage);}
-function search(){page.value=1;void run(loadPage);}
+function search(){page.value=1;gotoPage.value=1;void run(loadPage);}
 function turnPage(delta:number){page.value=Math.min(pages.value,Math.max(1,page.value+delta));gotoPage.value=page.value;void run(loadPage);}
 function resetFilters(){query.value='';status.value='ALL';sort.value='created';order.value='desc';from.value='';to.value='';search();}
 function openCreate(){if(!canCreate.value)return;parentId.value=current.value!.id;
@@ -72,7 +72,12 @@ function openCreate(){if(!canCreate.value)return;parentId.value=current.value!.i
 async function create(){await run(async()=>{
  if(newPassword.value!==confirmPassword.value)throw new Error('Passwords do not match.');
  const result=await api<{id:string;username:string}>('admin/accounts',{parentId:parentId.value,username:NewUsername.parse(newUsername.value),displayName:newName.value,password:NewPassword.parse(newPassword.value),requestKey:createKey.value});
- createOpen.value=false;newPassword.value='';confirmPassword.value='';notice.value=`Created ${result.username} with 0.00 credits.`;await load();
+ createOpen.value=false;newPassword.value='';confirmPassword.value='';
+ // A saved account must not be hidden by the previous search or page. Refresh
+ // the list directly: creation does not change the operator's wallet.
+ query.value='';status.value='ALL';sort.value='created';order.value='desc';page.value=1;gotoPage.value=1;editor.value='';searchField.value='Account';
+ notice.value=`Created ${result.username} with 0.00 credits. Showing newest accounts first.`;
+ try{await loadPage();}catch(e){if(e instanceof ApiError&&e.status===401)throw e;throw new Error(`The account was saved, but the list could not refresh. Use search to reload it. ${(e as Error).message}`);}
 });}
 function openManage(member:Member,action:'EDIT_PROFILE'|'RESET_PASSWORD'|'SET_ACTIVE'|'SET_ARCHIVED'='EDIT_PROFILE'){selected.value=member;editName.value=member.displayName;resetPassword.value='';resetConfirm.value='';manageAction.value=action;editor.value='';manageKey.value=crypto.randomUUID();error.value='';manageOpen.value=true;}
 async function manage(){await run(async()=>{

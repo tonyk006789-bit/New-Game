@@ -20,7 +20,17 @@ async function call(path,body,auth,extra={}){const response=await fetch(`${base}
 async function signin(username,password=adminPassword,code){const response=await call('auth/login',{username,password,...(code?{code}:{})});assert.equal(response.status,201,JSON.stringify(response.data));return {cookie:response.cookie,csrf:response.data.csrf};}
 const admin=await signin('test.admin',adminPassword,totp(secret));
 const fixture=hierarchyFixture({db:control,call,signin,rootId:adminId,rootAuth:admin});
-async function create(parentId,username,auth){auth??=await fixture.auth(parentId);const r=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword,requestKey:randomUUID()},auth);assert.equal(r.status,201,JSON.stringify(r.data));return r.data.id;}
+async function create(parentId,username,auth){
+ auth??=await fixture.auth(parentId);
+ const r=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword,requestKey:randomUUID()},auth);assert.equal(r.status,201,JSON.stringify(r.data));
+ // Read through the same parent's real list immediately after commit, for
+ // Main Admin -> Sub-contractor -> Agent -> Player alike.
+ const list=await call(`operator/accounts?role=${r.data.role}&sort=created&order=desc&page=1`,undefined,auth);
+ assert.equal(list.status,200,JSON.stringify(list.data));
+ const row=list.data.items.find(item=>item.id===r.data.id);
+ assert.ok(row,`Creator cannot see new ${r.data.role} ${username}`);assert.equal(row.wallet.available,'0');assert.equal(row.canManage,true);
+ return r.data.id;
+}
 async function wallet(id){return (await control.query('SELECT settled_units settled,reserved_units reserved,version,(settled_units-reserved_units)::text available FROM wallets WHERE account_id=$1',[id])).rows[0];}
 async function adjust(id,amount){return fixture.fund(id,amount);}
 async function move(path,actorAuth,actorId,playerId,amount,extra={}){return call(path,{targetId:playerId,amount,reason:'Approved operator workflow test',requestKey:randomUUID(),expectedVersion:(await wallet(actorId)).version,targetVersion:(await wallet(playerId)).version,...extra},actorAuth);}
