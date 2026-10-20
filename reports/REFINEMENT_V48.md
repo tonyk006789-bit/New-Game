@@ -49,7 +49,14 @@ Coverage: shared reel/cascade/vault presentation covers all 16 slot/feature cabi
 
 ## Deployment and limits
 
-No database migration, operator deployment, game-math change or account mutation is required. Current hosted player alias: https://new-game-test-topaz.vercel.app/. Publication verification is pending below until complete.
+No database migration, operator deployment, game-math change or account mutation is required. Published player alias: https://new-game-test-topaz.vercel.app/.
+
+- Implementation commit: `7c03e8c`.
+- Ready Vercel deployment: `dpl_5hoo5nQXhSYzuK6qc7Cw7YkpT3Yw`, https://new-game-test-efy65q3q9-tonyk006789-7532.vercel.app/.
+- Published with `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config 'C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli' --scope tonyk006789-7532 --no-color` — READY and production alias assigned.
+- `node .local/verify-v48-live.mjs` — passed all 65 asset SHA/cache checks (entry JS/CSS, 62 responsive covers and walking sprite); health 200, unauthenticated session 401, catalog 31. Live entry `/assets/index-D8zYangk.js`, stylesheet `/assets/index-B7G6qSS0.css` match the verified build.
+- Reloaded the existing live browser session and reviewed shelf and walking floor. All eight slot covers in the observed page decoded correctly, with exactly one image per card. The optimized walking sprite rendered cleanly. No JavaScript errors were captured; no hosted game plays or account changes were made.
+- Published UI evidence: `reports/screenshots/v48/live-slot-shelf.png`, `live-walking-floor.png`, `live-image-audit.json` and `live-checks.json` (ignored local evidence).
 
 Physical Android/iPhone tests, native lifecycle/orientation behavior and device GPU/audio performance remain unverified. The existing lazy Three.js dealer chunk still exceeds Vite's 500 kB advisory. No claim of universal zero lag or a 100% provider clone.
 
