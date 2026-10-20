@@ -46,4 +46,9 @@ No database migration is required. No operator deployment is required for these 
 
 Rollback: redeploy the prior V46 player build. Keep every receipt and balance unchanged. New image/audio assets are additive and can remain cached; do not remove or rewrite game history.
 
-Publication evidence is appended after the deployment is verified.
+Published player deployment: `dpl_9WbTqLb78n1MDbtuyTjj6g8q4Fny`, immutable URL https://new-game-test-ewzy096xa-tonyk006789-7532.vercel.app/, current alias https://new-game-test-topaz.vercel.app/. Implementation commit: `92a9549`.
+
+- `node scripts/vercel-build.mjs` and `node --test tests/deployment/vercel.test.mjs` — passed, four deployment tests. Regenerating the previous protected `.vercel/output` directory required approved normal local execution after a sandbox EPERM.
+- Live entry `/assets/index-D_1e4AfR.js`, CSS `/assets/index-L61dOWeE.css`.
+- `.local/verify-v47-live.mjs` verified SHA-256 and immutable caching for 55 assets: JS/CSS, all 21 identity strips and all 32 instrument samples. HTML is no-store; health returned 200; unauthenticated account access returned 401; catalog contains 31 games.
+- Browser confirmed the published slot shelf and Walk the Floor use the new identities. The live tab remains open. No hosted plays were placed. Evidence: `screenshots/v47/live-checks.json`, `live-slot-catalog.png`, `live-floor.png`.
