@@ -1,0 +1,191 @@
+{
+  "neon-sevens": {
+    "url": "/art/identity-v47/neon-sevens-ef7b899d6b56.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 42686,
+    "sha256": "ef7b899d6b5693e467debe37d39e52ac9eafd23bd4c8953563f81512d6f43ca1"
+  },
+  "ruby-rush": {
+    "url": "/art/identity-v47/ruby-rush-cc0fae70efe1.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 49174,
+    "sha256": "cc0fae70efe155d1a2080624f27f27e99d3e9f4efe31ba9c5be3536f87d24bd8"
+  },
+  "disco-diamonds": {
+    "url": "/art/identity-v47/disco-diamonds-485c6ae2ee20.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 51904,
+    "sha256": "485c6ae2ee20d173689fef8c1b516c5e687a49f2ac452011235bebb44640b6b2"
+  },
+  "outlaw-sevens": {
+    "url": "/art/identity-v47/outlaw-sevens-6f037b96f701.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 47610,
+    "sha256": "6f037b96f7018c6a8de93ebdd1734c11fa266697d049710171a8c4138c3e1d92"
+  },
+  "jade-fortune": {
+    "url": "/art/identity-v47/jade-fortune-9f8baade2ee3.webp",
+    "width": 2048,
+    "height": 256,
+    "columns": 8,
+    "host": 7,
+    "bytes": 78730,
+    "sha256": "9f8baade2ee339e4a1b5b290ec2fed7c8471765a165c5ab4220fd60646ef9495"
+  },
+  "sapphire-crown": {
+    "url": "/art/identity-v47/sapphire-crown-c443c675d1de.webp",
+    "width": 2048,
+    "height": 256,
+    "columns": 8,
+    "host": 7,
+    "bytes": 76152,
+    "sha256": "c443c675d1de5cea9039959a99f931da46b022c537e7b61e8fdb2235997dfa9b"
+  },
+  "midnight-express": {
+    "url": "/art/identity-v47/midnight-express-2fd08b633542.webp",
+    "width": 2048,
+    "height": 256,
+    "columns": 8,
+    "host": 7,
+    "bytes": 73876,
+    "sha256": "2fd08b633542802fbeec835b0518c09b8ff4edc3abed276de301f15a4b0899e9"
+  },
+  "celestial-wilds": {
+    "url": "/art/identity-v47/celestial-wilds-600e258930d3.webp",
+    "width": 2048,
+    "height": 256,
+    "columns": 8,
+    "host": 7,
+    "bytes": 84600,
+    "sha256": "600e258930d3a762a19055f718d3347405a83a468401bf796bc6106dd75251a9"
+  },
+  "coin-carnival": {
+    "url": "/art/identity-v47/coin-carnival-fdfe3477136e.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 74228,
+    "sha256": "fdfe3477136e9de3f00e3c46156dea9b532104da603188d2f111da7d72154a52"
+  },
+  "solar-fortune": {
+    "url": "/art/identity-v47/solar-fortune-5cc104450b09.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 64034,
+    "sha256": "5cc104450b09a1f3085fe5ae1aac983389a9ab79aa3ec8566a4c78593bc39bfc"
+  },
+  "pirate-gold": {
+    "url": "/art/identity-v47/pirate-gold-f16f1c92e65b.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 67092,
+    "sha256": "f16f1c92e65b8a33a7e6ae4bcf05f9c84679a607c47578591c6baefd4f75743d"
+  },
+  "temple-lights": {
+    "url": "/art/identity-v47/temple-lights-a3a998147883.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 65250,
+    "sha256": "a3a998147883851e06076a7397c10a81a710db79f16e50644e275659ce647214"
+  },
+  "aurora-vault": {
+    "url": "/art/identity-v47/aurora-vault-19207d4722c8.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 78830,
+    "sha256": "19207d4722c8f8c30c0f85e3084b15baea4d8e1cddd7600b6c84fd59b84710b7"
+  },
+  "ember-relics": {
+    "url": "/art/identity-v47/ember-relics-fd6558f6f5a6.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 83550,
+    "sha256": "fd6558f6f5a6a7758776b63cd0a79575f44422b796c75cceaf050fb747352edc"
+  },
+  "clockwork-vault": {
+    "url": "/art/identity-v47/clockwork-vault-a08ded07d04d.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 85642,
+    "sha256": "a08ded07d04d9889b434db4e80f0642aae203945ca9dd7a5e49328485e3846a0"
+  },
+  "phoenix-falls": {
+    "url": "/art/identity-v47/phoenix-falls-4814a98e983c.webp",
+    "width": 1536,
+    "height": 256,
+    "columns": 6,
+    "host": 5,
+    "bytes": 84664,
+    "sha256": "4814a98e983c96eceec69b6e5820b49839b6ea8c6b003b074b92dbf7c0d1aa45"
+  },
+  "orchard-numbers": {
+    "url": "/art/identity-v47/orchard-numbers-78889536adcc.webp",
+    "width": 512,
+    "height": 256,
+    "columns": 2,
+    "host": 1,
+    "bytes": 27006,
+    "sha256": "78889536adccf253a743b4f774783d794d9b40d302143513315abe68d354814c"
+  },
+  "neon-numbers": {
+    "url": "/art/identity-v47/neon-numbers-9be514949ff1.webp",
+    "width": 512,
+    "height": 256,
+    "columns": 2,
+    "host": 1,
+    "bytes": 25472,
+    "sha256": "9be514949ff13dc7db90345a9d0fdc7ed7c357ee6b1397e47a58fa15de61e182"
+  },
+  "pearl-keno": {
+    "url": "/art/identity-v47/pearl-keno-2a9737460393.webp",
+    "width": 512,
+    "height": 256,
+    "columns": 2,
+    "host": 1,
+    "bytes": 26940,
+    "sha256": "2a97374603936806a6571eaf8c7e1569451e48f262ffc5aa12e509225a4b028b"
+  },
+  "meteor-keno": {
+    "url": "/art/identity-v47/meteor-keno-9dfb8123b98d.webp",
+    "width": 512,
+    "height": 256,
+    "columns": 2,
+    "host": 1,
+    "bytes": 26948,
+    "sha256": "9dfb8123b98d9bd7750354dcc437bf98f90059d6d22169f39c1b2d606834ba07"
+  },
+  "bamboo-keno": {
+    "url": "/art/identity-v47/bamboo-keno-d099e1068792.webp",
+    "width": 512,
+    "height": 256,
+    "columns": 2,
+    "host": 1,
+    "bytes": 25694,
+    "sha256": "d099e1068792ca9a4ebeb618177bc53cf82bd83e8a979f1fd0a3fb0d5befffa9"
+  }
+}

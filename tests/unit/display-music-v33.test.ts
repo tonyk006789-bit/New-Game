@@ -14,15 +14,15 @@ describe('HD, Full HD and QHD game output',()=>{
   expect(fitGameFrame(0,0,false)).toBe(0);expect(validGameResolution('4k')).toBe(false);expect(validGameResolution('2k')).toBe(true);
  });
 });
-describe('five additional original music collections',()=>{
- it('has ten distinct, schedulable scores, with unique rhythmic and melodic fingerprints across all 42 tracks',()=>{
-  expect(Object.keys(musicCollections)).toHaveLength(5);
+describe('original music collections',()=>{
+ it('has 22 distinct, schedulable scores, with unique rhythmic and melodic fingerprints across all 54 tracks',()=>{
+  expect(Object.keys(musicCollections)).toHaveLength(11);
   const extra=Object.values(musicCollections).flatMap(c=>c.tracks),all=[...Object.values(musicScores),...extra];
-  expect(extra).toHaveLength(10);expect(new Set(all.map(t=>t.name)).size).toBe(42);
-  expect(new Set(all.map(t=>JSON.stringify([t.barSteps,t.kick,t.snare,t.hat,t.bassHits,t.chordHits]))).size).toBe(42);
-  expect(new Set(all.map(t=>JSON.stringify([t.melody,t.answer]))).size).toBe(42);
+  expect(extra).toHaveLength(22);expect(new Set(all.map(t=>t.name)).size).toBe(54);
+  expect(new Set(all.map(t=>JSON.stringify([t.barSteps,t.kick,t.snare,t.hat,t.bassHits,t.chordHits]))).size).toBe(54);
+  expect(new Set(all.map(t=>JSON.stringify([t.melody,t.answer]))).size).toBe(54);
   for(const track of extra){
-   expect(track.melody).toHaveLength(track.barSteps);expect(track.answer).toHaveLength(track.barSteps);
+   expect(track.melody.length%track.barSteps).toBe(0);expect(track.answer.length%track.barSteps).toBe(0);
    for(const hits of [track.kick,track.snare,track.hat,track.bassHits,track.chordHits])expect(hits.every(n=>n>=0&&n<track.barSteps)).toBe(true);
    const events=Array.from({length:track.barSteps*64},(_,i)=>scoreEvents(track,i)).flat();
    expect(events.length).toBeGreaterThan(1000);expect(new Set(events.map(e=>e.kind)).size).toBeGreaterThanOrEqual(6);

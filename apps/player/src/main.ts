@@ -36,3 +36,4 @@ import './layout-v31.css';
 import './screen-v32.css';
 import './experience-v35.css';
 import './blackjack-v37.css';
+import './identity-v47.css';

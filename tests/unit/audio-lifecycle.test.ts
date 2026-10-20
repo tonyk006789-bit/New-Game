@@ -23,7 +23,7 @@ describe('casino audio lifecycle',()=>{
   audio.audioPreferences.music=true;await nextTick();await audio.unlockAudio();
   expect(vi.getTimerCount()).toBe(1);expect(sources.length).toBeGreaterThan(0);
   const firstTrack=[...sources];await audio.unlockAudio();expect(vi.getTimerCount()).toBe(1);
-  audio.setMusicScene('abyss-legends');expect(vi.getTimerCount()).toBe(1);
+  audio.setMusicScene('abyss-legends');await audio.unlockAudio();expect(vi.getTimerCount()).toBe(1);
   expect(firstTrack.every(s=>s.stop.mock.calls.length===2)).toBe(true);
   expect(audio.musicNow.scene).toBe('abyss-legends');
   audio.nextMusicTrack();expect(audio.musicNow.title).toBe('Blackwater Engine');
@@ -38,7 +38,7 @@ describe('casino audio lifecycle',()=>{
   const before=sources.length;audio.playSound('shot');expect(sources.length).toBeGreaterThan(before);
   audio.audioPreferences.sound=false;await nextTick();const muted=sources.length;audio.playSound('treasure');expect(sources.length).toBe(muted);
   audio.audioPreferences.music=true;await nextTick();expect(vi.getTimerCount()).toBe(1);
-  audio.selectMusicCollection('neon-drive');expect(audio.musicNow.title).toBe('Electric Skyline');expect(audio.musicNow.total).toBe(2);expect(vi.getTimerCount()).toBe(1);
+  audio.selectMusicCollection('neon-drive');await audio.unlockAudio();expect(audio.musicNow.title).toBe('Electric Skyline');expect(audio.musicNow.total).toBe(2);expect(vi.getTimerCount()).toBe(1);
   audio.nextMusicTrack();expect(audio.musicNow.title).toBe('Last Train Uptown');
   audio.selectMusicCollection('unknown');expect(audio.musicNow.collection).toBe('neon-drive');
   audio.setMusicScene('lobby');audio.setMusicScene('abyss-legends');expect(audio.musicNow.title).toBe('Last Train Uptown');

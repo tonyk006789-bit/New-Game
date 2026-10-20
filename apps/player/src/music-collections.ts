@@ -1,4 +1,5 @@
 import type {Instrument,MusicScore} from './music-score';
+import {newMusicCollections} from './music-v47';
 type Row=[string,string,number,number,number,number,Instrument,Instrument,Instrument,Instrument,string,string,string,string,string,string,string,string,boolean,Instrument];
 const notes=(s:string)=>s.split(' ').map(n=>n==='.'?-1:Number(n));
 function track([name,genre,bpm,key,barSteps,swing,lead,chords,bass,pad,progression,melody,answer,kick,snare,hat,bassHits,chordHits,minor,percussion]:Row):MusicScore{
@@ -7,6 +8,7 @@ function track([name,genre,bpm,key,barSteps,swing,lead,chords,bass,pad,progressi
 // Ten additional original compositions. Distinct phrases, meters, groove and
 // harmonic movement; the existing original instrument bank supplies the timbres.
 export const musicCollections={
+ ...newMusicCollections,
  'neon-drive':{name:'Neon Drive',description:'Peak-time house & garage',tracks:[
   track(['Electric Skyline','Piano house',128,60,16,0,'piano','organ','sub','strings','0 5 -2 3','12 . 7 10 . 12 15 . 19 15 . 12 10 . 7 .','7 10 12 . 15 . 19 22 . 19 17 15 . 12 10 .','0 4 8 12','4 12','2 6 7 10 14','0 3 6 7 10 11 14','2 5 10 13',true,'clap']),
   track(['Last Train Uptown','Two-step garage',134,63,16,.16,'bell','electric','sub','choir','0 -2 5 3','7 . . 12 10 . 7 . 15 . 12 10 . 7 . 3','19 . 15 . 12 10 . 7 . 5 7 . 10 . 12 .','0 5 11 14','4 12','1 3 6 9 11 14 15','0 5 7 10 14','1 6 11 15',true,'shaker'])]},

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {expansionSymbolNames} from './expansion-theme';
+import {symbolLabel} from './game-identity';
 import {computed,onMounted} from 'vue';
-import {cabinetGames,cabinetBase,isCabinetGame,cabinetExpansionProfile,reefChallengeProfile,stagingRules,hasLowStake,isFishGame,type StagingGame} from '@new-game/game-math';
+import {cabinetGames,cabinetBase,isCabinetGame,reefChallengeProfile,stagingRules,hasLowStake,isFishGame,type StagingGame} from '@new-game/game-math';
 import {stage} from './staging-state';
 import {loadEnvironment} from './api';
 import ArcadeSymbol from './ArcadeSymbol.vue';
@@ -13,10 +13,10 @@ const instructions:Record<StagingGame,string[]>={
  'outlaw-sevens':['Three reels and five lines pay matching triples. See the exact symbol returns below.','The sheriff highlights each winning line after the reels slow to a stop.'],
  'celestial-wilds':['Five reels and nine paylines in a portrait cabinet. Match at least three symbols from the left.','The moon scepter substitutes for any symbol. An all-wild run counts once per line.'],
  'clockwork-vault':['Three gears start locked in the fifteen-cell vault. Three pulses remain.','New gears lock in place and reset the pulse counter. The sequence ends when the board fills or pulses run out.'],
- 'phoenix-falls':['Connect groups of at least four matching feathers horizontally or vertically on a 6 × 5 board.','Groups ignite and new feathers fall. Up to six cascades are included in one stake.'],
+ 'phoenix-falls':['Connect groups of at least four matching phoenix relics horizontally or vertically on a 6 × 5 board.','Groups ignite and new feathers fall. Up to six cascades are included in one stake.'],
  'meteor-keno':['Select 4–10 coordinates from 1–80 or choose a constellation preset. Presets only select numbers; they do not improve odds.','Twenty unique meteors reveal. Selected matches count toward the same approved keno return.'],
  'bamboo-keno':['Select 4–10 lanterns from 1–80 or choose a lantern path preset. Presets only select numbers; they do not improve odds.','Twenty unique lantern numbers reveal. Selected matches use the same approved keno return.'],
- 'disco-diamonds':['Three reels and five active paylines. Match all three symbols on a line.','Disco diamonds use the gem award. Cherry 1×, bell/BAR 2×, diamond 3× and seven 5×; add all winning lines.'],
+ 'disco-diamonds':['Three reels and five active paylines. Match all three symbols on a line.','Platform shoe 1×, microphone and vinyl record 2×, keytar 3× and mirror ball 5×; add all winning lines.'],
  'midnight-express':['An upright five-reel cabinet with nine active paylines. Play in portrait on phones.','The locomotive is WILD. It substitutes in left-to-right runs of at least three symbols. An all-locomotive run pays once on its line.'],
  'pirate-gold':['Center-row doubloons lock their entire reel. The other reels respin up to three times with no extra stake.','Collect all five doubloons for the existing 5× return. New locks do not reset the respin counter.'],
  'sunken-dynasty':['Choose one of four jade cannons. Koi and shrimp are small; lionfish and cuttlefish medium; turtles and sentinel crabs large; the dynasty dragon and sea empress are bosses.','A moving jackpot wheel is a boss target. Shoot and capture it for the existing 20× stake return. Auto, lock and rapid firing work exactly as in Reef Party. AI shots do not add capture attempts.'],
@@ -24,7 +24,7 @@ const instructions:Record<StagingGame,string[]>={
  'neon-numbers':['Choose 4–10 numbers from 1–80. Twenty numbers reveal in sequence. Quick Pick selects six editable numbers.','Uses the same test paytable as Orchard Numbers. There is no separate bonus stake.'],
  'pearl-keno':['Choose 4–10 numbered pearls from 1–80. Twenty pearls reveal. Matching selected pearls are highlighted.','Uses the same test paytable as Orchard Numbers. There is no additional bonus pool.'],
  'abyss-legends':['Choose one of four seats in the Abyss Lounge. Each player controls their own cannon and stake.','Aim, click to fire, or enable AUTO and LOCK. Lantern anglers, leafy seadragons, armored sharks, krakens and leviathans use the same size-based rewards as Reef Party.','A treasure chest is a medium target. Catching it reveals its 3× award. The moving jackpot wheel is itself a boss target: shoot and capture it to win 20× the shot stake. These animations add no extra stake, payout or progressive pool.'],
- 'ruby-rush':['Three reels, three rows. Choose your stake and press SPIN. All five paylines are active.','Match all three symbols on a line. Red diamonds use the gem award. The line review highlights each winning path in turn.'],
+ 'ruby-rush':['Three reels, three rows. Choose your stake and press SPIN. All five paylines are active.','Match all three symbols on a line. The scarlet falcon, telescope, map, compass and satchel use the returns shown below.'],
  'sapphire-crown':['Play in portrait orientation. Choose your stake and press SPIN. All nine paylines are active.','The crown is WILD. It substitutes in left-to-right runs of three or more; an all-crown run pays once on each line.'],
  'solar-fortune':['Five reels show a single row of symbols. A sun coin locks its reel. Choose your stake and press SPIN.','Only unlocked reels respin, up to three times, with no additional stake. New locks do not reset the counter. Collect all five sun coins to win.'],
  'neon-sevens':['Three reels, three rows. Choose your stake, then press SPIN. All five paylines are active.','Match all three symbols on a line. Use LINE MAP to see the five paths.'],
@@ -39,8 +39,14 @@ const instructions:Record<StagingGame,string[]>={
 const lines=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game].lines:props.game==='temple-lights'?[[0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2]]:[]);
 const cabinet=computed(()=>isCabinetGame(props.game)?cabinetGames[props.game]:null);
 const baseGame=computed(()=>isCabinetGame(props.game)?cabinetBase(props.game):null);
-const themed=computed(()=>Object.hasOwn(cabinetExpansionProfile.rules,props.game));
-function symbolName(symbol:string){if(expansionSymbolNames[props.game]?.[symbol])return expansionSymbolNames[props.game][symbol];if(props.game==='midnight-express')return ({dragon:'Locomotive · WILD',coin:'Ticket',lotus:'Pocket watch',gem:'Sapphire',bell:'Whistle',leaf:'Luggage',seven:'Lantern'} as Record<string,string>)[symbol];if(props.game==='pirate-gold')return ({coin:'Doubloon · HOLD',cherry:'Compass',bell:'Skull',bar:'Ship',seven:'Treasure map'} as Record<string,string>)[symbol];if(props.game==='disco-diamonds'&&symbol==='gem')return 'Disco diamond';if(props.game==='sapphire-crown')return ({dragon:'Crown · WILD',coin:'Sun coin',lotus:'Crystal lotus',gem:'Amethyst',bell:'Scepter',leaf:'Treasure pouch',seven:'Star'} as Record<string,string>)[symbol];if(props.game==='solar-fortune')return ({coin:'Sun coin · HOLD',cherry:'Planet',bell:'Moon',bar:'Star',seven:'Phoenix'} as Record<string,string>)[symbol];return symbol==='gem'&&themed.value?'Ruby':symbol.toUpperCase();}
+function symbolName(symbol:string){return symbolLabel(props.game,symbol);}
+const displayedRules=computed(()=>{
+ const text=stagingRules[props.game];
+ if(baseGame.value==='neon-sevens')return text.replace(/\b(cherry|bell|BAR|gem|ruby|seven)\b/gi,word=>symbolName(word.toLowerCase()==='ruby'?'gem':word.toLowerCase()));
+ if(props.game==='clockwork-vault')return text.replace('crystals','gears');
+ if(props.game==='aurora-vault')return text.replace('crystals','polar treasures');
+ return text;
+});
 function returns(symbol:string,count:number){return baseGame.value==='neon-sevens'?({cherry:1,bell:2,bar:2,gem:3,seven:5}[symbol]||0)*({3:1,4:2,5:4}[count]||0):({3:2,4:4,5:8}[count]||0);}
 const matchCounts=computed(()=>cabinet.value?.columns===3?[3]:[3,4,5]);
 const tiers=Object.values(reefChallengeProfile.tiers);
@@ -56,7 +62,7 @@ onMounted(()=>{if(props.staked)void loadEnvironment().catch(()=>{});});
     <p>Each valid paid hit gets one independent capture attempt, with no free solo assists. When you are the only human, three labeled AI crew fire at their own targets. Their hit combos require 8 small, 14 medium, 24 large or 40 boss hits to earn that AI 10, 30, 80 or 200 scoreboard points. A 12-second gap resets the combo. AI points have no credit value and do not remove shared creatures or change your awards. The crew stop when another human joins.</p><table><thead><tr><th>Size</th><th>Return</th><th>Capture per paid hit</th><th>Average hits per catch</th></tr></thead><tbody><tr v-for="tier in tiers" :key="tier.label"><th>{{tier.label}}</th><td>{{tier.multiplier}}× stake</td><td>{{tier.captureTickets/100}}%</td><td>{{(10000/tier.captureTickets).toFixed(1)}}</td></tr></tbody></table>
     <p>At a 0.25 stake, a successful small, medium, large or boss catch returns 0.25, 0.75, 2.00 or 5.00 credits respectively. Open SPECIES at the table to see each creature’s size tier.</p>
    </template>
-   <template v-else><p>{{stagingRules[game]}}</p><p v-if="staked&&stage.roundPolicy"><strong>Current chance of any credit return: {{stage.roundPolicy.payingPercent}}%.</strong> Applies equally to all players in independent rounds; no fixed win schedule. A return can be smaller than the stake. This is not RTP or a guarantee for a short session. Revision {{stage.roundPolicy.revision}} applies to new rounds; saved results retain their original rules.</p></template>
+   <template v-else><p>{{displayedRules}}</p><p v-if="staked&&stage.roundPolicy"><strong>Current chance of any credit return: {{stage.roundPolicy.payingPercent}}%.</strong> Applies equally to all players in independent rounds; no fixed win schedule. A return can be smaller than the stake. This is not RTP or a guarantee for a short session. Revision {{stage.roundPolicy.revision}} applies to new rounds; saved results retain their original rules.</p></template>
    <p>Multipliers apply to the total selected stake. Returns include any returned stake; they are not extra profit on top of it. An unsuccessful paid play returns zero.</p>
   </section>
   <table v-if="cabinet && baseGame!=='coin-carnival'" class="symbol-paytable"><thead><tr><th>Symbol</th><th v-for="count in matchCounts" :key="count">{{count}}</th></tr></thead><tbody><tr v-for="symbol in cabinet.symbols" :key="symbol"><th><ArcadeSymbol :symbol="symbol" :theme="game"/><span>{{symbolName(symbol)}}</span></th><td v-for="count in matchCounts" :key="count">{{returns(symbol,count)}}×</td></tr></tbody></table>

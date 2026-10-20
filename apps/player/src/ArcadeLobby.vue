@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameBrand from './GameBrand.vue';
 import {computed,nextTick,onBeforeUnmount,ref,watch} from 'vue';
 import {playSound} from './audio';
 import {catalog,type GameId} from '@new-game/contracts';
@@ -48,7 +49,7 @@ onBeforeUnmount(()=>cancelAnimationFrame(raf));
     <button class="hall-cabinet-button" :data-game-id="game.id" data-own-sound :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
      <span class="machine-crown">{{game.detail}}</span>
      <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
-     <span class="machine-deck"><i></i><b>{{game.name}}</b><i></i></span>
+     <span class="machine-deck"><i></i><b><GameBrand :game="game.id"/></b><i></i></span>
      <span class="machine-pedestal"><em>PLAY</em><span>✦</span><em>ENTER</em></span>
     </button>
     <button class="favorite-control" :class="{saved:favorites.includes(game.id)}" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" @click="emit('favorite',game.id)"><Icon name="star" :size="16" /></button>

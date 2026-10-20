@@ -60,11 +60,18 @@ export function scoreEvents(s:MusicScore,step:number):ScoreEvent[]{
   if(s.hat.includes(tick)&&(!intro||bar>=4))add('hat',60,.05,tick%4===0?.045:.025,.3);
   if((!intro||bar>=6)&&s.hat.includes((tick+3)%s.barSteps))add(s.percussion,60,.16,.048,-.28);
  }
- if(s.bassHits.includes(tick)&&(!breakdown||tick===0))add(s.bass,root-24+(tick>s.barSteps/2?7:0),seconds*.62,.17);
- if(s.chordHits.includes(tick)&&(!breakdown||tick===s.chordHits[0]))for(const [i,n] of (s.minor?[0,3,7,10]:[0,4,7,11]).entries())add(s.chords,root-12+n,seconds*(breakdown?2:.65),.045,(i-1.5)*.22);
+ if(s.bassHits.includes(tick)&&(!breakdown||tick===0))add(s.bass,root-24+(tick>s.barSteps/2?7:0),seconds*.72,.15);
+ // Compact inversions keep chords in a stable register rather than leaping in
+ // parallel with every root. Alternate offbeat voicings make the response breathe.
+ if(s.chordHits.includes(tick)&&(!breakdown||tick===s.chordHits[0]))for(const [i,n] of (s.minor?[0,3,7,10]:[0,4,7,9]).entries()){
+  let note=root-12+n;while(note>67)note-=12;while(note<48)note+=12;
+  add(s.chords,note,seconds*(breakdown?2:.8),.036,(i-1.5)*.22);
+ }
  if(tick===0&&bar%4===0)for(const [i,n] of [0,7,12].entries())add(s.pad,root+n,seconds*Math.min(3,s.barSteps/4),.026,(i-1)*.35);
- const melody=section===2||section===5||finale?s.answer:s.melody,note=melody[(tick+(bar%2)*s.barSteps)%melody.length];
- if(note>=0&&(!intro||bar>=4)&&(!breakdown||tick%3===0))add(s.lead,s.key+note+(finale&&bar%4===3?12:0),seconds*(tick%4===0?.72:.42),.15,-.12);
+ const melody=section===2||section===5||finale?s.answer:s.melody,position=(tick+bar*s.barSteps)%melody.length,note=melody[position];
+ let hold=1;while(hold<8&&melody[(position+hold)%melody.length]<0)hold++;
+ const phraseRest=bar%8===3&&tick>=s.barSteps-4;
+ if(note>=0&&!phraseRest&&(!intro||bar>=2)&&(!breakdown||tick%3===0))add(s.lead,s.key+note,Math.max(.075,seconds*.25*hold*.86),tick%4===0?.13:.105,-.12);
  if(!intro&&!breakdown&&bar%8===7&&tick>=s.barSteps-3)add(s.percussion,60+(tick%2)*3,.12,.055,.2);
  return out;
 }

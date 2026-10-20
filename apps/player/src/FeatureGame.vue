@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import GameBrand from './GameBrand.vue';
 import GameCharacter from './GameCharacter.vue';
-import {catalog} from '@new-game/contracts';
+import {symbolLabel} from './game-identity';
 import WinBurst from './WinBurst.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { isVaultGame, type FeatureGameId, featurePractice, storyboardRandom, type FeatureResult, type VaultFrame, type CascadeFrame } from '@new-game/game-math';
@@ -109,7 +110,7 @@ onBeforeUnmount(() => { disposed = true; generation++; clearTimeout(timer); canc
   <section class="feature-stage" :data-game="game" :class="[isVault ? 'aurora-stage' : 'ember-stage', `phase-${phase}`, { 'feature-active': active, 'stage-paused': !running }]" :style="{'--motion-rate':fast ? 1 / featureTiming.speed : 1}" :data-phase="phase">
     <WinBurst v-if="staked&&phase==='complete'&&result&&stage.last?.id===result.id&&BigInt(stage.last.award)>0n" :key="result.id" :game="game" :id="result.id" :award="stage.last.award" :stake="stage.last.stake" :running="running" :reduced-motion="reducedMotion"/><div class="stage-vignette"></div><div class="atmosphere" aria-hidden="true"><i v-for="n in 18" :key="n" :style="{ '--i': n }"></i></div>
     <div class="feature-top"><span>NEW GAME ORIGINALS</span><span>{{ authenticated ? (staked ? 'PLAY' : 'FREE PRACTICE') : 'GUEST STORYBOARD' }}</span></div>
-    <div class="feature-marquee"><small>{{ clockwork ? 'WIND THE CELESTIAL CLOCK' : isVault ? 'LOCK THE LIGHT' : 'AWAKEN THE FIRE' }}</small><h2>{{catalog.find(g=>g.id===game)?.name.toUpperCase()}}</h2><p>{{ clockwork ? 'Lock the gears. Wind the clock.' : isVault ? 'Crystals stay. The vault awakens.' : 'Connect. Clear. Cascade.' }}</p></div>
+    <div class="feature-marquee"><small>{{ clockwork ? 'WIND THE CELESTIAL CLOCK' : isVault ? 'LOCK THE LIGHT' : 'AWAKEN THE FIRE' }}</small><h2><GameBrand :game="game"/></h2><p>{{ clockwork ? 'Lock the gears. Wind the clock.' : isVault ? 'Crystals stay. The vault awakens.' : 'Connect. Clear. Cascade.' }}</p></div>
     <GameCharacter :game="game" compact/><div class="feature-playfield">
       <aside class="feature-meter"><Icon :name="isVault ? 'gem' : 'sun'" :size="30" /><small>{{ clockwork ? 'GEARS LOCKED' : isVault ? 'CRYSTALS LOCKED' : game==='phoenix-falls'?'EMBERS CLEARED':'RELICS CLEARED' }}</small><strong>{{ isVault ? locked : cleared }}<em v-if="isVault"> / 15</em></strong><div v-if="isVault" class="vault-progress"><i v-for="n in 15" :key="n" :class="{ lit: n <= locked }"></i></div><span>{{ isVault ? 'Collect all fifteen' : '4+ connected symbols' }}</span><p>{{ clockwork ? 'Each new gear resets three pulses.' : isVault ? 'Each new crystal resets three pulses.' : 'Up to six cascades in one sequence.' }}</p></aside>
       <div v-if="isVault" class="vault-machine">
@@ -120,7 +121,7 @@ onBeforeUnmount(() => { disposed = true; generation++; clearTimeout(timer); canc
       <div v-else class="cascade-machine">
         <div class="cascade-counter"><span>THE FALLING SANCTUARY</span><b>CASCADE {{ result ? Math.min(frame + 1, sequence.frames.length - 1) : 0 }} / 6</b></div>
         <div ref="board" class="cascade-board" aria-label="Six column five row relic board">
-          <div v-for="tile in tiles" :key="tile.id" class="relic-cell" :class="{ 'cluster-cell': cascade.removed.includes(tile.row * 6 + tile.column) }" :style="{gridRow:tile.row + 1, gridColumn:tile.column + 1}" :data-drop="tile.drop" :data-column="tile.column" :data-tile="tile.id" :data-symbol="tile.symbol" :aria-label="`${tile.symbol} relic`"><ArcadeSymbol :symbol="tile.symbol" :theme="game" /></div>
+          <div v-for="tile in tiles" :key="tile.id" class="relic-cell" :class="{ 'cluster-cell': cascade.removed.includes(tile.row * 6 + tile.column) }" :style="{gridRow:tile.row + 1, gridColumn:tile.column + 1}" :data-drop="tile.drop" :data-column="tile.column" :data-tile="tile.id" :data-symbol="tile.symbol" :aria-label="symbolLabel(game,tile.symbol)"><ArcadeSymbol :symbol="tile.symbol" :theme="game" /></div>
         </div><div class="board-engraving">✧ FOUR CONNECTED RELICS IGNITE ✧</div>
       </div>
       <aside class="feature-guide"><strong>{{ phase === 'complete' ? 'SEQUENCE COMPLETE' : isVault ? 'LOCK & COLLECT' : 'CLUSTER CASCADES' }}</strong><span>{{ isVault ? '01' : '04' }}<small>{{ clockwork ? 'GEAR AT A TIME' : isVault ? 'CRYSTAL AT A TIME' : 'MATCH TO CLEAR' }}</small></span><p>{{ isVault ? 'Empty cells pulse with new possibilities.' : 'Relics drop into the spaces you clear.' }}</p><div class="no-award-tag">{{staked ? "WIN" : "NO STAKE"}}<br>{{staked ? "PLAY CREDITS" : "NO CREDIT AWARD"}}</div></aside>

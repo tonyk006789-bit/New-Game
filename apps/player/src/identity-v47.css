@@ -1,0 +1,88 @@
+/* Per-game identity. Artwork is one small hashed strip per selected game. */
+.game-brand{display:inline-flex;align-items:center;justify-content:center;text-transform:uppercase;line-height:1.02;color:#fff1d1;letter-spacing:.025em}
+.game-brand>span{display:block}.brand-electric{font-family:Impact,'Arial Black',sans-serif;font-style:italic;letter-spacing:.045em;text-shadow:1px 2px #663771,0 0 14px var(--brand-color)}
+.brand-royal{font-family:Georgia,serif;letter-spacing:.065em;text-shadow:0 2px #533929}
+.brand-expedition{font-family:Rockwell,Georgia,serif;letter-spacing:.025em;text-shadow:1px 3px #513020}
+.brand-mechanical{font-family:'Arial Black',Impact,sans-serif;letter-spacing:.06em;text-shadow:0 2px #384454}
+.brand-natural{font-family:Georgia,serif;font-style:italic;letter-spacing:.01em;text-shadow:0 2px #153b40}
+.brand-mythic{font-family:Georgia,serif;letter-spacing:.06em;text-shadow:0 2px #46305e,0 0 16px #b981ed66}
+.shelf-game-caption .game-brand{font-size:inherit;max-width:100%}.machine-deck .game-brand{font-size:inherit}.game-topline .game-brand{font-size:inherit;text-shadow:none;letter-spacing:0}
+.identity-symbol{border-radius:13%;overflow:hidden;filter:none!important;isolation:isolate}
+.slot-cabinet .reel-symbol,.temple-game .reel-symbol{background:#090c18!important;border-color:#3d354e!important}
+.slot-cabinet .reel-window,.temple-game .reel-window{background:#090c18}
+.slot-cabinet .reel-symbol .identity-symbol,.temple-game .reel-symbol .identity-symbol{height:98%;max-height:100%;width:95%;max-width:100%}
+.kinetic-reels .matching-symbol{animation:none}
+.matching-symbol .identity-symbol{animation:identity-lift .65s ease-out 1}
+.ruby-rush .matching-symbol .identity-symbol,.outlaw-sevens .matching-symbol .identity-symbol{animation-name:identity-tilt}
+.disco-diamonds .matching-symbol .identity-symbol,.neon-sevens .matching-symbol .identity-symbol{animation-name:identity-pop}
+.midnight-express .matching-symbol .identity-symbol{animation-name:identity-arrive}
+.stage-paused .identity-symbol{animation-play-state:paused!important}
+@keyframes identity-lift{0%,100%{transform:translateY(0)}40%{transform:translateY(-5%) scale(1.04)}}
+@keyframes identity-tilt{0%,100%{transform:rotate(0)}35%{transform:rotate(-5deg) scale(1.06)}65%{transform:rotate(2deg)}}
+@keyframes identity-pop{0%,100%{transform:scale(1)}35%{transform:scale(1.13)}65%{transform:scale(.97)}}
+@keyframes identity-arrive{0%{transform:translateX(-9%)}70%{transform:translateX(2%)}100%{transform:translateX(0)}}
+.identity-character{margin:0;position:relative!important;inset:auto!important;flex:none;border:1px solid #e7c78366;background:#090c18;border-radius:18px;overflow:hidden;box-shadow:0 5px 18px #0004;transform:none!important}
+.identity-character svg{width:100%;height:100%;display:block;overflow:hidden}.identity-character figcaption{position:absolute;bottom:0;left:0;right:0;padding:5px 2px;background:linear-gradient(transparent,#090c18);font:700 11px Arial;text-align:center;color:#f9e9cc}
+.slot-marquee .host-wing{width:105px;height:100%;display:flex;align-items:center;justify-content:center}.slot-marquee .host-wing .identity-character{width:83px;height:83px;display:block!important}.slot-marquee .host-wing figcaption{display:none}
+.fixed-game-frame .slot-marquee .marquee-wing:last-child{width:76px;height:76px}
+.feature-stage>.identity-character{position:absolute!important;top:12px!important;left:20px!important;width:78px;height:78px;z-index:2;display:block!important}.feature-stage>.identity-character figcaption{display:none}
+.fixed-game-frame .portrait-cabinet .slot-marquee .host-wing{width:64px}.fixed-game-frame .portrait-cabinet .slot-marquee .host-wing .identity-character{width:58px;height:58px}
+.fixed-game-frame .portrait-cabinet .feature-stage>.identity-character{top:12px!important;left:8px!important;width:55px;height:55px}.portrait-cabinet .feature-marquee{padding-left:65px}
+.temple-scene-title{display:flex;align-items:center;justify-content:center;gap:18px}.temple-scene-title .identity-character{width:80px;height:80px;display:block!important}.temple-scene-title .identity-character figcaption{display:none}
+.keno-wood-sign .identity-character{display:block!important}.keno-wood-sign .orchard-apples{display:none!important}
+.keno-page-tools{display:flex;gap:6px}.keno-page-tools button{background:#1a1631;border:1px solid #72598e;border-radius:10px;color:#fff0cc}.keno-page-tools button[aria-pressed=true]{background:#6b428a;border-color:#e7baff}.keno-page-tools small{display:block;font-size:.55em}
+.keno-game .keno-board button.chosen:not(.matched){background:linear-gradient(#704989,#362049);color:#fff3cf;border-color:#ddb0ff;text-shadow:0 1px #25142f}
+.keno-game .keno-board button.drawn:not(.chosen){background:linear-gradient(#234558,#172638);color:#d5f0ff;border-color:#6d9cad;text-shadow:none}
+/* Enlarge hit boxes in logical coordinates so they remain 48 CSS pixels after auto-fit. */
+.fixed-game-frame[data-compact=true] .game-topline{height:var(--touch-target);min-height:var(--touch-target);gap:8px;padding:0 10px}
+.fixed-game-frame[data-compact=true] .game-topline>div>small,.fixed-game-frame[data-compact=true] .four-player-badge,.fixed-game-frame[data-compact=true] .game-topline .resolution-control,.fixed-game-frame[data-compact=true] .screen-fit-button:not(.screen-fullscreen){display:none}
+.fixed-game-frame[data-compact=true] .game-topline button{min-height:var(--touch-target);min-width:var(--touch-target);height:var(--touch-target);font-size:var(--phone-type)}
+.fixed-game-frame[data-compact=true] .game-topline h1{font-size:calc(var(--phone-type)*.95);max-width:360px}
+.fixed-game-frame[data-compact=true] .game-topline .round-control,.fixed-game-frame[data-compact=true] .game-music-button{width:var(--touch-target);padding:8px}
+.fixed-game-frame[data-compact=true] .game-topline .music-controls{margin-left:auto}
+.fixed-game-frame[data-compact=true] :is(.cabinet-controls,.preview-controls,.feature-console,.blackjack-controls,.reef-console) button,
+.fixed-game-frame[data-compact=true] :is(.cabinet-controls,.preview-controls,.feature-console,.blackjack-controls,.reef-console) select{min-width:var(--touch-target);min-height:var(--touch-target);font-size:var(--phone-type)}
+.fixed-game-frame[data-compact=true] :is(.cabinet-controls,.preview-controls,.feature-console) .stake-max{display:none}
+.fixed-game-frame[data-compact=true] :is(.cabinet-controls,.preview-controls,.feature-console){height:calc(var(--touch-target) + 12px);min-height:calc(var(--touch-target) + 12px);gap:8px}
+.fixed-game-frame[data-compact=true] .reef-console{height:calc(var(--touch-target) + 20px);min-height:calc(var(--touch-target) + 20px)}
+.fixed-game-frame[data-compact=true] .reef-console .stake-max{display:none}
+.fixed-game-frame[data-compact=true] :is(.reef-seat-plaque.seat-1,.reef-seat-plaque.seat-2,.reef-shot-notice){bottom:calc(var(--touch-target) + 28px)}
+.fixed-game-frame[data-compact=true] .blackjack-controls select{min-width:calc(var(--touch-target)*1.5)}
+.fixed-game-frame[data-compact=true] .slot-cabinet .slot-marquee{height:88px;min-height:88px;margin-bottom:2px}.fixed-game-frame[data-compact=true] .slot-marquee h2{font-size:35px}
+.fixed-game-frame[data-compact=true] .slot-marquee .host-wing .identity-character{width:84px;height:84px}.fixed-game-frame[data-compact=true] .slot-marquee small,.fixed-game-frame[data-compact=true] .slot-marquee p{display:none}
+.fixed-game-frame[data-compact=true] .cabinet-game-body{margin-top:3px}.fixed-game-frame[data-compact=true] .cabinet-side{width:62px}.fixed-game-frame[data-compact=true] .reel-banner{padding:5px 12px}.fixed-game-frame[data-compact=true] .reel-tray{min-height:24px;padding:5px}
+.fixed-game-frame[data-compact=true] .slot-cabinet .cabinet-game-body{max-width:none;width:100%;grid-template-columns:62px minmax(0,1fr) 62px;gap:12px}
+.fixed-game-frame[data-compact=true] .bet-console{gap:6px}.fixed-game-frame[data-compact=true] .incremental-stake{gap:4px}.fixed-game-frame[data-compact=true] .stake-dial{min-width:120px}
+.fixed-game-frame[data-compact=true] .bet-options>small,.fixed-game-frame[data-compact=true] .cabinet-speed small,.fixed-game-frame[data-compact=true] .practice-only-meter,.fixed-game-frame[data-compact=true] .practice-tag{display:none}
+.fixed-game-frame[data-compact=true] .keno-game{height:auto;grid-template-columns:220px minmax(0,1fr);grid-template-rows:var(--touch-target) minmax(0,1fr) calc(var(--touch-target) + 10px) 20px;gap:7px 12px;padding:5px 12px 0}
+.fixed-game-frame[data-compact=true] .keno-game .keno-intro{grid-column:2;grid-row:1;height:auto;justify-content:flex-start;gap:20px}.fixed-game-frame[data-compact=true] .keno-intro h2{font-size:30px}
+.fixed-game-frame[data-compact=true] .keno-layout{grid-column:1/-1;grid-row:2;grid-template-columns:1fr;min-height:0}.fixed-game-frame[data-compact=true] .keno-wood-sign,.fixed-game-frame[data-compact=true] .keno-pattern-tools{display:none!important}
+.fixed-game-frame[data-compact=true] .keno-board{grid-template-rows:repeat(4,minmax(0,1fr));gap:6px;padding:4px}
+.fixed-game-frame[data-compact=true] .keno-board button{font-size:calc(var(--phone-type)*1.1);min-height:var(--touch-target)}
+.fixed-game-frame[data-compact=true] .keno-tools{grid-column:1;grid-row:1;gap:5px;margin:0!important;height:auto!important;align-self:stretch;align-items:stretch;flex-direction:row;flex-wrap:nowrap}.fixed-game-frame[data-compact=true] .keno-tools button{min-height:var(--touch-target);min-width:var(--touch-target);font-size:calc(var(--phone-type)*.8)}
+.fixed-game-frame[data-compact=true] .keno-page-tools{grid-column:2;grid-row:1;justify-self:end}.fixed-game-frame[data-compact=true] .keno-page-tools button{min-height:var(--touch-target);min-width:calc(var(--touch-target)*1.3);font-size:var(--phone-type)}
+.fixed-game-frame[data-compact=true] .keno-intro>span{display:none}.fixed-game-frame[data-compact=true] .keno-game .preview-controls{grid-column:2;grid-row:3;height:auto;min-height:0;justify-content:flex-end}.fixed-game-frame[data-compact=true] .draw-track{grid-row:3}
+.fixed-game-frame[data-compact=true] .preview-controls .bet-console{width:auto;flex:none}
+.fixed-game-frame[data-compact=true] .preview-controls .stage-return{min-width:calc(var(--touch-target)*1.4);min-height:var(--touch-target)}
+.fixed-game-frame[data-compact=true] .preview-controls .stage-return b,.fixed-game-frame[data-compact=true] .preview-controls>div:not(.bet-console)>strong{font-size:var(--phone-type)}
+.fixed-game-frame[data-compact=true] .preview-controls>div:not(.bet-console){min-width:calc(var(--touch-target)*1.7);max-width:none;flex:none}
+.fixed-game-frame[data-compact=true] .preview-controls :is(.stage-return small,div>small){font-size:calc(var(--phone-type)*.55)}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .keno-board{grid-template-rows:repeat(2,minmax(0,1fr))}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .keno-intro{display:none}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .keno-page-tools{justify-self:stretch;justify-content:flex-end}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .preview-controls{grid-column:1/-1;justify-content:center}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .draw-track{grid-row:1;grid-column:2;justify-self:start;width:auto;max-width:180px}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .draw-track b{display:none}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .draw-track>span{font-size:calc(var(--phone-type)*.8)}
+.fixed-game-frame[data-compact=true] .feature-marquee{height:70px}.fixed-game-frame[data-compact=true] .feature-top{display:none}
+.fixed-game-frame[data-orientation=portrait] .game-topline button{min-height:var(--touch-target);min-width:var(--touch-target)}
+.fixed-game-frame[data-orientation=portrait] .game-topline{min-height:calc(var(--touch-target) + 8px);height:calc(var(--touch-target) + 8px)}
+.fixed-game-frame[data-orientation=portrait] :is(.cabinet-controls,.feature-console) :is(button,select){min-height:var(--touch-target);min-width:var(--touch-target);font-size:var(--phone-type)}
+.fixed-game-frame[data-orientation=portrait] .portrait-cabinet :is(.cabinet-controls,.feature-console){height:auto;min-height:calc(var(--touch-target)*2 + 24px);flex-wrap:wrap}
+.fixed-game-frame[data-orientation=portrait] :is(.cabinet-controls,.feature-console) .stake-max{display:none}
+.fixed-game-frame[data-orientation=portrait] .bet-console{width:100%;gap:9px}
+.fixed-game-frame[data-orientation=portrait] :is(.cabinet-spin,.feature-play){min-width:calc(var(--touch-target)*2);font-size:calc(var(--phone-type)*1.2)}
+.fixed-game-frame[data-orientation=portrait] .game-topline .resolution-control,.fixed-game-frame[data-orientation=portrait] .screen-fit-button:not(.screen-fullscreen){display:none}
+@media(max-width:1000px){.arcade-app .shelf-favorite{width:48px;height:48px}.arcade-app .shelf-pagination>button{min-width:48px;min-height:48px}.arcade-app .shelf-pagination{gap:3px}.arcade-app .lobby-view-switch button,.arcade-app .lobby-quick-actions button{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.identity-symbol,.identity-character,.game-brand{animation:none!important;transition:none!important}}
+.reduce-motion .identity-symbol,.stage-paused .identity-symbol{animation:none!important}

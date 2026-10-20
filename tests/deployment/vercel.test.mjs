@@ -31,6 +31,7 @@ test('API routing precedes SPA fallback and static output excludes privileged ap
  assert.equal(config.routes.at(-1).headers['Cache-Control'],'no-store');
  assert.ok(config.routes.some(route=>route.src==='/(index\\.html)?'&&route.headers?.['Cache-Control']==='no-store'&&route.continue));
  assert.ok(config.routes.some(route=>route.src==='/art/delivery/(.*)'&&route.headers?.['Cache-Control']==='public, max-age=31536000, immutable'&&route.continue));
+ for(const prefix of ['/art/identity-v47/','/audio/v47/'])assert.ok(config.routes.some(route=>route.src===`${prefix}(.*)`&&route.headers?.['Cache-Control']==='public, max-age=31536000, immutable'&&route.continue));
  assert.ok(config.routes.some(route=>route.src==='/art/dealers/(.*\\.(?:glb|webp))'&&route.headers?.['Cache-Control']==='public, max-age=31536000, immutable'&&route.continue));
  const html=await readFile('.vercel/output/static/index.html','utf8');assert.match(html,/New Game/);assert.doesNotMatch(html,/admin\/src/);
  const staticFiles=await readdir('.vercel/output/static');assert.ok(!staticFiles.includes('motion-check.html'));assert.ok(!staticFiles.includes('win-check.html'));

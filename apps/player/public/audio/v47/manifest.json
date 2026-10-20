@@ -1,0 +1,231 @@
+{
+  "version": "original-ensembles-v47",
+  "sampleRate": 32000,
+  "provenance": "Original dispersive-string/additive/FM/noise synthesis in scripts/render-music-v47.py, seed 4720. No third-party recordings.",
+  "samples": [
+    {
+      "id": "piano",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2482
+    },
+    {
+      "id": "electric",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2674
+    },
+    {
+      "id": "organ",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.3817
+    },
+    {
+      "id": "guitar",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.154
+    },
+    {
+      "id": "muteguitar",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.0977
+    },
+    {
+      "id": "sax",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.4325
+    },
+    {
+      "id": "trumpet",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.4266
+    },
+    {
+      "id": "strings",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.4503
+    },
+    {
+      "id": "choir",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.3032
+    },
+    {
+      "id": "flute",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.4387
+    },
+    {
+      "id": "koto",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.1457
+    },
+    {
+      "id": "sitar",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.1576
+    },
+    {
+      "id": "marimba",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.1387
+    },
+    {
+      "id": "steelpan",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.167
+    },
+    {
+      "id": "celeste",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2088
+    },
+    {
+      "id": "bell",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2668
+    },
+    {
+      "id": "accordion",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.3739
+    },
+    {
+      "id": "synth",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2917
+    },
+    {
+      "id": "arp",
+      "root": 60,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.1862
+    },
+    {
+      "id": "bass",
+      "root": 36,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2504
+    },
+    {
+      "id": "upright",
+      "root": 36,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.1638
+    },
+    {
+      "id": "sub",
+      "root": 36,
+      "seconds": 3.0,
+      "peak": 0.8,
+      "rms": 0.2504
+    },
+    {
+      "id": "kick",
+      "root": 36,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1951
+    },
+    {
+      "id": "snare",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.104
+    },
+    {
+      "id": "rim",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0677
+    },
+    {
+      "id": "clap",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1654
+    },
+    {
+      "id": "hat",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0477
+    },
+    {
+      "id": "ride",
+      "root": 60,
+      "seconds": 1.5,
+      "peak": 0.8,
+      "rms": 0.1199
+    },
+    {
+      "id": "shaker",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0658
+    },
+    {
+      "id": "conga",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.1344
+    },
+    {
+      "id": "taiko",
+      "root": 60,
+      "seconds": 1.5,
+      "peak": 0.8,
+      "rms": 0.1449
+    },
+    {
+      "id": "tambourine",
+      "root": 60,
+      "seconds": 0.6,
+      "peak": 0.8,
+      "rms": 0.0991
+    }
+  ]
+}

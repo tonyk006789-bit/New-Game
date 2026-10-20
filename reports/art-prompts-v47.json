@@ -1,0 +1,58 @@
+{
+  "tool": "Built-in image_gen",
+  "purpose": "Original per-game symbols and hosts",
+  "prompts": [
+    {
+      "id": "A",
+      "prompt": "Create an original polished 3D-rendered mobile arcade sprite atlas, exactly SIX columns and FOUR rows, 24 separate objects, landscape 1536x1024. Equal 256x256 cells with NO grid lines, NO text, NO labels, NO numbers. Every object fully contained inside the middle 70% of its cell, generous transparent gutters, no overlapping neighbors, no ground shadows outside cell. Actual transparent background. Premium tangible materials, crisp bold silhouettes, detailed and luminous but readable small, front three-quarter view. Row 1 neon city music theme, left to right: chrome lightning bolt sign; pink roller skate; blue cassette player; purple headphones; neon arcade joystick; waist-up woman DJ with short violet hair black jacket and headphones. Row 2 scarlet expedition theme: red feather falcon; antique golden telescope; rolled parchment map with red seal; bronze expedition compass; red leather satchel; waist-up female adventurer with chestnut braid scarlet jacket and aviator goggles. Row 3 seventies disco studio: silver mirror ball; purple platform shoe; gold studio microphone; vinyl record with magenta label; purple keytar; waist-up smiling black male disco singer with afro and purple velvet suit. Row 4 frontier theme: bronze eagle; cowboy hat; leather saddle; wagon wheel; turquoise horseshoe; waist-up woman sheriff with auburn hair tan leather coat and broad brim hat. Absolutely NO sevens, diamonds, bells, BAR signs or cherries. These are wholly original game art, no existing brands or characters."
+    },
+    {
+      "id": "A2",
+      "prompt": "Edit this exact 6-column by 4-row original game sprite atlas. Preserve all 24 object identities and their EXACT cell order, style and colors. For every one of the 24 cells SHRINK the full object to 68% of its cell width and height, centered in the 256x256 square, leaving at least 30 pixels empty space on every side, especially eagle wings and telescope. Remove every colored backdrop, halo and shadow. Use a PERFECTLY UNIFORM solid #090C18 background across the entire sheet, no gradient or texture anywhere outside the objects. Do not draw grid lines or text. Every object must be isolated and separate, no overlap. Keep the 1536x1024 canvas and equal 6x4 grid. Preserve facial detail."
+    },
+    {
+      "id": "B",
+      "prompt": "Original premium 3D game icon atlas. Landscape 2048x1024. EXACT EIGHT COLUMNS and FOUR ROWS, equal square cells. Exactly 32 isolated items in the specified order. Perfectly flat uniform midnight navy #090C18 background. No grid, text, lettering, numbers, diamonds, bells or sevens. Every full object occupies ONLY CENTER 65% of cell with 35px empty gutters, no overlaps. Tangible polished materials, sharp silhouettes readable small, cinematic mobile arcade quality. Row1 JADE FORTUNE: coiled jade dragon; red silk lantern; porcelain tea pot; carved ivory fan; bronze incense burner; jade bamboo stalks; red ceremonial drum; waist-up elegant East Asian woman with black hair and jade silk robe. Row2 SAPPHIRE CROWN: royal blue crown with pearls; royal wax seal; silver chalice; blue fleur-de-lis shield; ceremonial silver sword; rolled royal decree; blue heraldic lion statuette; waist-up black woman queen with braids and blue velvet royal dress. Row3 MIDNIGHT EXPRESS: blue brass steam locomotive; punched train ticket; brass pocket watch; leather travel trunk; train signal semaphore; golden oil lantern; conductor's peaked cap; waist-up silver-haired moustached male railway conductor in navy uniform. Row4 CELESTIAL WILDS: radiant crescent scepter; golden astrolabe; ornate star atlas book; lavender comet; silver lunar moth; glass constellation orb; eight-pointed compass star; waist-up dark-skinned moon sorceress with white hair and violet robe. Original characters no trademarks. Keep all 32 items completely inside their exact cells, small enough never clipped."
+    },
+    {
+      "id": "C",
+      "prompt": "Original polished mobile game sprite atlas, landscape SIX columns by FOUR rows exactly, 1536x1024. 24 separate objects on perfectly flat dark midnight #090C18 background. Each item fully visible at ONLY 65% cell size, wide empty gutters, isolated, no grid lines, no text, no numbers. Premium realistic 3D game render, expressive characters, tangible metals and fabric. Row1 COIN CARNIVAL: ornate brass carnival token with carousel horse relief; ornate red carousel horse figurine; red-and-gold circus tent; colorful carnival mask; illuminated ferris wheel miniature; waist-up cheerful male ringmaster with curled moustache burgundy tailcoat. Row2 SOLAR FORTUNE: golden solar medallion with sun relief; bronze orbital satellite; polished astronaut helmet with orange visor; orange rocket; bronze lunar rover; waist-up female solar pilot with copper braids and white orange flight suit. Row3 PIRATE GOLD: antique gold doubloon engraved with ship wheel; blue nautical sextant; red pirate spyglass; black pirate ship miniature; green parrot with red scarf; waist-up female pirate captain with dark curly hair teal coat and tricorn. Row4 TEMPLE LIGHTS: bronze owl idol; stone carved lotus tablet; jade ritual scarab; turquoise sun altar disk; brass oil lamp; waist-up temple guardian man with dark skin white beard and teal ceremonial robe. NO bells, diamonds, seven symbols, BARs or cherries. One object per square, center every object, no overlaps. Not existing brands."
+    },
+    {
+      "id": "D",
+      "prompt": "Create an original premium mobile arcade sprite atlas of EXACT SIX COLUMNS by FOUR ROWS, 1536x1024, 24 isolated items. Every item centered inside its equal cell and fully visible with generous 30px gutters. Flat uniform midnight #090C18 background, absolutely no text or grid or overlapping objects. Rich realistic 3D materials with clean silhouettes. NO diamonds, bells, sevens, BARs, cherries. Row1 AURORA VAULT: icy nautilus shell; luminous snowflake prism with six branches; carved polar bear totem; borealis hourglass; aurora lantern; waist-up silver-haired Arctic explorer woman in white blue fur-collared coat. Row2 EMBER RELICS: black basalt fire mask; molten serpent idol; volcanic clay urn; copper ritual dagger; ancient obsidian tablet with amber cracks; waist-up muscular older forge keeper man with dark beard leather apron and glowing amber hammer. Row3 CLOCKWORK VAULT: brass escapement gear; mechanical wind-up beetle; copper mainspring barrel; pendulum clock mechanism; brass winding key; waist-up wise anthropomorphic owl clockmaker with monocle and waistcoat. Row4 PHOENIX FALLS: red phoenix feather plume; glowing golden phoenix egg; orange wing-shaped flame; bronze phoenix talon amulet; ruby firebird crest shield; head and chest portrait of majestic red gold phoenix with long radiant feathers. Distinct designed relic shapes not gems. Sharp detailed original game art not existing characters."
+    },
+    {
+      "id": "E",
+      "prompt": "Original premium mobile arcade character and emblem sprite sheet EXACT FIVE columns and TWO rows, 1536x614, equal square cells. Flat solid midnight #090C18 background. All subjects fully within their cells with generous clear space, 70% size, no overlap, NO words, letters or numbers. Highly polished detailed realistic stylized 3D artwork, friendly adult arcade hosts. FIRST ROW left to right, waist-up portraits: 1 smiling woman orchard keeper with freckles curly ginger hair straw hat and green overalls carrying apples; 2 futuristic young male neon DJ with dark skin cyan visor magenta jacket; 3 serene East Asian pearl diver woman with black ponytail and elegant teal diving suit holding a shell; 4 white-and-copper small astronaut robot with expressive blue visor face and orange shoulder lights; 5 adventurous red panda in olive explorer waistcoat carrying a bamboo lantern. SECOND ROW matching emblem objects left to right: 1 richly textured red apple with two leaves; 2 glowing cyan circuit hexagon with magenta core; 3 open oyster holding one luminous pearl; 4 orange meteor with rocky core; 5 hanging red paper lantern with golden tassels. All original, no existing brands."
+    }
+  ],
+  "outputs": [
+    {
+      "file": "design/identity-v47/classics.png",
+      "bytes": 2071471,
+      "sha256": "3faa9c5528bda1bdfa1c0f6453bb68d570229f5b70bcb6fb41d16801b9d4aac2"
+    },
+    {
+      "file": "design/identity-v47/collectors.png",
+      "bytes": 2484809,
+      "sha256": "8bbdb525cdea68a4667383720f1e5f6a8496b275d1217ffc093615de0365f078"
+    },
+    {
+      "file": "design/identity-v47/features.png",
+      "bytes": 2797521,
+      "sha256": "1c6eaac0358088b6a6a80c7ca80d9f961aebcac293c419e950a963873372d4cf"
+    },
+    {
+      "file": "design/identity-v47/keno.png",
+      "bytes": 2473895,
+      "sha256": "d4b0a95b1b804a3dcdec7b1871206c7a5bd589386a25da33e87a97f93641de04"
+    },
+    {
+      "file": "design/identity-v47/wilds.png",
+      "bytes": 2462590,
+      "sha256": "00d558a58dc0cad8bc406159dd3ce54ec82b12a84a0b8b12e2deb7be34ee2a82"
+    }
+  ],
+  "delivery": "scripts/prepare-identity-v47.mjs crops original atlas rows into hashed per-game strips; explicit SVG clipping keeps each logical symbol within its cell. Final backgrounds are flat dark, not transparent."
+}
