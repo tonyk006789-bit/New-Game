@@ -19,7 +19,7 @@ import AquaticSprite from './AquaticSprite.vue';
 import {holdCredits,revealCredits} from './credit-presentation';
 import {FishWalletPresentation} from './fish-wallet';
 import {playSound} from './audio';
-import {dampAngle, recoilOffset, effectProgress} from './game-motion';
+import {dampAngle, recoilOffset, effectProgress,fishImpactPulse,netExpansion} from './game-motion';
 import AbyssJackpotWheel from './AbyssJackpotWheel.vue';
 import {bossReveal,type BossReveal} from './boss-reveal';
 const jackpotReward=ref<BossReveal|null>(null);
@@ -132,7 +132,7 @@ function showPeerImpact(event:ReefImpact){
 function effect(view:Container,x:number,y:number,life:number,kind='burst',vx=0,vy=0){view.position.set(x,y);world.addChild(view);if(effects.length>=400)effects.shift()!.view.destroy();effects.push({view,age:0,life,kind,vx,vy,x,y});}
 function impact(x:number,y:number,win=false){
  const net=new Graphics();for(const r of [14,30,48])net.circle(0,0,r).stroke({color:win?0xffdf70:0xafffff,width:1.5,alpha:.85});
- for(let a=0;a<Math.PI*2;a+=Math.PI/6)net.moveTo(0,0).lineTo(Math.cos(a)*48,Math.sin(a)*48).stroke({color:0xffffff,width:1,alpha:.7});effect(net,x,y,.65);
+ for(let a=0;a<Math.PI*2;a+=Math.PI/6)net.moveTo(0,0).lineTo(Math.cos(a)*48,Math.sin(a)*48).stroke({color:0xffffff,width:1,alpha:.7});effect(net,x,y,.65,'net');
  if(!props.reducedMotion)for(let i=0;i<12;i++){const a=i*Math.PI/6,r=win?4:2.5;effect(new Graphics().circle(0,0,r).fill(win?0xffd455:0xc5fbff).circle(-1,-1,r*.4).fill(0xffffff),x,y,.65,'particle',Math.cos(a)*(65+i*4),Math.sin(a)*(65+i*4));}
 }
 async function settleShot(shot:Projectile){
@@ -200,8 +200,8 @@ onMounted(async()=>{
   app.ticker.add(ticker=>{
    if(!props.running)return;const dt=Math.min(ticker.deltaMS,50)/1000,time=(Date.now()+clockOffset-epoch)/1000;
    waterLight.visible=!props.reducedMotion;if(waterLight.visible){waterLight.x=Math.sin(time*.09)*24;for(let i=0;i<bubbles.length;i++)bubbles[i].position.set(45+(i*67)%1120+Math.sin(time*.45+i)*9,610-((time*(8+i%5)+i*37)%640));}
-   for(const fish of creatures){const p=targetAt(fish.id,time);fish.hit=Math.max(0,fish.hit-dt);fish.view.position.set(p.x+(props.reducedMotion?0:Math.sin(fish.hit*50)*fish.hit*14),p.y);fish.view.scale.set(p.species===48?1:p.direction,Math.min(1,world.scale.x/world.scale.y));fish.sprite.tint=fish.hit>.2?0xc6f5ff:0xffffff;
-    fish.view.rotation=props.reducedMotion?0:Math.sin(time*2+fish.id)*.035;fish.view.visible=!fish.captured&&p.active&&p.x>-200&&p.x<1400;
+   for(const fish of creatures){const p=targetAt(fish.id,time);fish.hit=Math.max(0,fish.hit-dt);const pulse=props.reducedMotion?0:fishImpactPulse(fish.hit);fish.view.position.set(p.x,p.y);fish.view.scale.set((p.species===48?1:p.direction)*(1-pulse*.045),Math.min(1,world.scale.x/world.scale.y)*(1+pulse*.035));fish.sprite.tint=fish.hit>.2?0xe2faff:0xffffff;
+    fish.view.rotation=props.reducedMotion||p.species===48?0:Math.sin(time*(p.radius<20?2.4:1.4)+fish.id)*.022;fish.view.visible=!fish.captured&&p.active&&p.x>-200&&p.x<1400;
     if(fish.view.visible){fish.shadow.position.set(7+(props.reducedMotion?0:Math.sin(time*.8+fish.id)*2),12+(props.reducedMotion?0:Math.cos(time*.8+fish.id)*3));const buffer=fish.sprite.geometry.getAttribute('aPosition').buffer,positions=buffer.data as Float32Array,width=fish.sprite.texture.width;
      for(let i=0;i<positions.length;i+=2){const along=fish.vertices[i]/width,tail=(1-along)**2;positions[i+1]=fish.vertices[i+1]+(props.reducedMotion||p.species===48?0:Math.sin(time*(p.radius<20?8:4.2)-along*5+fish.id)*width*.035*tail);}
      buffer.update();
@@ -219,7 +219,7 @@ onMounted(async()=>{
    for(let i=projectiles.length-1;i>=0;i--){const s=projectiles[i];s.age=(Date.now()+clockOffset-s.firedAt)/1000;const t=Math.min(s.age,s.flight.time);s.view.position.set(s.flight.origin.x+s.flight.vx*t,s.flight.origin.y+s.flight.vy*t);
     if(s.age>=s.flight.time){s.view.destroy();projectiles.splice(i,1);void settleShot(s);}
    }
-   for(let i=effects.length-1;i>=0;i--){const e=effects[i];e.age+=dt;const progress=Math.min(1,e.age/e.life);e.view.alpha=1-progress**2;if(e.kind==='particle'||e.kind==='coin'){e.view.x=e.x+e.vx*e.age;e.view.y=e.y+e.vy*e.age+(e.kind==='coin'?74*e.age**2:0);if(e.kind==='coin'){e.view.scale.x=Math.cos(e.age*12);e.view.rotation=e.age*.6;}}else if(e.kind!=='trail')e.view.scale.set(props.reducedMotion?1:.3+effectProgress(e.age,e.life)*1.05);if(e.age>=e.life){e.view.destroy({children:true});effects.splice(i,1);}}
+   for(let i=effects.length-1;i>=0;i--){const e=effects[i];e.age+=dt;const progress=Math.min(1,e.age/e.life);e.view.alpha=1-progress**2;if(e.kind==='particle'||e.kind==='coin'){e.view.x=e.x+e.vx*e.age;e.view.y=e.y+e.vy*e.age+(e.kind==='coin'?74*e.age**2:0);if(e.kind==='coin'){e.view.scale.x=Math.cos(e.age*12);e.view.rotation=e.age*.6;}}else if(e.kind!=='trail')e.view.scale.set(props.reducedMotion?1:e.kind==='net'?netExpansion(e.age,e.life):.3+effectProgress(e.age,e.life)*1.05);if(e.age>=e.life){e.view.destroy({children:true});effects.splice(i,1);}}
   });loading.value=false;if(!props.running)app.stop();
  }catch(e){loading.value=false;error.value=`The reef renderer could not start: ${(e as Error).message}`;}
 });

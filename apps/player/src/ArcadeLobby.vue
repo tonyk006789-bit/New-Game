@@ -7,13 +7,14 @@ import Icon from '@new-game/ui/Icon.vue';
 import GamePoster from './GamePoster.vue';
 import {usePosterPrefetch} from './poster-prefetch';
 import assets from './presentation-assets.json';
+import floorAvatar from './floor-avatar.json';
 const props=defineProps<{games:readonly (typeof catalog)[number][];favorites:string[];running:boolean;reducedMotion:boolean;playerName:string}>();
 const emit=defineEmits<{open:[id:GameId];favorite:[id:GameId]}>();
 const floor=ref<HTMLElement>(),x=ref(50),y=ref(92),walking=ref(false),facing=ref(1),pose=ref(0),destination=ref({x:50,y:92}),selected=ref<GameId|null>(null);
 const spots=[{x:18,y:48},{x:39,y:45},{x:61,y:45},{x:82,y:48},{x:12,y:77},{x:34,y:74},{x:66,y:74},{x:88,y:77}];
 const floorPage=ref(0),floorPages=computed(()=>Math.max(1,Math.ceil(props.games.length/8)));
 const machines=computed(()=>props.games.slice(floorPage.value*8,floorPage.value*8+8).map((game,index)=>({...game,spot:spots[index]})));
-usePosterPrefetch(computed(()=>props.games.slice((floorPage.value+1)*8,(floorPage.value+2)*8).map(g=>g.id)),()=>props.running);
+usePosterPrefetch(computed(()=>props.games.slice((floorPage.value+1)*8,(floorPage.value+2)*8).map(g=>g.id)),()=>props.running,true);
 let raf=0,last=0,walkTime=0;
 const status=computed(()=>selected.value?`Walking to ${catalog.find(game=>game.id===selected.value)?.name}`:walking.value?'Exploring the arcade':'Tap the floor to walk · Choose a cabinet to play');
 function arrive(){walking.value=false;pose.value=0;const id=selected.value;selected.value=null;if(id&&props.running)emit('open',id);}
@@ -48,7 +49,7 @@ onBeforeUnmount(()=>cancelAnimationFrame(raf));
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
     <button class="hall-cabinet-button" :data-game-id="game.id" data-own-sound :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
      <span class="machine-crown">{{game.detail}}</span>
-     <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" /></span>
+     <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" floor /></span>
      <span class="machine-deck"><i></i><b><GameBrand :game="game.id"/></b><i></i></span>
      <span class="machine-pedestal"><em>PLAY</em><span>✦</span><em>ENTER</em></span>
     </button>
@@ -57,7 +58,7 @@ onBeforeUnmount(()=>cancelAnimationFrame(raf));
    <div v-if="walking" class="walk-marker" :style="{left:`${destination.x}%`,top:`${destination.y}%`}" aria-hidden="true"></div>
    <div class="hall-avatar" :class="{walking}" :data-x="x.toFixed(1)" :data-y="y.toFixed(1)" :style="{'--avatar-x':x,'--avatar-y':y,zIndex:Math.round(y)}" aria-label="Your walking character">
     <span class="avatar-ring"></span>
-    <svg class="avatar-art" viewBox="0 0 512 1024" :style="{transform:`scaleX(${facing})`}" aria-hidden="true"><defs><filter id="avatar-key" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 -3 0 0 1" /><feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 1 1"/></feComponentTransfer></filter><clipPath id="avatar-crop"><rect width="512" height="1024"/></clipPath></defs><g clip-path="url(#avatar-crop)"><image href="/art/arcade-host-v7.png" :x="-pose*512" width="1536" height="1024" filter="url(#avatar-key)" /></g></svg>
+    <svg class="avatar-art" viewBox="0 0 512 1024" :style="{transform:`scaleX(${facing})`}" aria-hidden="true"><defs><filter id="avatar-key" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  3 -3 0 0 1" /><feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 1 1"/></feComponentTransfer></filter><clipPath id="avatar-crop"><rect width="512" height="1024"/></clipPath></defs><g clip-path="url(#avatar-crop)"><image :href="floorAvatar.url" :x="-pose*512" width="1536" height="1024" filter="url(#avatar-key)" /></g></svg>
     <span class="avatar-name">{{playerName}}</span>
    </div>
    <div v-if="!games.length" class="hall-empty">No cabinets in this collection.<small>Choose another category or search.</small></div>

@@ -19,9 +19,9 @@ export function reelTravel(progress: number): number {
 export function reelMotion(column: number, travelCells: number, totalCells: number, fast: boolean) {
   const speed = fast ? 1.85 : 1;
   const keyframes = Array.from({ length: 81 }, (_, index) => {
-    const offset = index / 80, settle = clamp((offset - .93) / .07);
-    const spring = offset > .93 ? .12 * Math.sin(settle * Math.PI) * (1 - settle) : 0;
-    return { offset, transform: `translateY(${-100 * (travelCells * reelTravel(offset) + spring) / totalCells}%)` };
+    const offset = index / 80;
+    // Stop on the committed symbol without reversing the strip for a synthetic bounce.
+    return { offset, transform: `translateY(${-100 * travelCells * reelTravel(offset) / totalCells}%)` };
   });
   return { keyframes, duration: (2050 + column * 190) / speed, delay: column * 35 / speed };
 }
@@ -61,4 +61,13 @@ export function recoilOffset(remaining: number): number {
 }
 export function effectProgress(age: number, life: number): number {
   return 1 - (1 - clamp(age / life)) ** 3;
+}
+/** One soft impact compression, zero at both ends; no shaking the target off its path. */
+export function fishImpactPulse(remaining:number):number{
+ const t=1-clamp(remaining/.4);
+ return Math.sin(Math.PI*t)**2*(1-t)*1.6;
+}
+export function netExpansion(age:number,life:number):number{
+ const t=clamp(age/life);
+ return .18+.82*effectProgress(age,life)+.08*Math.sin(Math.PI*t)**2;
 }

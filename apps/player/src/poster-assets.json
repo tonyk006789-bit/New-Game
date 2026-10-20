@@ -1,0 +1,622 @@
+{
+  "corsair-cove": {
+    "source": "/art/delivery/corsair-cove-e5f22e221427.webp",
+    "originalBytes": 40680,
+    "variants": [
+      {
+        "url": "/art/delivery/corsair-cove-240-dab96be1d09c.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 10152,
+        "sha256": "dab96be1d09c0dd2293ee6e5a8d258177cda44408ebfa2580361a7e1e5f27527"
+      },
+      {
+        "url": "/art/delivery/corsair-cove-480-389cb3cc9ea0.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 37080,
+        "sha256": "389cb3cc9ea0b187aab89af5400ee8c3ddd3d98f0b4a219800c0b42bf71f9de3"
+      }
+    ]
+  },
+  "cosmic-tides": {
+    "source": "/art/delivery/cosmic-tides-fe2042db4432.webp",
+    "originalBytes": 44018,
+    "variants": [
+      {
+        "url": "/art/delivery/cosmic-tides-240-9ff361150344.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 12048,
+        "sha256": "9ff361150344d5b9c8a4a6c412b18f88942d6deeb5a3528594228564bd475a6d"
+      },
+      {
+        "url": "/art/delivery/cosmic-tides-480-f1bd4abf0534.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 40418,
+        "sha256": "f1bd4abf0534612c22da20487c98d98c3290ea90b04bd409761e3851702ecbeb"
+      }
+    ]
+  },
+  "double-deck-blackjack": {
+    "source": "/art/delivery/double-deck-blackjack-c04e7f7ed7f2.webp",
+    "originalBytes": 28484,
+    "variants": [
+      {
+        "url": "/art/delivery/double-deck-blackjack-240-c23b96234516.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 9728,
+        "sha256": "c23b9623451646a8596d13fbb63a19b6bcf2e6a0c0c27f2bf235e0d77bff0347"
+      },
+      {
+        "url": "/art/delivery/double-deck-blackjack-480-c93d8d7a79bd.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 25992,
+        "sha256": "c93d8d7a79bdcd876c7a18a03c9f9eb68ca5cae891ae42d5326f1bf76031e44c"
+      }
+    ]
+  },
+  "european-blackjack": {
+    "source": "/art/delivery/european-blackjack-c49915bc821b.webp",
+    "originalBytes": 32748,
+    "variants": [
+      {
+        "url": "/art/delivery/european-blackjack-240-2374250852a8.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 10932,
+        "sha256": "2374250852a8a2be3653eec87f4c74dacd9d15dd013a36ac27970bc4dbe40c82"
+      },
+      {
+        "url": "/art/delivery/european-blackjack-480-b85f2129f56d.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 29534,
+        "sha256": "b85f2129f56df88e4064368daf3dcdd7a4b64e5632af2c8e57a2addadaa93335"
+      }
+    ]
+  },
+  "clockwork-vault": {
+    "source": "/art/delivery/clockwork-vault-3baa5a1c11a6.webp",
+    "originalBytes": 44602,
+    "variants": [
+      {
+        "url": "/art/delivery/clockwork-vault-240-8e8bf5e83706.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14296,
+        "sha256": "8e8bf5e83706072613e50398fc3fd9f31881d58df910a0239100dd08fed4b52f"
+      },
+      {
+        "url": "/art/delivery/clockwork-vault-480-91c3ff38e135.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 41390,
+        "sha256": "91c3ff38e135e20377af1ad5b603b6d7a5590916c1c651020e5364a7cb04e2ea"
+      }
+    ]
+  },
+  "phoenix-falls": {
+    "source": "/art/delivery/phoenix-falls-0d955aebba65.webp",
+    "originalBytes": 43216,
+    "variants": [
+      {
+        "url": "/art/delivery/phoenix-falls-240-cb104d5e7465.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 13128,
+        "sha256": "cb104d5e7465a8817b4d0d617eb0f8e853a1cdeafd29c98f5f2fcbd47260e683"
+      },
+      {
+        "url": "/art/delivery/phoenix-falls-480-066dcf22f3c5.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 39206,
+        "sha256": "066dcf22f3c527ff7b442d1b169b3ba957601fa8c9860d393fbeb72e5e519dc8"
+      }
+    ]
+  },
+  "outlaw-sevens": {
+    "source": "/art/delivery/outlaw-sevens-47aa1d17941e.webp",
+    "originalBytes": 30926,
+    "variants": [
+      {
+        "url": "/art/delivery/outlaw-sevens-240-ddf499f023aa.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 9966,
+        "sha256": "ddf499f023aa5c252f32ea5cac9859eb935b05976708d49f859db7cca2e610bb"
+      },
+      {
+        "url": "/art/delivery/outlaw-sevens-480-9c28d9a3e1f9.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 27774,
+        "sha256": "9c28d9a3e1f9dac7a86b11b371268b623ad621cc0c2394016013e64cf4bc4b9e"
+      }
+    ]
+  },
+  "celestial-wilds": {
+    "source": "/art/delivery/celestial-wilds-d90c90230155.webp",
+    "originalBytes": 36280,
+    "variants": [
+      {
+        "url": "/art/delivery/celestial-wilds-240-58fc1bde6267.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 11572,
+        "sha256": "58fc1bde6267265ce48911b914f1ac5ab6da80efd9041cc33a56fddaac823b4f"
+      },
+      {
+        "url": "/art/delivery/celestial-wilds-480-243fd1570a5f.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 33288,
+        "sha256": "243fd1570a5f95845b0899d2137eb73556240952d206ba2b3154c26650939e89"
+      }
+    ]
+  },
+  "meteor-keno": {
+    "source": "/art/delivery/meteor-keno-59d1fc20b769.webp",
+    "originalBytes": 43774,
+    "variants": [
+      {
+        "url": "/art/delivery/meteor-keno-240-653d911fa790.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14044,
+        "sha256": "653d911fa790a15ea56f84bc2f67fadffb8f928a4fcfe3534097032212047a82"
+      },
+      {
+        "url": "/art/delivery/meteor-keno-480-036d2995f785.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 40168,
+        "sha256": "036d2995f7852d563edf3c8f337c5f551e3c520df923337ced8c7097d98117ab"
+      }
+    ]
+  },
+  "bamboo-keno": {
+    "source": "/art/delivery/bamboo-keno-1b4b769ea0ed.webp",
+    "originalBytes": 42922,
+    "variants": [
+      {
+        "url": "/art/delivery/bamboo-keno-240-b78a96ab00c8.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 13144,
+        "sha256": "b78a96ab00c83289368c462221bce3d46dc368f0abdb5087e8c6859cea1eaff9"
+      },
+      {
+        "url": "/art/delivery/bamboo-keno-480-db0b9d23c859.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 39126,
+        "sha256": "db0b9d23c859aa091c166aa1d2cdbde5f740874bfd4e06a216bd41906cb6b614"
+      }
+    ]
+  },
+  "disco-diamonds": {
+    "source": "/art/delivery/disco-diamonds-6a5f40be364a.webp",
+    "originalBytes": 47570,
+    "variants": [
+      {
+        "url": "/art/delivery/disco-diamonds-240-4ccb2d57d948.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 12866,
+        "sha256": "4ccb2d57d9487fb1a8737e5e0c8d6351227ab076f115c760237ef46372689bbd"
+      },
+      {
+        "url": "/art/delivery/disco-diamonds-480-73f5e748c34c.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 43256,
+        "sha256": "73f5e748c34cb42ffc778ba3e7aed5f37920f56da1b7dec11cd2329a78318515"
+      }
+    ]
+  },
+  "midnight-express": {
+    "source": "/art/delivery/midnight-express-33943ce780da.webp",
+    "originalBytes": 51818,
+    "variants": [
+      {
+        "url": "/art/delivery/midnight-express-240-7503500958c5.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14500,
+        "sha256": "7503500958c51abf3ed67ec6d452245933ca90f9e77949c2f0794e3d1ad0335b"
+      },
+      {
+        "url": "/art/delivery/midnight-express-480-044e3af6827a.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 48082,
+        "sha256": "044e3af6827a845d30c25e2c054473b916d1c04e4cc7e4b344b27832a5ca35f8"
+      }
+    ]
+  },
+  "pirate-gold": {
+    "source": "/art/delivery/pirate-gold-249decaf8508.webp",
+    "originalBytes": 54200,
+    "variants": [
+      {
+        "url": "/art/delivery/pirate-gold-240-f7a1e45faad4.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14644,
+        "sha256": "f7a1e45faad44f98e6c324518324064297df0a39350d13c072ce30f31ae37bfa"
+      },
+      {
+        "url": "/art/delivery/pirate-gold-480-c5b449cedb7e.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 49996,
+        "sha256": "c5b449cedb7e7c464d66023cc8d2de134d2faef788ff8756468b6abc99465874"
+      }
+    ]
+  },
+  "royal-blackjack": {
+    "source": "/art/delivery/royal-blackjack-625313aa8a8f.webp",
+    "originalBytes": 16140,
+    "variants": [
+      {
+        "url": "/art/delivery/royal-blackjack-240-6a4eccacddbc.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 4588,
+        "sha256": "6a4eccacddbc9e5baeef04b5552f6bcbb76f3a7e6ce7dfe4d3eceda62ab0dc07"
+      },
+      {
+        "url": "/art/delivery/royal-blackjack-480-1d169a7aa520.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 14618,
+        "sha256": "1d169a7aa520575d77c2e882f838eade2753d437af46738e06879025078d788a"
+      }
+    ]
+  },
+  "sunken-dynasty": {
+    "source": "/art/delivery/sunken-dynasty-be49c63afab7.webp",
+    "originalBytes": 53362,
+    "variants": [
+      {
+        "url": "/art/delivery/sunken-dynasty-240-41d2e125cb60.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14580,
+        "sha256": "41d2e125cb60b1714dcc72ad90a45c39440cd8889861a9ca6b4a93c7531ad33f"
+      },
+      {
+        "url": "/art/delivery/sunken-dynasty-480-b0317e34b27a.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 48656,
+        "sha256": "b0317e34b27a472baec168966a08d942f03014e70fb915366c997d270cb54391"
+      }
+    ]
+  },
+  "polar-odyssey": {
+    "source": "/art/delivery/polar-odyssey-907683f98edf.webp",
+    "originalBytes": 38932,
+    "variants": [
+      {
+        "url": "/art/delivery/polar-odyssey-240-1127d0e990a9.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 11056,
+        "sha256": "1127d0e990a9d1bea9753057b77e4b604ecffd514255b61e9b82a08dd8f0a175"
+      },
+      {
+        "url": "/art/delivery/polar-odyssey-480-46b2b0e69102.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 35690,
+        "sha256": "46b2b0e6910226c07087e0419a3e1de71947d336dfd5931d2657a9891cdf2535"
+      }
+    ]
+  },
+  "neon-numbers": {
+    "source": "/art/delivery/neon-numbers-6709f10dfc44.webp",
+    "originalBytes": 25752,
+    "variants": [
+      {
+        "url": "/art/delivery/neon-numbers-240-ec2a0a4934b2.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 7520,
+        "sha256": "ec2a0a4934b2944ce5318e0e10b05653a9c8f35c009f2f65e17f8ff15fa77346"
+      },
+      {
+        "url": "/art/delivery/neon-numbers-480-1bc8e9a3bcee.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 22534,
+        "sha256": "1bc8e9a3bcee4a6dae932571360282dcc3c60c43bbf078dd79bed7ab20498418"
+      }
+    ]
+  },
+  "pearl-keno": {
+    "source": "/art/delivery/pearl-keno-66ed87a04cfc.webp",
+    "originalBytes": 28738,
+    "variants": [
+      {
+        "url": "/art/delivery/pearl-keno-240-58e1d015aeb2.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 8156,
+        "sha256": "58e1d015aeb2e864a3d075581a7f7325fd5e04c9efa5c791399efe1c4a3f7b3e"
+      },
+      {
+        "url": "/art/delivery/pearl-keno-480-846f3bba4210.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 25302,
+        "sha256": "846f3bba4210c1cfc3e2be54351b227982fb4b9421e0c39e5b2d73b4a09ecd10"
+      }
+    ]
+  },
+  "abyss-legends": {
+    "source": "/art/delivery/abyss-legends-ecdde3be07c3.webp",
+    "originalBytes": 46240,
+    "variants": [
+      {
+        "url": "/art/delivery/abyss-legends-240-adaa46ae59f2.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 11724,
+        "sha256": "adaa46ae59f25fcc64ea36fa8cf61d41303fe5cdcf59e4b6463a90f8d84cab32"
+      },
+      {
+        "url": "/art/delivery/abyss-legends-480-a8220d48c9e7.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 42778,
+        "sha256": "a8220d48c9e77a6d983234d311ae6c7b446b3b8e6e99f76dca88a8ced6ae543e"
+      }
+    ]
+  },
+  "ruby-rush": {
+    "source": "/art/delivery/ruby-rush-26e4c6ba436b.webp",
+    "originalBytes": 57380,
+    "variants": [
+      {
+        "url": "/art/delivery/ruby-rush-240-fc1646ab1b3c.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 16154,
+        "sha256": "fc1646ab1b3cfde03b75861e2366f1508b28a727d852d23e5f00b4fd0cca62a4"
+      },
+      {
+        "url": "/art/delivery/ruby-rush-480-cb8b41a9608c.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 52680,
+        "sha256": "cb8b41a9608c3b4d33f88a7575666c5b8136ca6d3878134866c4b10a8dc07980"
+      }
+    ]
+  },
+  "sapphire-crown": {
+    "source": "/art/delivery/sapphire-crown-f6c3cedf08e7.webp",
+    "originalBytes": 75258,
+    "variants": [
+      {
+        "url": "/art/delivery/sapphire-crown-240-981b02368217.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 20434,
+        "sha256": "981b02368217997620f2c36a462407948f155395094942546940c267b59dc06e"
+      },
+      {
+        "url": "/art/delivery/sapphire-crown-480-da8a3a9850bf.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 68856,
+        "sha256": "da8a3a9850bfe68ee80b6874b0e3b4399377f30ef933c582acd74af9ae7e2f77"
+      }
+    ]
+  },
+  "solar-fortune": {
+    "source": "/art/delivery/solar-fortune-230d11d8a27f.webp",
+    "originalBytes": 65628,
+    "variants": [
+      {
+        "url": "/art/delivery/solar-fortune-240-f217443d8cc0.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 17576,
+        "sha256": "f217443d8cc08d1fc03802d2e500f7669de383ab0680fa04da441b34581fad4f"
+      },
+      {
+        "url": "/art/delivery/solar-fortune-480-f3af658fb642.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 60496,
+        "sha256": "f3af658fb64291961c1b27429ece3d2a7ac764ff6d8688ad8bb84b8c91b1d2ca"
+      }
+    ]
+  },
+  "neon-sevens": {
+    "source": "/art/delivery/neon-sevens-2868e7e6c9cc.webp",
+    "originalBytes": 44288,
+    "variants": [
+      {
+        "url": "/art/delivery/neon-sevens-240-4f5e7ecd1b50.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 11548,
+        "sha256": "4f5e7ecd1b50ef6fbc1815a0e67eccc37c0401c4b78b4e4d3224431a5d2c1547"
+      },
+      {
+        "url": "/art/delivery/neon-sevens-480-9c6b3cba1d0d.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 39852,
+        "sha256": "9c6b3cba1d0d0ed0fb45288ed50ed987f661499c134e78f818c18c476c6985fc"
+      }
+    ]
+  },
+  "jade-fortune": {
+    "source": "/art/delivery/jade-fortune-76c0d09fbba7.webp",
+    "originalBytes": 57460,
+    "variants": [
+      {
+        "url": "/art/delivery/jade-fortune-240-d30a5b02517e.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 15732,
+        "sha256": "d30a5b02517e5d3dbd642bad7173a2b6cdd25f3f2d6ad1aac2e9ad7ecf638b70"
+      },
+      {
+        "url": "/art/delivery/jade-fortune-480-fb792b05d1d0.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 53528,
+        "sha256": "fb792b05d1d0ccd3a60c866550f38ec94f8164e39bef1e88c1bd0b44572ab272"
+      }
+    ]
+  },
+  "coin-carnival": {
+    "source": "/art/delivery/coin-carnival-a6464a5a725e.webp",
+    "originalBytes": 46890,
+    "variants": [
+      {
+        "url": "/art/delivery/coin-carnival-240-93e665e44516.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 12202,
+        "sha256": "93e665e445166dfba8cb6406d6bfe8d3326d8bd2f1227ef07795ea84312a879a"
+      },
+      {
+        "url": "/art/delivery/coin-carnival-480-1cf6ea1949ad.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 43254,
+        "sha256": "1cf6ea1949ad1a0509e2f7ab47850c6b4961421d2ae1ad011207a781e4e709fe"
+      }
+    ]
+  },
+  "aurora-vault": {
+    "source": "/art/delivery/aurora-vault-b7a3f0d5180c.webp",
+    "originalBytes": 56132,
+    "variants": [
+      {
+        "url": "/art/delivery/aurora-vault-240-e18cd94c9b4e.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 14608,
+        "sha256": "e18cd94c9b4e7c89f520926d47f9a653d7c9eaa9cb6bdc8a41f1ea37daf28fe7"
+      },
+      {
+        "url": "/art/delivery/aurora-vault-480-970aa9c9ec6d.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 50534,
+        "sha256": "970aa9c9ec6d97e725f01ad15a9458853d5f260006b3e5225b1f083f32dbd7bd"
+      }
+    ]
+  },
+  "ember-relics": {
+    "source": "/art/delivery/ember-relics-8f95a4234374.webp",
+    "originalBytes": 48758,
+    "variants": [
+      {
+        "url": "/art/delivery/ember-relics-240-a3d61c199b16.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 12462,
+        "sha256": "a3d61c199b16dddd988491e72d856336d04deac310fbd3e586e0fa32e1b2c1ba"
+      },
+      {
+        "url": "/art/delivery/ember-relics-480-e365501206ad.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 44524,
+        "sha256": "e365501206ad533081e4480486d290bbc39cafb30d93e088f9e0a0622405be4d"
+      }
+    ]
+  },
+  "temple-lights": {
+    "source": "/art/delivery/temple-lights-1cfb4427b193.webp",
+    "originalBytes": 52604,
+    "variants": [
+      {
+        "url": "/art/delivery/temple-lights-240-b00eb3c09aeb.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 13744,
+        "sha256": "b00eb3c09aeb7af2eef52da94e5c432c6f2cec791ff95175c362e070d72c82ad"
+      },
+      {
+        "url": "/art/delivery/temple-lights-480-81cdd16ed68f.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 48000,
+        "sha256": "81cdd16ed68f2dff5970116bbe74f083faacb90c094d5332f35c094223281767"
+      }
+    ]
+  },
+  "orchard-numbers": {
+    "source": "/art/delivery/orchard-numbers-3633a358b88d.webp",
+    "originalBytes": 29572,
+    "variants": [
+      {
+        "url": "/art/delivery/orchard-numbers-240-9983eedde189.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 8164,
+        "sha256": "9983eedde1899cc8044c3b5bc1249273511353ff7e0512cfd42068ac37c6215b"
+      },
+      {
+        "url": "/art/delivery/orchard-numbers-480-3e4caf5d5148.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 26352,
+        "sha256": "3e4caf5d51480fcddbbdfadbac054972fe5d29f093f24909ca0693e9f67aaa0e"
+      }
+    ]
+  },
+  "reef-party": {
+    "source": "/art/delivery/reef-party-4a9b62f33877.webp",
+    "originalBytes": 56524,
+    "variants": [
+      {
+        "url": "/art/delivery/reef-party-240-e0604fc46c10.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 13144,
+        "sha256": "e0604fc46c109d9619959db5fd15257690cbd2e153f6b5ece4147557a3e340ed"
+      },
+      {
+        "url": "/art/delivery/reef-party-480-d2a3d5eb5da4.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 51638,
+        "sha256": "d2a3d5eb5da453eb3b481f5186127282330ab0390a7c5b7fbf2b484e955029b5"
+      }
+    ]
+  },
+  "coral-rush": {
+    "source": "/art/delivery/coral-rush-8b0e99276c04.webp",
+    "originalBytes": 83416,
+    "variants": [
+      {
+        "url": "/art/delivery/coral-rush-240-de84f0f13096.webp",
+        "width": 240,
+        "height": 240,
+        "bytes": 25606,
+        "sha256": "de84f0f13096d16c463e9fdc0367c43fd89a91c83511790acc7b20756afc3e40"
+      },
+      {
+        "url": "/art/delivery/coral-rush-480-5d612cfb54ce.webp",
+        "width": 440,
+        "height": 440,
+        "bytes": 84518,
+        "sha256": "5d612cfb54ce4b7c187a4fbf6dbc0a0029ffc161c58edd1fa005bd4875a90f07"
+      }
+    ]
+  }
+}

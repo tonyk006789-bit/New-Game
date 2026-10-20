@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {cascadeSequence, storyboardRandom} from '@new-game/game-math';
-import {cascadeMotion, dampAngle, effectProgress, featureTiming, kenoDelay, recoilOffset, reelMotion, reelTravel} from '../../apps/player/src/game-motion';
+import {cascadeMotion, dampAngle, effectProgress, featureTiming, kenoDelay, recoilOffset, reelMotion, reelTravel,fishImpactPulse,netExpansion} from '../../apps/player/src/game-motion';
 
 describe('presentation timelines', () => {
   it('accelerates continuously, then brakes monotonically to a complete stop', () => {
@@ -78,5 +78,14 @@ describe('presentation timelines', () => {
     expect(recoilOffset(.12)).toBeLessThan(2);
     expect(effectProgress(0, .65)).toBe(0); expect(effectProgress(.65, .65)).toBe(1);
     expect(effectProgress(.325, .65)).toBeGreaterThan(.8);
+  });
+  it('never reverses a stopped reel or displaces fish paths for impact feedback',()=>{
+    const motion=reelMotion(4,21,24,false);
+    const distances=motion.keyframes.map(k=>Number(k.transform.match(/-?[\d.]+/)![0]));
+    expect(distances.every((d,i)=>!i||d<=distances[i-1])).toBe(true);
+    expect(fishImpactPulse(.4)).toBe(0);expect(fishImpactPulse(0)).toBe(0);
+    for(let t=0;t<=.4;t+=.004){expect(fishImpactPulse(t)).toBeGreaterThanOrEqual(0);expect(fishImpactPulse(t)).toBeLessThan(1);}
+    expect(netExpansion(0,.65)).toBeCloseTo(.18);expect(netExpansion(.65,.65)).toBe(1);
+    for(let age=0;age<.65;age+=.01)expect(netExpansion(age,.65)).toBeLessThan(1.06);
   });
 });

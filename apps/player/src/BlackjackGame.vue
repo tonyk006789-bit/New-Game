@@ -22,6 +22,7 @@ const hand=ref<View|null>(null),stake=ref('50'),busy=ref(false),loading=ref(true
 const dealerVisible=ref(1),dealerDealt=ref(0),playerVisible=ref<number[]>([]),showResult=ref(false),celebrate=ref(false),dealerReady=ref(false),turningCard=ref(-1);
 const felt=ref<HTMLElement|null>(null),flight=ref<DealerDelivery|null>(null);
 let flightId=0;
+let landingCue:DealCue|null=null;
 const dealerCards=computed(()=>hand.value?.dealer.map((card,index)=>index<dealerVisible.value?card:null)||[]);
 const active=computed(()=>!!hand.value&&!hand.value.settled),staked=computed(()=>props.authenticated&&stage.enabled&&blackjackCreditApproved(props.game));
 const timeLeft=computed(()=>Math.max(0,Math.min(profile.idleMs/1000,Math.ceil(((hand.value?.expiresAt?Date.parse(hand.value.expiresAt):0)-now.value)/1000))));
@@ -33,7 +34,7 @@ function later(fn:()=>void,delay:number){const timer=setTimeout(()=>{motionTimer
 function clearMotion(){for(const timer of motionTimers)clearTimeout(timer);motionTimers.clear();}
 const key=()=>`new-game-blackjack-${session.current?.id}`;
 function savePending(){if(!staked.value)return;try{if(pending.value)localStorage.setItem(key(),JSON.stringify(pending.value));else localStorage.removeItem(key());}catch{/* Server receipt still survives a storage failure. */}}
-function finishReveal(){clearTimeout(revealTimer);clearMotion();flight.value=null;turningCard.value=-1;revealing.value=false;showResult.value=!!hand.value?.settled;dealerVisible.value=hand.value?.settled?hand.value.dealer.length:1;dealerDealt.value=hand.value?.dealer.length||0;playerVisible.value=hand.value?.hands.map(h=>h.cards.length)||[];revealCredits(props.game);}
+function finishReveal(){clearTimeout(revealTimer);clearMotion();flight.value=null;landingCue=null;turningCard.value=-1;revealing.value=false;showResult.value=!!hand.value?.settled;dealerVisible.value=hand.value?.settled?hand.value.dealer.length:1;dealerDealt.value=hand.value?.dealer.length||0;playerVisible.value=hand.value?.hands.map(h=>h.cards.length)||[];revealCredits(props.game);}
 function launchCard(cue:DealCue){
  const root=felt.value,target=root?.querySelector(`[data-card="${cue.target}-${cue.hand}-${cue.index}"]`);
  if(!root||!target)return;
@@ -42,10 +43,17 @@ function launchCard(cue:DealCue){
  flight.value={id:++flightId,startedAt:performance.now(),kind:cue.kind,card:card||null,target:{x:(destination.left+destination.width/2-box.left)/box.width,y:(destination.top+destination.height/2-box.top)/box.height,width:destination.width/box.width,height:destination.height/box.height}};
 }
 function dealCue(cue:DealCue){
- launchCard(cue);
+ landingCue=cue;launchCard(cue);const id=flight.value?.id;
  later(()=>{if(cue.kind==='turn'){turningCard.value=cue.index;dealerVisible.value=Math.max(dealerVisible.value,cue.index+1);}playSound('card-deal');},CARD_RELEASE);
 
- later(()=>{turningCard.value=-1;if(cue.target==='player')playerVisible.value[cue.hand]=Math.max(playerVisible.value[cue.hand]||0,cue.index+1);else{dealerDealt.value=Math.max(dealerDealt.value,cue.index+1);if(cue.faceUp)dealerVisible.value=Math.max(dealerVisible.value,cue.index+1);}},CARD_LAND);
+ // Fallback covers the still dealer and unavailable WebGL without racing the render clock.
+ later(()=>landCard(id),CARD_LAND+100);
+}
+function landCard(id?:number){
+ if(id!==flight.value?.id||!landingCue)return;
+ const cue=landingCue;landingCue=null;turningCard.value=-1;
+ if(cue.target==='player')playerVisible.value[cue.hand]=Math.max(playerVisible.value[cue.hand]||0,cue.index+1);
+ else{dealerDealt.value=Math.max(dealerDealt.value,cue.index+1);if(cue.faceUp)dealerVisible.value=Math.max(dealerVisible.value,cue.index+1);}
 }
 function present(value:View,animate=true){
  if(value.game!==props.game){foreignHand.value=value.settled?null:value.game;return;}foreignHand.value=null;
@@ -98,7 +106,7 @@ onBeforeUnmount(()=>{disposed=true;clearInterval(poll);finishReveal();});
 <template><section class="blackjack-cabinet" :data-game="game" :class="{'cards-still':reducedMotion,'hand-revealing':revealing}">
  <p v-if="!blackjackCreditApproved(game)" class="blackjack-variant-note">FREE PREVIEW · No credits spent or awarded. Test rules awaiting owner approval.</p><div class="blackjack-rail"><span>♠ {{gameName(game).toUpperCase()}}</span><b>PREMIUM</b><span>{{staked?'PLAY CREDITS':'FREE PREVIEW'}}</span></div>
  <div ref="felt" class="blackjack-felt"><WinBurst v-if="celebrate&&hand?.settled&&showResult&&hand.hands.some(h=>h.result==='WIN'||h.result==='BLACKJACK')" :key="hand.id" :game="game" :id="hand.id" :award="hand.award" :stake="String(hand.hands.reduce((sum,h)=>sum+h.stake,0))" :running="running" :reduced-motion="reducedMotion"/>
-  <div class="dealer-room" aria-hidden="true"><i></i><i></i><i></i><i></i></div><BlackjackDealer :game="game" :delivery="flight" :active="revealing" @ready="dealerReady=true" :running="running" :reduced-motion="reducedMotion"/><div class="dealer-table-edge" aria-hidden="true"></div>
+  <div class="dealer-room" aria-hidden="true"><i></i><i></i><i></i><i></i></div><BlackjackDealer :game="game" :delivery="flight" :active="revealing" @ready="dealerReady=true" @landed="landCard" :running="running" :reduced-motion="reducedMotion"/><div class="dealer-table-edge" aria-hidden="true"></div>
   <div class="card-shoe" aria-hidden="true"><span>♠</span><b>{{profile.decks}} DECKS</b></div><div class="table-chip-rack" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="dealer-nameplate"><b>YOUR DEALER</b><small>{{profile.standSoft17?'STANDS ON ALL 17s':'HITS SOFT 17'}}</small></div>
   <div class="dealer-cards" aria-label="Dealer hand"><template v-if="hand"><div v-for="(card,i) in dealerCards" :key="`${hand.id}-dealer-${i}`" :data-card="`dealer-0-${i}`" class="playing-card" :class="{red:card&&(card.suit===1||card.suit===2),back:!card,'card-waiting':i>=dealerDealt,'dealer-card-turn':i===turningCard}" :aria-hidden="i>=dealerDealt"><template v-if="card"><b>{{rank(card)}}<small>{{suits[card.suit]}}</small></b><strong :class="{'court-card':card.rank>10}"><em v-if="card.rank>10">♛</em>{{suits[card.suit]}}</strong><b class="card-bottom">{{rank(card)}}<small>{{suits[card.suit]}}</small></b></template><span v-else>♠</span></div></template><span v-if="hand?.dealerValue&&showResult" class="hand-total">{{hand.dealerValue.total}}</span></div>
   <div class="felt-lettering"><strong>BLACKJACK PAYS 3 TO 2</strong><small>{{profile.decks}} DECKS · {{game==='european-blackjack'?'DEALER SECOND CARD AFTER YOUR TURN':game==='double-deck-blackjack'?'DOUBLE ON 9, 10 OR 11':'HIT / STAND / DOUBLE / SPLIT'}}</small></div>
