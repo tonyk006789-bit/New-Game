@@ -1,0 +1,48 @@
+/* The same material/lighting scene now contains the dealer and physical table.
+   DOM hands remain above it for readable ranks, keyboard access and recovery. */
+.blackjack-cabinet{--dealer-room:#23232e;--dealer-accent:#e2cfaa}
+.blackjack-cabinet[data-game="double-deck-blackjack"]{--dealer-room:#34252b;--dealer-accent:#e2c7a1}
+.blackjack-cabinet[data-game="european-blackjack"]{--dealer-room:#233239;--dealer-accent:#c7d6d8}
+.blackjack-cabinet .dealer-character{z-index:3}
+.blackjack-cabinet:has([data-renderer="jointed-3d"]) :is(.dealer-table-edge,.table-chip-rack){visibility:hidden}
+.blackjack-cabinet .dealer-room{inset:0 0 35%;background:radial-gradient(ellipse at 50% 6%,#b79b7330,transparent 45%),linear-gradient(90deg,#11121b,var(--dealer-room) 35%,var(--dealer-room) 65%,#11121b);padding-inline:17%}
+.blackjack-cabinet .dealer-room:after{content:"";top:8%;left:30%;right:30%;height:32%;border-radius:50%;background:radial-gradient(ellipse,#f0d39a0c,transparent 70%);text-indent:0}
+.blackjack-cabinet .dealer-room i{width:2px;background:linear-gradient(transparent,#b8a18255,#b8a18211);box-shadow:18px 0 0 #080a111a,-18px 0 0 #080a111a;transform:none}
+.blackjack-cabinet .dealer-nameplate{top:24%;left:11%;font-size:12px;letter-spacing:2.2px;gap:10px}
+.blackjack-cabinet .dealer-nameplate small{font-size:11px;letter-spacing:1px}
+.blackjack-cabinet .dealer-cards{top:53%;height:18%;gap:0}
+.blackjack-cabinet .playing-card{width:60px;min-width:60px;height:84px;background:#fffdf4;border:1px solid #c9c5b9;color:#20212c;box-shadow:1px 2px 1px #17131255,2px 5px 9px #090b173b;overflow:hidden;padding:0}
+.blackjack-cabinet .playing-card.red{color:#b12c3b}
+.blackjack-cabinet .card-ink{display:contents}
+.blackjack-cabinet .playing-card.back{border:3px solid #f2eee2;background:repeating-linear-gradient(45deg,transparent 0 3px,#b8a57d60 3px 3.4px,transparent 3.4px 6px),repeating-linear-gradient(-45deg,#28283f 0 3px,#b8a57d60 3px 3.4px,#28283f 3.4px 6px)}
+.blackjack-cabinet .playing-card .card-index{position:absolute;top:3px;left:3px;font:700 12px/.9 Georgia;text-align:center;z-index:2}
+.blackjack-cabinet .playing-card .card-index small{display:block;font:11px/1 Georgia;margin-top:2px}
+.blackjack-cabinet .playing-card .card-index.card-bottom{top:auto;left:auto;right:3px;bottom:3px;transform:rotate(180deg)}
+.blackjack-cabinet .card-pips{position:absolute;inset:0}
+.blackjack-cabinet .card-pips i{position:absolute;transform:translate(-50%,-50%);font:16px/1 Georgia}
+.blackjack-cabinet .card-pips i.inverted{transform:translate(-50%,-50%) rotate(180deg)}
+.blackjack-cabinet .card-pips.ace-pip i{font-size:31px}
+.blackjack-cabinet .card-court{position:absolute;inset:18% 24%;border:1px solid #b39b6b;background:#b39b6b22;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly}
+.blackjack-cabinet .card-court i{font:14px/.9 Georgia;color:#a58b52;text-align:center}
+.blackjack-cabinet .card-court i:last-child{transform:rotate(180deg)}
+.blackjack-cabinet .card-court b{display:block;font:700 11px/1 Georgia;color:#20212c}
+.blackjack-cabinet .red .card-court b{color:#b12c3b}
+.blackjack-cabinet .playing-card.back .card-back-medallion{position:absolute;inset:27% 25%;border-radius:50%;border:1px solid #d7c18d;background:#28283f;display:grid;place-items:center;font:23px/1 Georgia;color:#ead9b0;padding:0}
+.blackjack-cabinet:has([data-renderer="jointed-3d"]) .playing-card.dealer-card-turn{visibility:hidden;animation:none}
+.blackjack-cabinet .playing-card.dealer-card-turn{animation-duration:340ms}
+.blackjack-cabinet .felt-lettering{top:72%;opacity:.74}
+.blackjack-cabinet .felt-lettering strong{font:500 13px Georgia;letter-spacing:3px;color:#e2d4b8}
+.blackjack-cabinet .felt-lettering small{font-size:9px;letter-spacing:1.2px;color:#e2d4b8;opacity:1}
+.blackjack-cabinet .blackjack-player-hands{top:80%}
+.blackjack-cabinet .blackjack-hand{padding-top:0}
+.blackjack-cabinet .blackjack-hand.current{border-color:transparent;box-shadow:none;background:transparent}
+.blackjack-cabinet .blackjack-hand.current .hand-label b{background:#e6d0a5;color:#24232b}
+.blackjack-cabinet .hand-label{max-width:none;white-space:nowrap;top:16%;gap:5px}
+.blackjack-cabinet .hand-label b{font:700 16px/1.1 Arial;white-space:nowrap;margin:0;padding:4px 8px;justify-self:end;border-radius:12px}
+.blackjack-cabinet .table-betting-line{position:absolute;z-index:4;left:14%;right:14%;top:59%;height:12%;border-bottom:1px solid #e2d4b84d;border-radius:0 0 50% 50%;pointer-events:none}
+.blackjack-cabinet .blackjack-welcome{top:81%}
+.blackjack-cabinet .blackjack-welcome h2{font-size:23px;letter-spacing:.3px}
+.blackjack-cabinet .blackjack-welcome p{font-size:12px}
+.blackjack-cabinet .blackjack-return{bottom:5%;right:5%;background:#1a1a23ed;padding:7px 12px;box-shadow:0 5px 18px #0003}
+.blackjack-cabinet .hand-result{bottom:-12px;font-size:11px}
+@container (max-height:460px){.blackjack-cabinet .playing-card{height:72px;width:52px;min-width:52px}.blackjack-cabinet .card-pips i{font-size:13px}.blackjack-cabinet .card-pips.ace-pip i{font-size:28px}.blackjack-cabinet .blackjack-player-hands{top:79%}.blackjack-cabinet .playing-card .card-index{font-size:11px}.blackjack-cabinet .playing-card .card-index small{font-size:9px}}

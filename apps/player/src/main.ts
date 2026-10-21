@@ -38,3 +38,4 @@ import './experience-v35.css';
 import './blackjack-v37.css';
 import './identity-v47.css';
 import './motion-v48.css';
+import './blackjack-v49.css';

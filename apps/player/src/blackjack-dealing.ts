@@ -1,7 +1,7 @@
 /** Presentation only. The server's cards and awards are never changed here. */
 export type DealSnapshot={id:string;settled:boolean;dealer:readonly unknown[];hands:readonly {cards:readonly unknown[]}[]};
 export type DealCue={target:'player'|'dealer';hand:number;index:number;kind:'deal'|'turn';at:number;faceUp:boolean};
-export const DEAL_STEP=1120, CARD_RELEASE=650, CARD_LAND=890;
+export const DEAL_STEP=1120, CARD_RELEASE=650, CARD_LAND=990;
 export function blackjackDealPlan(previous:DealSnapshot|null,next:DealSnapshot,holeCard=true){
  const opening=!previous||previous.id!==next.id||previous.settled;
  const split=!opening&&next.hands.length>previous.hands.length;
