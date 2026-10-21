@@ -32,7 +32,13 @@ Reviewed the official [Three.js physical-material documentation](https://threejs
 
 ## Publication and remaining limits
 
-Vercel publication and final deployment checks pending. No database migration, operator deployment, mathematics or balance migration is required.
+Published to https://new-game-test-topaz.vercel.app/. No database migration, operator deployment, mathematics or balance migration is required.
+
+- Implementation commit: `99cd2d9`.
+- Deployment: `dpl_GBd5E84DYN7U3paUjTdkRmkmX7Pw`, https://new-game-test-mnyg2gqa0-tonyk006789-7532.vercel.app/ — READY with production alias assigned.
+- Published using `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config 'C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli' --scope tonyk006789-7532 --no-color`.
+- `node .local/verify-v49-live.mjs` — passed 27 SHA/cache checks covering all emitted JS/CSS and all three dealer models. Health 200, unauthenticated session 401, catalog 31. Entry `/assets/index-Br7rufxE.js`, stylesheet `/assets/index-Bn82stKl.css`, lazy dealer `/assets/dealer-rig-B1DtMkRs.js`.
+- Live browser: restored the existing session, verified the jointed-3D renderer and completed a Double Deck free-preview deal/stand. Player 17, dealer bust 25, preview return 1.00; hosted credit display stayed 1,468.80. No hosted credit-staked play or account change. No captured JavaScript errors. Saved `reports/screenshots/v49/live-double-deck.png` and `live-checks.json`.
 
 Physical Android/iPhone rendering, native lifecycle and real-device performance remain unverified. The existing models retain their real-time mesh limitations; this release does not claim cinematic human realism or universal glitch-free rendering.
 
