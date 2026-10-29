@@ -33,4 +33,11 @@ Target is the existing authorized player project, https://new-game-test-topaz.ve
 
 Do not roll back accepted rounds, ledger postings, immutable history or setting revisions. Prefer a forward fix. A presentation-only rollback may restore V49 visuals while retaining V50 historical evaluation. A full V49 rollback would restore old rules for future rounds and lose correct V50 historical line-map/evaluator support; do not use it as an automatic rollback after V50 stakes have been accepted. No accounting data rollback is needed.
 
-Publication evidence will be recorded after the deployment and live verification.
+Published successfully to https://new-game-test-topaz.vercel.app/.
+
+- Implementation commit: `7072a41`.
+- Deployment: `dpl_56WrVjCq97ZvGLh32D8yyWbSP7Pa`, https://new-game-test-88luej3vq-tonyk006789-7532.vercel.app/ — READY and production alias assigned.
+- Exact publication command: `node --import ./.local/vercel-web-gateway.mjs .cache/vercel-tools/node_modules/vercel/dist/vc.js deploy --prebuilt --prod --yes --global-config 'C:/Users/kcdre/OneDrive/Documents/ChatGPT/New Game/.local/vercel-cli' --scope tonyk006789-7532 --no-color`.
+- `node .local/verify-v50-live.mjs` — all 27 JS/CSS/model SHA/cache checks passed, health 200, unauthenticated session 401, catalog 31, `stage-straight-v50` present and Outlaw catalog metadata updated.
+- Live browser update banner reloaded the new version and restored the existing session. The virtual lobby and Outlaw's three horizontal rule diagrams/20% disclosure were verified. Hosted credits remained 423.55; no hosted stake or account mutation was performed. No captured JavaScript errors. Final screenshot: `reports/screenshots/v50/live-lobby.png`.
+- Initial Git commit lacked a configured identity; used the same per-command Codex identity as the previous commits, without changing global Git configuration. This did not affect the built or published files.
