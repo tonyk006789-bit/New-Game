@@ -1,6 +1,6 @@
 import {randomInt,randomUUID} from 'node:crypto';
 import {z} from 'zod';
-import {expansionProfile,newCabinetsProfile,blackjackProfile,stagingProfile,stagingRules,premiumKenoProfile,isKenoGame,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,configuredGameProfileId,testProbabilityPolicy,stagingOutcome,stagingMultiplier,reefChallengeOutcome,reefChallengeProfile,reefFlight,reefBallistics,isFishGame,stakePolicy,hasLowStake,validGameStake,type StagingGame} from '@new-game/game-math';
+import {straightLineProfile,expansionProfile,newCabinetsProfile,blackjackProfile,stagingProfile,stagingRules,premiumKenoProfile,isKenoGame,cabinetExpansionProfile,classicReelsProfile,stagingGameProfileId,configuredGameProfileId,testProbabilityPolicy,stagingOutcome,stagingMultiplier,reefChallengeOutcome,reefChallengeProfile,reefFlight,reefBallistics,isFishGame,stakePolicy,hasLowStake,validGameStake,type StagingGame} from '@new-game/game-math';
 import {stagingEnabled} from './environment.js';
 import {actorFor,parse,type Request} from './auth.js';
 import {transaction,fail,idempotent} from './store.js';
@@ -8,7 +8,7 @@ import {lockWallets,posting,beginLedger} from './ledger.js';
 import {canonical,digest} from './security.js';
 import {readRoundPolicy} from './game-policy.js';
 export const profileHash=digest(canonical(stagingProfile));
-export async function environment(){return {staging:stagingEnabled(),productionApproved:false,roundPolicy:stagingEnabled()?await transaction(db=>readRoundPolicy(db)):null,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null,additionalProfiles:stagingEnabled()?[expansionProfile,newCabinetsProfile,cabinetExpansionProfile,classicReelsProfile,premiumKenoProfile,blackjackProfile,reefChallengeProfile,testProbabilityPolicy,stakePolicy].map(profile=>({...profile,hash:digest(canonical(profile))})):[]};}
+export async function environment(){return {staging:stagingEnabled(),productionApproved:false,roundPolicy:stagingEnabled()?await transaction(db=>readRoundPolicy(db)):null,sampleLogin:process.env.GAME_ENV==='staging'&&stagingEnabled()&&process.env.STAGING_DEMO_PASSWORD?{username:'stage.player',password:process.env.STAGING_DEMO_PASSWORD}:null,profile:stagingEnabled()?{...stagingProfile,hash:profileHash}:null,additionalProfiles:stagingEnabled()?[straightLineProfile,expansionProfile,newCabinetsProfile,cabinetExpansionProfile,classicReelsProfile,premiumKenoProfile,blackjackProfile,reefChallengeProfile,testProbabilityPolicy,stakePolicy].map(profile=>({...profile,hash:digest(canonical(profile))})):[]};}
 function gate(){if(!stagingEnabled())fail(404,'STAGING_DISABLED');}
 const schema=z.object({requestKey:z.string().min(8).max(128),stake:z.string().regex(/^[1-9]\d{0,3}$/).refine(value=>Number(value)<=2000),profileId:z.string().min(1).max(80),picks:z.array(z.number().int().min(1).max(80)).min(4).max(10).optional(),trajectoryVersion:z.string().max(60).optional(),roomId:z.uuid().optional(),targetId:z.number().int().min(1).max(80).optional(),aimX:z.number().min(0).max(1200).optional(),aimY:z.number().min(0).max(600).optional(),observedAt:z.number().int().optional(),firedAt:z.number().int().optional(),angle:z.number().min(-Math.PI).max(Math.PI).optional()}).strict();
 export async function stagingRound(req:Request,id:string,body:unknown){
@@ -22,7 +22,7 @@ export async function stagingRound(req:Request,id:string,body:unknown){
    // Accepted historical receipts replay before checking the stake/profile for new plays.
    if(!validGameStake(game,data.stake))fail(400,'INVALID_STAKE','Choose a listed stake for this game.');
    const policy=await readRoundPolicy(db,!isFishGame(game)),profileId=configuredGameProfileId(game,policy);
-   const baseId=stagingGameProfileId(game),baseProfile=[expansionProfile,newCabinetsProfile,premiumKenoProfile,classicReelsProfile,cabinetExpansionProfile,stagingProfile].find(p=>p.id===baseId);
+   const baseId=stagingGameProfileId(game),baseProfile=[straightLineProfile,expansionProfile,newCabinetsProfile,premiumKenoProfile,classicReelsProfile,cabinetExpansionProfile,stagingProfile].find(p=>p.id===baseId);
    const roundProfileHash=digest(canonical(isFishGame(game)?{profile:reefChallengeProfile,ballistics:reefBallistics.version,...(hasLowStake(game)?{stakePolicy}:{})}:{id:profileId,policy,definition:testProbabilityPolicy,baseProfile,...(hasLowStake(game)?{stakePolicy}:{})}));
    if(data.profileId!==profileId)fail(400,'PROFILE_CHANGED','Refresh the arcade before starting a new round.');
    if(isFishGame(game)&&data.trajectoryVersion!==reefBallistics.version)fail(400,'PROFILE_CHANGED','Refresh the arcade before firing.');

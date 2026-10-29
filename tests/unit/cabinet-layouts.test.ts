@@ -4,7 +4,7 @@ import {displayedReelGrid,isPortraitGame} from '../../apps/player/src/cabinet-la
 
 describe('distinct cabinet layouts and historical evaluation',()=>{
  for(const game of ['neon-sevens','ruby-rush'] as CabinetGameId[])it(`${game}: three physical reels and approved triple returns`,()=>{
-  expect(stagingGameProfileId(game)).toBe(classicReelsProfile.id);
+  expect(stagingGameProfileId(game)).toBe('stage-straight-v50');
   for(const [symbol,award] of Object.entries(classicReelsProfile.rewards)){
    const grid=[[symbol,symbol,symbol],['bar',symbol==='bell'?'gem':'bell','cherry'],['seven','cherry','bar']];
    const matches=cabinetMatches(game,grid);

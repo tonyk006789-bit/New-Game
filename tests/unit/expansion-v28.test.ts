@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {catalog,GameId,premiumGames} from '@new-game/contracts';
-import {expansionAliases,stagingOutcome,stagingMultiplier,stagingGameProfileId,storyboardRandom,blackjackShoe,blackjackDeal,blackjackAct,blackjackPublic,blackjackFinish,blackjackProfiles,fishGuide,reefTarget,reefTier,reefLeadAngle,reefFlight} from '@new-game/game-math';
+import {expansionAliases,cabinetMatches,stagingOutcome,stagingMultiplier,stagingGameProfileId,storyboardRandom,blackjackShoe,blackjackDeal,blackjackAct,blackjackPublic,blackjackFinish,blackjackProfiles,fishGuide,reefTarget,reefTier,reefLeadAngle,reefFlight} from '@new-game/game-math';
 const shoe=(...ranks:number[])=>[...ranks,...Array(100).fill(10)].map((rank,i)=>({rank,suit:i%4}));
 describe('thirty-game expansion',()=>{
  it('contains 31 unique playable identities, seven fish worlds, five kenos and three premium blackjack tables',()=>{
@@ -8,13 +8,17 @@ describe('thirty-game expansion',()=>{
   expect(catalog.filter(g=>g.category==='Fish')).toHaveLength(7);expect(catalog.filter(g=>g.category==='Keno')).toHaveLength(5);
   expect(premiumGames).toHaveLength(3);for(const g of catalog)expect(GameId.parse(g.id)).toBe(g.id);
  });
- it('keeps reused profiles and their complete displayed outcomes equivalent without changing historical profile IDs',()=>{
+ it('keeps unchanged aliases equivalent and isolates V50 horizontal-line revisions',()=>{
   for(const [game,base] of Object.entries(expansionAliases))for(let seed=1;seed<100;seed++){
    const next=stagingOutcome(game as keyof typeof expansionAliases,'round',storyboardRandom(seed),[1,7,19,25,40,72]);
+   if(game==='celestial-wilds'){
+    expect(next.matches).toEqual(cabinetMatches('celestial-wilds',next.frames!.at(-1)!.grid,'stage-expansion-v28'));
+    expect(stagingGameProfileId(game)).toBe('stage-expansion-v28');continue;
+   }
    const original=stagingOutcome(base,'round',storyboardRandom(seed),[1,7,19,25,40,72]);
-   expect({...next,game:base}).toEqual(original);expect(stagingMultiplier(next)).toBe(stagingMultiplier(original));expect(stagingGameProfileId(game)).toBe('stage-expansion-v28');
+   expect({...next,game:base}).toEqual(original);expect(stagingMultiplier(next)).toBe(stagingMultiplier(original));expect(stagingGameProfileId(game)).toBe(game==='outlaw-sevens'?'stage-straight-v50':'stage-expansion-v28');
   }
-  expect(stagingGameProfileId('disco-diamonds')).toBe('stage-cabinets-v23');expect(stagingGameProfileId('neon-numbers')).toBe('stage-keno-cabinets-v1');
+  expect(stagingGameProfileId('disco-diamonds')).toBe('stage-straight-v50');expect(stagingGameProfileId('neon-numbers')).toBe('stage-keno-cabinets-v1');
  });
  it('uses unique fish pools with collidable convoy/orbit paths and all four size tiers',()=>{
   for(const game of ['corsair-cove','cosmic-tides'] as const){

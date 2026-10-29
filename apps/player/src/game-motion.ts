@@ -20,8 +20,8 @@ export function reelMotion(column: number, travelCells: number, totalCells: numb
   const speed = fast ? 1.85 : 1;
   const keyframes = Array.from({ length: 81 }, (_, index) => {
     const offset = index / 80;
-    // Stop on the committed symbol without reversing the strip for a synthetic bounce.
-    return { offset, transform: `translateY(${-100 * travelCells * reelTravel(offset) / totalCells}%)` };
+    // Start at the old symbols at the bottom; travel down to the accepted grid at the top.
+    return { offset, transform: `translateY(${-100 * travelCells * (1-reelTravel(offset)) / totalCells}%)` };
   });
   return { keyframes, duration: (2050 + column * 190) / speed, delay: column * 35 / speed };
 }

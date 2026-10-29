@@ -9,7 +9,7 @@ describe('thirty-game collection and independent visual bots',()=>{
   expect(premiumGames).toEqual(['royal-blackjack','double-deck-blackjack','european-blackjack']);
  });
  it.each([['disco-diamonds','neon-sevens'],['midnight-express','jade-fortune'],['pirate-gold','coin-carnival']] as const)('%s preserves %s approved outcome math', (game,base)=>{
-  expect(stagingGameProfileId(game)).toBe('stage-cabinets-v23');
+  expect(stagingGameProfileId(game)).toBe(game==='pirate-gold'?'stage-cabinets-v23':'stage-straight-v50');
   for(let seed=1;seed<=160;seed++){
    const a=stagingOutcome(game,'same',storyboardRandom(seed)),b=stagingOutcome(base as StagingGame,'same',storyboardRandom(seed));
    expect('frames' in a&&a.frames).toEqual('frames' in b&&b.frames);

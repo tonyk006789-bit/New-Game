@@ -3,7 +3,7 @@ import GameBrand from './GameBrand.vue';
 import GameCharacter from './GameCharacter.vue';
 import WinBurst from './WinBurst.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { cabinetGames, legacyCabinetGames, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
+import { cabinetGames, legacyCabinetGames, cabinetReceiptProfile, usesStraightLines, cabinetBase, cabinetPractice, storyboardRandom, type CabinetGameId, type CabinetResult } from '@new-game/game-math';
 import { catalog } from '@new-game/contracts';
 import ReelStage from './ReelStage.vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
@@ -23,7 +23,8 @@ const reelGrid=(grid:string[][])=>displayedReelGrid(props.game,grid);
 const initialGrid = Array.from({length:3}, (_, r) => Array.from({length:profile.columns}, (_, c) => profile.symbols[(r + c) % profile.symbols.length]));
 const reels = ref<InstanceType<typeof ReelStage>>();
 const result = ref<CabinetResult | null>(null), frame = ref(0), active = ref(false), saving = ref(false), loading = ref(props.authenticated);
-const renderProfile=computed(()=>result.value?.frames[0]?.grid[0]?.length===5?legacyCabinetGames[props.game]:profile);
+const renderProfile=computed(()=>result.value?cabinetReceiptProfile(props.game,result.value.frames[0].grid[0].length,result.value.ruleVersion):profile);
+const previousLines=computed(()=>!!result.value&&usesStraightLines(props.game)&&!result.value.ruleVersion.includes('straight-v50'));
 const legacyReceipt=computed(()=>renderProfile.value.columns!==profile.columns);
 const fast = ref(false), showLines = ref(false), phase = ref('ready');
 const lineIndex=ref(0),freshResult=ref(false);
@@ -98,12 +99,12 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
   <section class="slot-cabinet" :class="[game.id, {'cabinet-active':active, 'stage-paused':!running,'classic-three':renderProfile.columns===3,'single-row-cabinet':singleRow}]" :data-phase="phase" :style="{'--game-color':game.color}">
     <WinBurst v-if="celebrating&&result" :key="result.id" :game="game.id" :id="result.id" :award="returnAmount" :stake="stage.last?.stake||'25'" :running="running" :reduced-motion="reducedMotion"/><div v-if="newTheme>=0" class="cabinet-v23-backdrop" :style="{backgroundPosition:`${newTheme*50}% center`}" aria-hidden="true"></div><div class="cabinet-bulbs" aria-hidden="true"><i v-for="n in 36" :key="n" :style="{'--lamp': n}"></i></div>
     <header class="slot-marquee"><span class="marquee-wing host-wing"><GameCharacter :game="props.game" compact/></span><div><small>NEW GAME ORIGINAL</small><h2><GameBrand :game="game.id"/></h2><p>{{legacyReceipt?'SAVED 5-REEL RESULT':game.detail}}</p></div><span class="marquee-wing"><ArcadeSymbol :theme="game.id" :symbol="coinGame?'coin':baseGame==='jade-fortune'?'dragon':'seven'"/></span></header>
-    <p v-if="legacyReceipt" class="legacy-layout-note">Previous five-reel round · New spins use three reels</p>
+    <p v-if="legacyReceipt||previousLines" class="legacy-layout-note">Saved result uses its original rules · New spins use {{profile.columns}} reels and {{profile.lines.length}} horizontal lines</p>
     <div v-if="game.id==='midnight-express'" class="express-feature" aria-hidden="true"><span>MIDNIGHT DEPARTURE</span><ArcadeSymbol symbol="dragon" theme="midnight-express"/><b>LOCOMOTIVE WILD</b></div><div v-if="crownGame" class="portrait-crown-feature" aria-hidden="true"><span>THE ROYAL COLLECTION</span><ArcadeSymbol symbol="dragon" :theme="game.id"/><b>CROWN WILD</b></div>
     <div class="cabinet-game-body">
       <aside class="cabinet-side left"><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span><div class="cabinet-readout"><small>{{ coinGame ? 'HELD' : 'MATCHES' }}</small><strong>{{ coinGame ? locked.length : phase === 'complete' ? result?.matches.length || 0 : '—' }}<em v-if="coinGame"> / 5</em></strong></div><b>{{ coinGame ? 'COLLECT' : baseGame === 'jade-fortune' ? 'WILD' : 'TRIPLES' }}</b></aside>
       <div class="slot-reel-surround">
-        <div class="reel-banner"><span>{{ coinGame ? singleRow?'SUN COINS • LOCK & COLLECT':'LOCK A COIN • HOLD THE REEL' : `${renderProfile.lines.length} LINES • LEFT TO RIGHT` }}</span><span>{{ coinGame ? `${remaining} RESPINS LEFT` : (staked ? 'PLAY' : 'FREE PRACTICE') }}</span></div>
+        <div class="reel-banner"><span>{{ coinGame ? singleRow?'SUN COINS • LOCK & COLLECT':'LOCK A COIN • HOLD THE REEL' : `${renderProfile.lines.length} ${renderProfile.lines.every(line=>line.every(row=>row===line[0]))?'HORIZONTAL ' : ''}LINES • LEFT TO RIGHT` }}</span><span>{{ coinGame ? `${remaining} RESPINS LEFT` : (staked ? 'PLAY' : 'FREE PRACTICE') }}</span></div>
         <div class="reel-playfield">
 
           <ReelStage ref="reels" :theme="game.id" :initial-grid="reelGrid(initialGrid)" :strip-symbols="profile.symbols" :reduced-motion="reducedMotion" :highlighted="highlighted" :locked="coinGame ? locked : []" />
@@ -111,7 +112,7 @@ onBeforeUnmount(() => { disposed = true; generation++; cancelDelay();clearInterv
         </div>
         <div class="reel-tray"><span v-if="coinGame" class="coin-lamps"><i v-for="n in profile.columns" :key="n" :class="{lit:locked.includes(n-1)}">{{ locked.includes(n-1) ? '★ LOCKED' : '☆ REEL ' + n }}</i></span><span v-else>✦ {{ phase === 'complete' && result?.matches.length ? `LINE ${currentMatches[0]?.line || 1} · ${currentMatches[0]?.count || 3} MATCHES` : 'SPIN • MATCH • LIGHT IT UP' }} ✦</span></div>
       </div>
-      <aside class="cabinet-side right"><strong>{{ coinGame ? remaining : profile.lines.length }}</strong><b>{{ coinGame ? 'RESPINS' : 'LINES' }}</b><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span></aside>
+      <aside class="cabinet-side right"><strong>{{ coinGame ? remaining : renderProfile.lines.length }}</strong><b>{{ coinGame ? 'RESPINS' : 'LINES' }}</b><span class="rail-stars" aria-hidden="true">✦<br>✦<br>✦</span></aside>
     </div>
     <div class="cabinet-controls"><BetControls :game="game.id" :ready="running" :authenticated="!!authenticated" :busy="active||saving" :reduced-motion="reducedMotion"/><div class="led-meter"><small>PLAY CREDITS</small><strong>{{balance}}</strong></div><button v-if="!coinGame" :disabled="active || saving" :aria-pressed="showLines" class="line-map-button" @click="showLines=!showLines">{{ showLines ? 'HIDE LINES' : 'LINE MAP' }}</button><button class="cabinet-speed" :aria-pressed="fast" aria-label="Fast animations" :disabled="active || saving" @click="fast=!fast">»<small>{{fast?'FAST':'NORMAL'}}</small></button><button v-if="active" class="cabinet-spin" @click="finish">STOP<small>SHOW RESULT</small></button><button v-else class="cabinet-spin" :disabled="creditPresentation.held!==null || !running || saving || loading" @click="play">{{ loading ? 'WAIT' : saving ? 'WAIT' : pendingKey ? 'RETRY' : 'SPIN' }}<small>{{ loading ? 'LOADING' : saving ? 'SAVING' : (staked ? 'PLAY' : 'FREE PRACTICE') }}</small></button></div>
     <p class="cabinet-notice" role="status">{{crownGame?notice.replaceAll('dragon','crown'):notice}}</p>

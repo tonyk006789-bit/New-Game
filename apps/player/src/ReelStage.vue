@@ -27,7 +27,7 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
   rows.value = grid.length;
   columns.value = Array.from({ length: grid[0].length }, (_, index) => {
     const column = previousColumns[index] || grid.map(row => row[index]);
-    return held.includes(index) ? grid.map(row => row[index]) : [...column, ...Array.from({ length: 10 + index * 2 }, (_, n) => stripSymbols[(n * 2 + index) % stripSymbols.length]), ...grid.map(row => row[index])];
+    return held.includes(index) ? grid.map(row => row[index]) : [...grid.map(row => row[index]), ...Array.from({ length: 10 + index * 2 }, (_, n) => stripSymbols[(n * 2 + index) % stripSymbols.length]), ...column];
   });
   await nextTick();
   if (token !== generation || !root.value) return;

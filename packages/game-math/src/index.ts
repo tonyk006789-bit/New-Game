@@ -181,7 +181,12 @@ export const legacyCabinetGames = {...originalCabinetGames,
  'solar-fortune':originalCabinetGames['coin-carnival']
 } as const;
 const classicCabinet={...originalCabinetGames['neon-sevens'],columns:3,lines:[[1,1,1],[0,0,0],[2,2,2],[0,1,2],[2,1,0]]} as const;
-export const cabinetGames={...legacyCabinetGames,'outlaw-sevens':classicCabinet,'neon-sevens':classicCabinet,'ruby-rush':classicCabinet,'disco-diamonds':classicCabinet} as const;
+export const cabinetGamesV49={...legacyCabinetGames,'outlaw-sevens':classicCabinet,'neon-sevens':classicCabinet,'ruby-rush':classicCabinet,'disco-diamonds':classicCabinet} as const;
+export const straightLineGames=['temple-lights','neon-sevens','ruby-rush','disco-diamonds','outlaw-sevens','jade-fortune','sapphire-crown','midnight-express'] as const;
+export const usesStraightLines=(game:string)=>(straightLineGames as readonly string[]).includes(game);
+const straightClassic={...classicCabinet,lines:classicCabinet.lines.slice(0,3)};
+const straightWild={...originalCabinetGames['jade-fortune'],lines:originalCabinetGames['jade-fortune'].lines.slice(0,3)};
+export const cabinetGames={...cabinetGamesV49,'neon-sevens':straightClassic,'ruby-rush':straightClassic,'disco-diamonds':straightClassic,'outlaw-sevens':straightClassic,'jade-fortune':straightWild,'sapphire-crown':straightWild,'midnight-express':straightWild} as const;
 export type CabinetGameId = keyof typeof cabinetGames;
 export function cabinetBase(game:CabinetGameId):keyof typeof originalCabinetGames{return Object.hasOwn(cabinetAliases28,game)?cabinetAliases28[game as keyof typeof cabinetAliases28]:Object.hasOwn(newCabinetAliases,game)?newCabinetAliases[game as keyof typeof newCabinetAliases]:Object.hasOwn(cabinetAliases,game)?cabinetAliases[game as keyof typeof cabinetAliases]:game as keyof typeof originalCabinetGames;}
 export function isCabinetGame(game:string):game is CabinetGameId{return Object.hasOwn(cabinetGames,game);}
@@ -191,10 +196,13 @@ export type CabinetResult = {
   id: string; game: CabinetGameId; mode: 'PRACTICE'|'STAGING'; ruleVersion: string;
   frames: CabinetFrame[]; matches: CabinetMatch[]; collected: number; description: string; creditsChanged: boolean;
 };
-export function cabinetMatches(game: CabinetGameId, grid: string[][]): CabinetMatch[] {
-  // Five-column historical receipts keep their original evaluation after the
-  // approved switch to three reels. New outcomes only use cabinetGames below.
-  const profile = grid[0]?.length===5?legacyCabinetGames[game]:cabinetGames[game];
+export function cabinetReceiptProfile(game:CabinetGameId,columns:number,ruleVersion?:string){
+  // A version, not grid width alone, distinguishes old diagonal receipts.
+  if(ruleVersion?.includes('straight-v50'))return cabinetGames[game];
+  return columns===5?legacyCabinetGames[game]:cabinetGamesV49[game];
+}
+export function cabinetMatches(game: CabinetGameId, grid: string[][],ruleVersion?:string): CabinetMatch[] {
+  const profile = cabinetReceiptProfile(game,grid[0]?.length,ruleVersion);
   if (grid.length !== 3 || grid.some(row => row.length !== profile.columns || row.some(symbol => !(profile.symbols as readonly string[]).includes(symbol)))) throw new Error('Invalid cabinet grid');
   const matches: CabinetMatch[] = [];
   profile.lines.forEach((rows, line) => {
@@ -220,9 +228,10 @@ export function cabinetPractice(game: CabinetGameId, id: string, random: RandomI
     remaining--;
     frames.push({ grid, locked: [...locked], remaining });
   }
-  const matches = cabinetMatches(game, grid), collected = locked.length;
+  const ruleVersion=usesStraightLines(game)?'practice-straight-v50':profile.columns===3?'practice-classic3-v1':'practice-cabinets-v2';
+  const matches = cabinetMatches(game, grid,ruleVersion), collected = locked.length;
   const description = coinGame ? `${collected} of ${profile.columns} coin reels locked in ${frames.length - 1} respins.` : matches.length ? `${matches.length} matching line${matches.length === 1 ? '' : 's'}.` : 'No matching lines. Spin again!';
-  return { id, game, mode: 'PRACTICE', ruleVersion: profile.columns===3?'practice-classic3-v1':'practice-cabinets-v2', frames, matches, collected, description, creditsChanged: false };
+  return { id, game, mode: 'PRACTICE', ruleVersion, frames, matches, collected, description, creditsChanged: false };
 }
 
 export const stakeLimits={min:25,max:2000,step:25} as const;
@@ -313,18 +322,23 @@ export const newCabinetsProfile={id:'stage-cabinets-v23',baseProfiles:[stagingPr
 export const expansionAliases={...cabinetAliases28,...featureAliases,'meteor-keno':'orchard-numbers','bamboo-keno':'orchard-numbers'} as const;
 export const expansionProfile={id:'stage-expansion-v28',baseProfiles:[stagingProfile.id,classicReelsProfile.id],payingProbability:stagingProfile.payingProbability,aliases:expansionAliases} as const;
 export const expansionRules={'outlaw-sevens':classicReelsProfile.rules['neon-sevens'],'celestial-wilds':stagingProfile.rules['jade-fortune'].replace('Dragon','Moon'), 'clockwork-vault':stagingProfile.rules['aurora-vault'],'phoenix-falls':stagingProfile.rules['ember-relics'],'meteor-keno':stagingProfile.rules['orchard-numbers'],'bamboo-keno':stagingProfile.rules['orchard-numbers']} as const;
-export const stagingRules={'coral-rush':currentFishRules,...expansionRules,...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,...newCabinetsProfile.rules,'corsair-cove':currentFishRules,'cosmic-tides':currentFishRules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
+const straightClassicRules='Three reels, three horizontal lines. Match all three symbols on a row: cherry 1×, bell 2×, BAR 2×, gem 3×, seven 5×. Add winning rows. Diagonal matches do not pay.';
+const straightWildRules='Five reels, three horizontal lines. Match from the leftmost reel: three symbols 2×, four 4×, five 8× per row. Wild substitutes; an all-wild run pays once per row. Diagonal matches do not pay.';
+export const straightLineProfile={id:'stage-straight-v50',games:straightLineGames,lines:{classic:straightClassic.lines,wild:straightWild.lines},rules:{'neon-sevens':straightClassicRules,'ruby-rush':straightClassicRules,'disco-diamonds':straightClassicRules,'outlaw-sevens':straightClassicRules,'jade-fortune':straightWildRules,'sapphire-crown':straightWildRules,'midnight-express':straightWildRules},rewards:{classic:classicReelsProfile.rewards,wild:{3:2,4:4,5:8}}} as const;
+export const stagingRules={'coral-rush':currentFishRules,...expansionRules,...stagingProfile.rules,...cabinetExpansionProfile.rules,...classicReelsProfile.rules,...newCabinetsProfile.rules,...straightLineProfile.rules,'corsair-cove':currentFishRules,'cosmic-tides':currentFishRules,'reef-party':currentFishRules,'abyss-legends':currentFishRules,'sunken-dynasty':currentFishRules,'polar-odyssey':currentFishRules,'neon-numbers':stagingProfile.rules['orchard-numbers'],'pearl-keno':stagingProfile.rules['orchard-numbers']};
 export type StagingGame=keyof typeof stagingRules;
 export const premiumKenoProfile={id:'stage-keno-cabinets-v1',baseProfile:stagingProfile.id,aliases:{'neon-numbers':'orchard-numbers','pearl-keno':'orchard-numbers'}} as const;
-export function stagingGameProfileId(game:string){return Object.hasOwn(expansionAliases,game)?expansionProfile.id:Object.hasOwn(newCabinetAliases,game)?newCabinetsProfile.id:Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
-export type StagingVisual={id:string;game:StagingGame;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
+export function stagingGameProfileId(game:string){return Object.hasOwn(straightLineProfile.rules,game)?straightLineProfile.id:Object.hasOwn(expansionAliases,game)?expansionProfile.id:Object.hasOwn(newCabinetAliases,game)?newCabinetsProfile.id:Object.hasOwn(premiumKenoProfile.aliases,game)?premiumKenoProfile.id: isFishGame(game)?reefAssistProfile.id:Object.hasOwn(classicReelsProfile.rules,game)?classicReelsProfile.id:Object.hasOwn(cabinetAliases,game)?cabinetExpansionProfile.id:stagingProfile.id;}
+export type StagingVisual={id:string;game:StagingGame;ruleVersion?:string;description:string;frames?:CabinetFrame[];matches?:CabinetMatch[];collected?:number;sequence?:VaultSequence|CascadeSequence;grid?:string[][];lines?:{row:number;count:number}[];drawn?:number[];picks?:number[];hits?:number[];captured?:boolean;fish?:{species:number;tier:ReturnType<typeof reefTier>;profileId:string}};
 export function stagingMultiplier(outcome:StagingVisual):number {
  const game=outcome.game;
+ if(isCabinetGame(game)&&cabinetBase(game)!=='coin-carnival'){
+  const matches=cabinetMatches(game,outcome.frames!.at(-1)!.grid,outcome.ruleVersion);
+  return matches.reduce((n,m)=>n+(cabinetBase(game)==='neon-sevens'?({cherry:1,bell:2,bar:2,gem:3,seven:5}[m.symbol]||0)*({3:1,4:2,5:4}[m.count]||0):({3:2,4:4,5:8}[m.count]||0)),0);
+ }
  if(Object.hasOwn(expansionAliases,game))return stagingMultiplier({...outcome,game:expansionAliases[game as keyof typeof expansionAliases]});
  if(Object.hasOwn(newCabinetAliases,game))return stagingMultiplier({...outcome,game:newCabinetAliases[game as keyof typeof newCabinetAliases]});
  if(Object.hasOwn(cabinetAliases,game))return stagingMultiplier({...outcome,game:cabinetAliases[game as keyof typeof cabinetAliases]});
- if(game==='neon-sevens')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({cherry:1,bell:2,bar:2,gem:3,seven:5}[m.symbol]||0)*({3:1,4:2,5:4}[m.count]||0),0);
- if(game==='jade-fortune')return cabinetMatches(game,outcome.frames!.at(-1)!.grid).reduce((n,m)=>n+({3:2,4:4,5:8}[m.count]||0),0);
  if(game==='coin-carnival'){const row=outcome.frames!.at(-1)!.grid[1];return row.length===5&&row.every(s=>s==='coin')?5:0;}
  if(game==='temple-lights')return outcome.grid!.reduce((n,row)=>{let count=1;while(count<5&&row[count]===row[0])count++;return n+({3:2,4:3,5:5}[count]||0);},0);
  if(game==='aurora-vault')return Math.max(0,(outcome.sequence as VaultSequence).frames.at(-1)!.cells.filter(Boolean).length-7);
@@ -335,7 +349,7 @@ export function stagingMultiplier(outcome:StagingVisual):number {
 export function stagingOutcome(game:StagingGame,id:string,random:RandomIndex,picks?:number[],payingPercent=30):StagingVisual {
  if(!Number.isInteger(payingPercent)||payingPercent<5||payingPercent>50)throw new Error('Invalid paying-round percentage');
  if(isFishGame(game))throw new Error('A server-validated fish target is required. Use reefOutcome.');
- if(Object.hasOwn(expansionAliases,game))return {...stagingOutcome(expansionAliases[game as keyof typeof expansionAliases],id,random,picks,payingPercent),game};
+ if(Object.hasOwn(expansionAliases,game)&&!isCabinetGame(game))return {...stagingOutcome(expansionAliases[game as keyof typeof expansionAliases],id,random,picks,payingPercent),game};
  const paying=random(10000)<payingPercent*100;
  // Rejection sampling conditions the visible outcome distribution, never a player's history.
  for(let attempt=0;attempt<10000;attempt++){

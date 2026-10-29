@@ -36,7 +36,7 @@ describe('original nonpayable cabinet mechanics', () => {
         expect(after.remaining).toBe(before.remaining-1);
       }
       const end=result.frames.at(-1)!;
-      expect(result.matches).toEqual(cabinetMatches(game,end.grid));
+      expect(result.matches).toEqual(cabinetMatches(game,end.grid,result.ruleVersion));
       if(cabinetBase(game)==='coin-carnival') {
         expect(result.collected).toBe(end.grid[1].filter(symbol=>symbol==='coin').length);
         expect(result.collected===5 || end.remaining===0).toBe(true);

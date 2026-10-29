@@ -111,6 +111,19 @@ test('isolated staging accounting and outcomes',async t=>{
    assert.deepEqual(await wallet(player),before);
   }
  });
+ await t.test('V50 preserves same-width diagonal receipts and rejects new requests with the retired profile',async()=>{
+  const game='neon-sevens',profileId='stage-rate-v31-r1-20-stage-classic3-v1-stakes-v32';
+  const old=body({profileId}),grid=[['seven','bell','cherry'],['bar','seven','bell'],['cherry','bar','seven']];
+  const receipt={id:randomUUID(),game,ruleVersion:profileId,stake:'25',award:'125',frames:[{grid,locked:[],remaining:0}]};
+  assert.equal(stagingMultiplier(receipt),5);
+  assert.equal(stagingMultiplier({...receipt,ruleVersion:stagingGameProfileId(game)}),0);
+  await control.query("INSERT INTO idempotency_records(actor_id,operation,request_key,request_hash,response) VALUES($1,'ROUND',$2,$3,$4)",[player,old.requestKey,digest(canonical({game,...old})),JSON.stringify(receipt)]);
+  const before=await wallet(player);
+  assert.deepEqual((await call(`staging/${game}/rounds`,old,playerAuth)).data,receipt);
+  assert.deepEqual((await call('staging/recover',{game,...old},playerAuth)).data.result,receipt);
+  assert.equal((await call(`staging/${game}/rounds`,{...old,requestKey:randomUUID()},playerAuth)).status,400);
+  assert.deepEqual(await wallet(player),before);
+ });
  await t.test('expanded stakes enforce quarter steps through twenty credits and preserve old-profile receipts',async()=>{
   for(const stake of ['100','275','1975','2000']){await sleep();const r=await call('staging/neon-sevens/rounds',body({stake}),playerAuth);assert.equal(r.status,201,JSON.stringify(r.data));assert.equal(r.data.stake,stake);assert.ok(r.data.frames.every(f=>f.grid.every(row=>row.length===3)));}
   for(const stake of ['0','24','26','2025','2500','025','25.0','2e3'])assert.equal((await call('staging/neon-sevens/rounds',body({stake}),playerAuth)).status,400);

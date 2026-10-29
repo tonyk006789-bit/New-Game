@@ -19,7 +19,8 @@ describe('presentation timelines', () => {
       for (let column = 0; column < 5; column++) {
         const total = rows * 2 + 20 + column * 3, travel = total - rows;
         const motion = reelMotion(column, travel, total, fast);
-        expect(motion.keyframes.at(-1)?.transform).toBe(`translateY(${-100 * travel / total}%)`);
+        expect(motion.keyframes[0].transform).toBe(`translateY(${-100 * travel / total}%)`);
+        expect(motion.keyframes.at(-1)?.transform).toBe('translateY(0%)');
         expect(motion.duration + motion.delay).toBeGreaterThan(lastStop);
         lastStop = motion.duration + motion.delay;
         for (const windowHeight of [135, 300, 417]) {
@@ -82,7 +83,7 @@ describe('presentation timelines', () => {
   it('never reverses a stopped reel or displaces fish paths for impact feedback',()=>{
     const motion=reelMotion(4,21,24,false);
     const distances=motion.keyframes.map(k=>Number(k.transform.match(/-?[\d.]+/)![0]));
-    expect(distances.every((d,i)=>!i||d<=distances[i-1])).toBe(true);
+    expect(distances.every((d,i)=>!i||d>=distances[i-1])).toBe(true);
     expect(fishImpactPulse(.4)).toBe(0);expect(fishImpactPulse(0)).toBe(0);
     for(let t=0;t<=.4;t+=.004){expect(fishImpactPulse(t)).toBeGreaterThanOrEqual(0);expect(fishImpactPulse(t)).toBeLessThan(1);}
     expect(netExpansion(0,.65)).toBeCloseTo(.18);expect(netExpansion(.65,.65)).toBe(1);

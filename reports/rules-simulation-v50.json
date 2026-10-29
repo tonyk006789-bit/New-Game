@@ -1,0 +1,220 @@
+{
+  "policy": {
+    "revision": "1",
+    "payingPercent": 20
+  },
+  "roundsPerCase": 10000,
+  "warning": "Offline seeded test sample, not certified RTP or production mathematics. Returns include stake. No virtual pool awards.",
+  "results": [
+    {
+      "game": "clockwork-vault",
+      "rounds": 10000,
+      "payingPercent": 19.580000000000002,
+      "observedGrossReturnPercent": 77.03999999999999,
+      "maximumSampledMultiplier": 8
+    },
+    {
+      "game": "phoenix-falls",
+      "rounds": 10000,
+      "payingPercent": 19.939999999999998,
+      "observedGrossReturnPercent": 26.650000000000002,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "outlaw-sevens",
+      "rounds": 10000,
+      "payingPercent": 19.09,
+      "observedGrossReturnPercent": 51.07000000000001,
+      "maximumSampledMultiplier": 10
+    },
+    {
+      "game": "celestial-wilds",
+      "rounds": 10000,
+      "payingPercent": 20.28,
+      "observedGrossReturnPercent": 117.16,
+      "maximumSampledMultiplier": 38
+    },
+    {
+      "game": "meteor-keno",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "bamboo-keno",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "disco-diamonds",
+      "rounds": 10000,
+      "payingPercent": 19.09,
+      "observedGrossReturnPercent": 51.07000000000001,
+      "maximumSampledMultiplier": 10
+    },
+    {
+      "game": "midnight-express",
+      "rounds": 10000,
+      "payingPercent": 20.25,
+      "observedGrossReturnPercent": 67.62,
+      "maximumSampledMultiplier": 14
+    },
+    {
+      "game": "pirate-gold",
+      "rounds": 10000,
+      "payingPercent": 19.88,
+      "observedGrossReturnPercent": 99.4,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "neon-numbers",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "pearl-keno",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "ruby-rush",
+      "rounds": 10000,
+      "payingPercent": 19.09,
+      "observedGrossReturnPercent": 51.07000000000001,
+      "maximumSampledMultiplier": 10
+    },
+    {
+      "game": "sapphire-crown",
+      "rounds": 10000,
+      "payingPercent": 20.25,
+      "observedGrossReturnPercent": 67.62,
+      "maximumSampledMultiplier": 14
+    },
+    {
+      "game": "solar-fortune",
+      "rounds": 10000,
+      "payingPercent": 19.88,
+      "observedGrossReturnPercent": 99.4,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "neon-sevens",
+      "rounds": 10000,
+      "payingPercent": 19.09,
+      "observedGrossReturnPercent": 51.07000000000001,
+      "maximumSampledMultiplier": 10
+    },
+    {
+      "game": "jade-fortune",
+      "rounds": 10000,
+      "payingPercent": 20.25,
+      "observedGrossReturnPercent": 67.62,
+      "maximumSampledMultiplier": 14
+    },
+    {
+      "game": "coin-carnival",
+      "rounds": 10000,
+      "payingPercent": 19.88,
+      "observedGrossReturnPercent": 99.4,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "aurora-vault",
+      "rounds": 10000,
+      "payingPercent": 19.580000000000002,
+      "observedGrossReturnPercent": 77.03999999999999,
+      "maximumSampledMultiplier": 8
+    },
+    {
+      "game": "ember-relics",
+      "rounds": 10000,
+      "payingPercent": 19.939999999999998,
+      "observedGrossReturnPercent": 26.650000000000002,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "temple-lights",
+      "rounds": 10000,
+      "payingPercent": 20.18,
+      "observedGrossReturnPercent": 48.11,
+      "maximumSampledMultiplier": 9
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    }
+  ],
+  "kenoPickReview": [
+    {
+      "game": "orchard-numbers",
+      "picks": 4,
+      "rounds": 10000,
+      "payingPercent": 19.79,
+      "observedGrossReturnPercent": 23.64,
+      "maximumSampledMultiplier": 3
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 5,
+      "rounds": 10000,
+      "payingPercent": 19.18,
+      "observedGrossReturnPercent": 24.93,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 6,
+      "rounds": 10000,
+      "payingPercent": 20.369999999999997,
+      "observedGrossReturnPercent": 28.410000000000004,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 7,
+      "rounds": 10000,
+      "payingPercent": 20.380000000000003,
+      "observedGrossReturnPercent": 26.58,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 8,
+      "rounds": 10000,
+      "payingPercent": 20.26,
+      "observedGrossReturnPercent": 28.79,
+      "maximumSampledMultiplier": 5
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 9,
+      "rounds": 10000,
+      "payingPercent": 20.24,
+      "observedGrossReturnPercent": 29.86,
+      "maximumSampledMultiplier": 4
+    },
+    {
+      "game": "orchard-numbers",
+      "picks": 10,
+      "rounds": 10000,
+      "payingPercent": 20.4,
+      "observedGrossReturnPercent": 32.550000000000004,
+      "maximumSampledMultiplier": 6
+    }
+  ]
+}
