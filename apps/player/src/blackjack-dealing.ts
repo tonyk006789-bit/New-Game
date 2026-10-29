@@ -2,6 +2,12 @@
 export type DealSnapshot={id:string;settled:boolean;dealer:readonly unknown[];hands:readonly {cards:readonly unknown[]}[]};
 export type DealCue={target:'player'|'dealer';hand:number;index:number;kind:'deal'|'turn';at:number;faceUp:boolean};
 export const DEAL_STEP=1120, CARD_RELEASE=650, CARD_LAND=990;
+type CardBounds={left:number;top:number;width:number;height:number};
+/** Both bounds are in viewport coordinates, including the same outer auto-fit scale. */
+export function cardDestination(scene:CardBounds,card:CardBounds){
+ if(scene.width<=0||scene.height<=0||card.width<=0||card.height<=0)return null;
+ return {x:(card.left+card.width/2-scene.left)/scene.width,y:(card.top+card.height/2-scene.top)/scene.height,width:card.width/scene.width,height:card.height/scene.height};
+}
 export function blackjackDealPlan(previous:DealSnapshot|null,next:DealSnapshot,holeCard=true){
  const opening=!previous||previous.id!==next.id||previous.settled;
  const split=!opening&&next.hands.length>previous.hands.length;

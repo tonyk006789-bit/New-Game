@@ -35,7 +35,7 @@ onMounted(async()=>{
  }catch(error){if(!disposed){console.warn('Jointed dealer unavailable; using still artwork.',error);rig?.dispose();rig=undefined;}}
  if(!disposed)emit('ready');
 });
-watch(()=>props.delivery,begin,{flush:'post'});
+watch(()=>props.delivery,(value,previous)=>{if(value&&value.id===previous?.id)rig?.retarget(value);else begin();},{flush:'post'});
 watch(()=>props.running&&!props.reducedMotion,value=>{if(!value)stop();else if(painted.value&&!raf)raf=requestAnimationFrame(frame);});
 onBeforeUnmount(()=>{disposed=true;cancelAnimationFrame(raf);resize?.disconnect();rig?.dispose();});
 </script>

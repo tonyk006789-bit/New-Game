@@ -46,3 +46,21 @@
 .blackjack-cabinet .blackjack-return{bottom:5%;right:5%;background:#1a1a23ed;padding:7px 12px;box-shadow:0 5px 18px #0003}
 .blackjack-cabinet .hand-result{bottom:-12px;font-size:11px}
 @container (max-height:460px){.blackjack-cabinet .playing-card{height:72px;width:52px;min-width:52px}.blackjack-cabinet .card-pips i{font-size:13px}.blackjack-cabinet .card-pips.ace-pip i{font-size:28px}.blackjack-cabinet .blackjack-player-hands{top:79%}.blackjack-cabinet .playing-card .card-index{font-size:11px}.blackjack-cabinet .playing-card .card-index small{font-size:9px}}
+/* Deal, Hit, Double, reconnect and settlement share the same table geometry. */
+.fixed-game-frame .blackjack-feedback{height:64px;min-height:64px;flex:none;overflow:auto;background:#181823;text-align:center}
+.fixed-game-frame .blackjack-feedback .blackjack-error{margin:0;padding:6px 12px;font-size:14px;line-height:1.3}
+.fixed-game-frame .blackjack-feedback .blackjack-error button{margin:0 6px;padding:4px 12px}
+.fixed-game-frame .blackjack-feedback .blackjack-move-hint{height:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+.fixed-game-frame .blackjack-controls{height:max(96px,calc(var(--touch-target) + 20px));min-height:max(96px,calc(var(--touch-target) + 20px))}
+.blackjack-cabinet .blackjack-player-hands{top:auto;bottom:22px;height:84px}
+.blackjack-cabinet .hand-label::before{position:absolute;left:-14px;top:8px}
+/* New hits extend the fan. Existing cards stay anchored for normal 2–4 card hands. */
+.blackjack-cabinet .hand-cards,.blackjack-cabinet .dealer-cards{width:220px;max-width:none;height:84px;position:relative}
+.blackjack-cabinet .dealer-cards{position:absolute;left:50%;top:48%;transform:translateX(-50%)}
+.blackjack-cabinet .hand-cards .playing-card,.blackjack-cabinet .dealer-cards .playing-card{position:absolute;left:calc(66px + var(--card-index)*min(28px,94px / max(1,var(--cards) - 1)));top:0;margin:0;transition:left .18s ease-out}
+.blackjack-cabinet .hand-cards .playing-card+.playing-card{margin:0}
+.blackjack-cabinet .hand-total{left:calc(100% + 10px)}
+.blackjack-cabinet .felt-lettering{top:auto;bottom:120px}
+@container(max-height:460px){.blackjack-cabinet .felt-lettering small{display:none}}
+@container(max-height:400px){.blackjack-cabinet .felt-lettering{display:none}}
+@container(max-height:360px){.blackjack-cabinet .playing-card{height:64px;width:46px;min-width:46px}.blackjack-cabinet .card-pips i{font-size:11px}}

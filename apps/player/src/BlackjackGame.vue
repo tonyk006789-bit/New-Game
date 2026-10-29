@@ -3,7 +3,7 @@ import BlackjackDealer from './BlackjackDealer.vue';
 import PlayingCardFace from './PlayingCardFace.vue';
 import {cardLabel} from './blackjack-cards';
 import type {DealerDelivery} from './dealer-rig';
-import {blackjackDealPlan,CARD_LAND,CARD_RELEASE,type DealCue} from './blackjack-dealing';
+import {blackjackDealPlan,cardDestination,CARD_LAND,CARD_RELEASE,type DealCue} from './blackjack-dealing';
 import {catalog} from '@new-game/contracts';
 import WinBurst from './WinBurst.vue';
 import {computed,onBeforeUnmount,onMounted,ref,watch} from 'vue';
@@ -25,6 +25,7 @@ const dealerVisible=ref(1),dealerDealt=ref(0),playerVisible=ref<number[]>([]),sh
 const felt=ref<HTMLElement|null>(null),flight=ref<DealerDelivery|null>(null);
 let flightId=0;
 let landingCue:DealCue|null=null;
+let tableResize:ResizeObserver|undefined;
 const dealerCards=computed(()=>hand.value?.dealer.map((card,index)=>index<dealerVisible.value?card:null)||[]);
 const active=computed(()=>!!hand.value&&!hand.value.settled),staked=computed(()=>props.authenticated&&stage.enabled&&blackjackCreditApproved(props.game));
 const timeLeft=computed(()=>Math.max(0,Math.min(profile.idleMs/1000,Math.ceil(((hand.value?.expiresAt?Date.parse(hand.value.expiresAt):0)-now.value)/1000))));
@@ -37,11 +38,18 @@ const key=()=>`new-game-blackjack-${session.current?.id}`;
 function savePending(){if(!staked.value)return;try{if(pending.value)localStorage.setItem(key(),JSON.stringify(pending.value));else localStorage.removeItem(key());}catch{/* Server receipt still survives a storage failure. */}}
 function finishReveal(){clearTimeout(revealTimer);clearMotion();flight.value=null;landingCue=null;turningCard.value=-1;revealing.value=false;showResult.value=!!hand.value?.settled;dealerVisible.value=hand.value?.settled?hand.value.dealer.length:1;dealerDealt.value=hand.value?.dealer.length||0;playerVisible.value=hand.value?.hands.map(h=>h.cards.length)||[];revealCredits(props.game);}
 function launchCard(cue:DealCue){
- const root=felt.value,target=root?.querySelector(`[data-card="${cue.target}-${cue.hand}-${cue.index}"]`);
+ const root=felt.value?.querySelector('.dealer-mesh'),target=felt.value?.querySelector(`[data-card="${cue.target}-${cue.hand}-${cue.index}"]`);
  if(!root||!target)return;
- const box=root.getBoundingClientRect(),destination=target.getBoundingClientRect();
+ const destination=cardDestination(root.getBoundingClientRect(),target.getBoundingClientRect());if(!destination)return;
  const card=cue.faceUp?(cue.target==='player'?hand.value?.hands[cue.hand].cards[cue.index]:hand.value?.dealer[cue.index]):null;
- flight.value={id:++flightId,startedAt:performance.now(),kind:cue.kind,card:card||null,target:{x:(destination.left+destination.width/2-box.left)/box.width,y:(destination.top+destination.height/2-box.top)/box.height,width:destination.width/box.width,height:destination.height/box.height}};
+ flight.value={id:++flightId,startedAt:performance.now(),kind:cue.kind,card:card||null,target:destination};
+}
+function repositionFlight(){
+ if(!flight.value||!landingCue)return;
+ const cue=landingCue,scene=felt.value?.querySelector('.dealer-mesh'),card=felt.value?.querySelector(`[data-card="${cue.target}-${cue.hand}-${cue.index}"]`);
+ if(!scene||!card)return;
+ const target=cardDestination(scene.getBoundingClientRect(),card.getBoundingClientRect());
+ if(target)flight.value={...flight.value,target}; // Same delivery ID and clock: never replay a card on resize.
 }
 function dealCue(cue:DealCue){
  landingCue=cue;launchCard(cue);const id=flight.value?.id;
@@ -110,20 +118,21 @@ const moveHint=computed(()=>{
 const canAct=(action:string)=>dealerReady.value&&!foreignHand.value&&props.running&&!loading.value&&!busy.value&&!revealing.value&&!pending.value&&(!active.value?action==='DEAL':hand.value!.actions.includes(action))&&(!staked.value||!['DEAL','DOUBLE','SPLIT'].includes(action)||available.value>=BigInt(action==='DEAL'?stake.value:hand.value!.hands[hand.value!.active].stake));
 onMounted(async()=>{if(staked.value){try{pending.value=JSON.parse(localStorage.getItem(key())||'null');}catch{/* Optional saved transport request. */}if(pending.value){const savedGame=blackjackGameForProfile(pending.value.profileId);if(savedGame!==props.game){foreignHand.value=savedGame;pending.value=null;}else await act(pending.value.action);}else await sync(false);}loading.value=false;poll=setInterval(()=>{now.value=Date.now();if(!pending.value)void sync();else if(props.running&&!busy.value)void act(pending.value.action);},2000);});
 watch(()=>props.running,r=>{if(!r)finishReveal();else void sync();});watch(()=>props.reducedMotion,r=>{if(r)finishReveal();});
-onBeforeUnmount(()=>{disposed=true;clearInterval(poll);finishReveal();});
+onMounted(()=>{tableResize=new ResizeObserver(repositionFlight);if(felt.value)tableResize.observe(felt.value);});
+onBeforeUnmount(()=>{disposed=true;tableResize?.disconnect();clearInterval(poll);finishReveal();});
 </script>
 <template><section class="blackjack-cabinet" :data-game="game" :class="{'cards-still':reducedMotion,'hand-revealing':revealing}">
  <p v-if="!blackjackCreditApproved(game)" class="blackjack-variant-note">FREE PREVIEW · No credits spent or awarded. Test rules awaiting owner approval.</p><div class="blackjack-rail"><span>♠ {{gameName(game).toUpperCase()}}</span><b>PREMIUM</b><span>{{staked?'PLAY CREDITS':'FREE PREVIEW'}}</span></div>
  <div ref="felt" class="blackjack-felt"><WinBurst v-if="celebrate&&hand?.settled&&showResult&&hand.hands.some(h=>h.result==='WIN'||h.result==='BLACKJACK')" :key="hand.id" :game="game" :id="hand.id" :award="hand.award" :stake="String(hand.hands.reduce((sum,h)=>sum+h.stake,0))" :running="running" :reduced-motion="reducedMotion"/>
   <div class="dealer-room" aria-hidden="true"><i></i><i></i><i></i><i></i></div><BlackjackDealer :game="game" :delivery="flight" :active="revealing" @ready="dealerReady=true" @landed="landCard" :running="running" :reduced-motion="reducedMotion"/><div class="dealer-table-edge" aria-hidden="true"></div><div class="table-betting-line" aria-hidden="true"></div>
   <div class="card-shoe" aria-hidden="true"><span>♠</span><b>{{profile.decks}} DECKS</b></div><div class="table-chip-rack" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="dealer-nameplate"><b>YOUR DEALER</b><small>{{profile.standSoft17?'STANDS ON ALL 17s':'HITS SOFT 17'}}</small></div>
-  <div class="dealer-cards" aria-label="Dealer hand"><template v-if="hand"><div v-for="(card,i) in dealerCards" :key="`${hand.id}-dealer-${i}`" :data-card="`dealer-0-${i}`" class="playing-card" role="img" :aria-label="cardLabel(card)" :class="{red:card&&(card.suit===1||card.suit===2),back:!card,'card-waiting':i>=dealerDealt,'dealer-card-turn':i===turningCard}" :aria-hidden="i>=dealerDealt"><PlayingCardFace :card="card"/></div></template><span v-if="hand?.dealerValue&&showResult" class="hand-total">{{hand.dealerValue.total}}</span></div>
+  <div class="dealer-cards" :style="{'--cards':dealerCards.length}" aria-label="Dealer hand"><template v-if="hand"><div v-for="(card,i) in dealerCards" :key="`${hand.id}-dealer-${i}`" :data-card="`dealer-0-${i}`" :style="{'--card-index':i}" class="playing-card" role="img" :aria-label="cardLabel(card)" :class="{red:card&&(card.suit===1||card.suit===2),back:!card,'card-waiting':i>=dealerDealt,'dealer-card-turn':i===turningCard}" :aria-hidden="i>=dealerDealt"><PlayingCardFace :card="card"/></div></template><span v-if="hand?.dealerValue&&showResult" class="hand-total">{{hand.dealerValue.total}}</span></div>
   <div class="felt-lettering"><strong>BLACKJACK PAYS 3 TO 2</strong><small>{{profile.decks}} DECKS · {{game==='european-blackjack'?'DEALER SECOND CARD AFTER YOUR TURN':game==='double-deck-blackjack'?'DOUBLE ON 9, 10 OR 11':'HIT / STAND / DOUBLE / SPLIT'}}</small></div>
-  <div v-if="hand" class="blackjack-player-hands"><article v-for="(h,index) in hand.hands" :key="`${hand.id}-${index}`" :aria-label="`Hand ${index+1}${!hand.settled&&hand.active===index?', your turn':''}`" class="blackjack-hand" :class="{current:!hand.settled&&hand.active===index}"><span class="hand-label">{{hand.hands.length>1?`HAND ${index+1}`:'YOUR HAND'}} <b v-if="playerVisible[index]">{{handValue(h.cards.slice(0,playerVisible[index])).total}}{{handValue(h.cards.slice(0,playerVisible[index])).soft?' · SOFT':''}}</b></span><div class="hand-cards" :style="{'--cards':h.cards.length}"><div v-for="(card,i) in h.cards" :key="`${hand.id}-${index}-${i}`" :data-card="`player-${index}-${i}`" class="playing-card" role="img" :aria-label="cardLabel(card)" :class="{red:card.suit===1||card.suit===2,'card-waiting':i>=(playerVisible[index]||0)}" :aria-hidden="i>=(playerVisible[index]||0)"><PlayingCardFace :card="card"/></div></div><span class="bet-chip">{{formatCredits(String(h.stake))}}</span><strong v-if="h.result&&showResult" class="hand-result" :class="h.result.toLowerCase()">{{h.result}}</strong></article></div>
+  <div v-if="hand" class="blackjack-player-hands"><article v-for="(h,index) in hand.hands" :key="`${hand.id}-${index}`" :aria-label="`Hand ${index+1}${!hand.settled&&hand.active===index?', your turn':''}`" class="blackjack-hand" :class="{current:!hand.settled&&hand.active===index}"><span class="hand-label">{{hand.hands.length>1?`HAND ${index+1}`:'YOUR HAND'}} <b v-if="playerVisible[index]">{{handValue(h.cards.slice(0,playerVisible[index])).total}}{{handValue(h.cards.slice(0,playerVisible[index])).soft?' · SOFT':''}}</b></span><div class="hand-cards" :style="{'--cards':h.cards.length}"><div v-for="(card,i) in h.cards" :key="`${hand.id}-${index}-${i}`" :data-card="`player-${index}-${i}`" :style="{'--card-index':i}" class="playing-card" role="img" :aria-label="cardLabel(card)" :class="{red:card.suit===1||card.suit===2,'card-waiting':i>=(playerVisible[index]||0)}" :aria-hidden="i>=(playerVisible[index]||0)"><PlayingCardFace :card="card"/></div></div><span class="bet-chip">{{formatCredits(String(h.stake))}}</span><strong v-if="h.result&&showResult" class="hand-result" :class="h.result.toLowerCase()">{{h.result}}</strong></article></div>
   <div v-else class="blackjack-welcome"><h2>Your seat is ready</h2><p>Choose a stake and let the dealer deal.</p><div class="empty-bet-circle">♠</div></div>
   <div v-if="hand?.settled&&showResult" class="blackjack-return" role="status"><small>{{staked?'TOTAL RETURN':'PREVIEW RETURN'}}</small><strong>{{formatCredits(hand.award)}}</strong></div>
  </div>
- <p v-if="foreignHand" class="blackjack-error">You have an unfinished hand in {{gameName(foreignHand)}}. <button @click="$emit('resume',foreignHand)">RESUME HAND</button></p><p v-if="error" role="alert" class="blackjack-error">{{error}}</p><p v-if="pending" role="status" class="blackjack-error">Reconnecting to your saved hand…</p>
+
  <p v-if="game==='european-blackjack'" class="blackjack-variant-note">Dealer blackjack takes all committed bets, including doubles and splits.</p><div class="blackjack-controls"><div class="blackjack-meter"><small>CREDITS</small><strong>{{balance}}</strong></div><label>STAKE<select v-model="stake" aria-label="Blackjack stake" :disabled="active||busy||revealing||!!pending"><option v-for="n in 40" :key="n" :value="String(n*50)">{{(n*.5).toFixed(2)}}</option></select></label><div class="blackjack-actions" aria-describedby="blackjack-move-hint"><button v-if="!active" class="deal-button" :disabled="!canAct('DEAL')" @click="act('DEAL')">{{loading||!dealerReady?'LOADING…':busy?'DEALING…':'DEAL'}}</button><template v-else><button :disabled="!canAct('HIT')" @click="act('HIT')">HIT <b>＋</b></button><button :disabled="!canAct('STAND')" @click="act('STAND')">STAND <b>✋</b></button><button :disabled="!canAct('DOUBLE')" @click="act('DOUBLE')">DOUBLE <b>2×</b></button><button :disabled="!canAct('SPLIT')" @click="act('SPLIT')">SPLIT <b>Ⅱ</b></button></template></div></div>
- <p v-if="moveHint" id="blackjack-move-hint" class="blackjack-move-hint" role="status">{{moveHint}}</p><p class="blackjack-status">{{revealing&&!showResult?'Dealer is dealing…':active?(staked?`Your move · auto-stand in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,'0')}`:'Your move · free preview'):hand?'Hand complete. Choose your next stake.':'Natural 3:2 · Win 1:1 · Tie returns your stake'}}</p>
+ <div class="blackjack-feedback"><template v-if="foreignHand||error||pending"><p v-if="foreignHand" class="blackjack-error">You have an unfinished hand in {{gameName(foreignHand)}}. <button @click="$emit('resume',foreignHand)">RESUME HAND</button></p><p v-if="error" role="alert" class="blackjack-error">{{error}}</p><p v-if="pending" role="status" class="blackjack-error">Reconnecting to your saved hand…</p></template><template v-else><p id="blackjack-move-hint" class="blackjack-move-hint" role="status">{{moveHint}}</p><p class="blackjack-status">{{revealing&&!showResult?'Dealer is dealing…':active?(staked?`Your move · auto-stand in ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,'0')}`:'Your move · free preview'):hand?'Hand complete. Choose your next stake.':'Natural 3:2 · Win 1:1 · Tie returns your stake'}}</p></template></div>
 </section></template>

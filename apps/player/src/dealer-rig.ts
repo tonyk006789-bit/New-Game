@@ -110,6 +110,7 @@ export class DealerRig{
  resize(){this.width=this.host.clientWidth||1280;this.height=this.host.clientHeight||500;const aspect=this.width/this.height;this.camera.left=-aspect*VIEW_HEIGHT/2;this.camera.right=aspect*VIEW_HEIGHT/2;this.camera.top=VIEW_HEIGHT/2;this.camera.bottom=-VIEW_HEIGHT/2;this.camera.updateProjectionMatrix();
   const displayedScale=this.host.getBoundingClientRect().width/this.width||1;
   this.renderer.setPixelRatio(Math.min(2,Math.sqrt(2_100_000/(this.width*this.height)),Math.max(1,devicePixelRatio*displayedScale)));this.renderer.setSize(this.width,this.height,false);
+  if(this.delivery)this.retarget(this.delivery);
  }
  private orient(bone:T.Object3D,world:T.Quaternion){const parent=bone.parent!.getWorldQuaternion(new T.Quaternion());bone.quaternion.copy(parent.invert().multiply(world));bone.updateWorldMatrix(false,true);}
  private arm(arm:Arm,target:T.Vector3,side:number,roll:number){
@@ -124,11 +125,15 @@ export class DealerRig{
  private heldPosition(){return this.hands[0].cardPosition();}
  start(delivery:DealerDelivery){
   this.delivery=delivery;this.cardFace?.dispose();this.cardFace=this.cardTexture(delivery.card);this.card.material.map=this.cardFace;this.card.material.needsUpdate=true;
-  const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(delivery.target.x*2-1,1-delivery.target.y*2),this.camera);ray.ray.intersectPlane(new T.Plane(Y,-1.115),this.target);
+  this.retarget(delivery);
   this.reach=delivery.kind==='turn'?[T.MathUtils.clamp(this.target.x,-.12,.30),1.16,T.MathUtils.clamp(this.target.z-.06,.25,.43)]:[T.MathUtils.clamp(this.target.x,-.06,.26),1.16,.34];
   const clock=delivery.startedAt??0;
   this.pose(CARD_RELEASE-1,clock+CARD_RELEASE-1);this.releaseVelocity.copy(this.heldPosition());
   this.pose(CARD_RELEASE,clock+CARD_RELEASE);this.release.copy(this.heldPosition());this.releaseVelocity.subVectors(this.release,this.releaseVelocity);this.heldQuaternion.copy(this.hands[0].cardQuaternion());this.pose(0,clock);
+ }
+ retarget(delivery:DealerDelivery){
+  this.delivery=delivery;
+  const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(delivery.target.x*2-1,1-delivery.target.y*2),this.camera);ray.ray.intersectPlane(new T.Plane(Y,-1.115),this.target);
  }
  private pose(ms:number,clock:number){if(!this.body)return;const p=dealerPose(ms,this.reach,this.delivery?.kind==='turn'),life=dealerLife(clock,identity[this.game].phase);
   this.spine!.quaternion.copy(this.spineRest!).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),p.follow*.5+life.breath));this.body.updateMatrixWorld(true);

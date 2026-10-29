@@ -1,8 +1,23 @@
 import {describe,it,expect} from 'vitest';
-import {blackjackDealPlan,CARD_LAND,DEAL_STEP,type DealSnapshot} from '../../apps/player/src/blackjack-dealing';
+import {blackjackDealPlan,cardDestination,CARD_LAND,DEAL_STEP,type DealSnapshot} from '../../apps/player/src/blackjack-dealing';
 const card={rank:4,suit:0};
 const view=(extra:Partial<DealSnapshot>={}):DealSnapshot=>({id:'round',settled:false,dealer:[card,null],hands:[{cards:[card,card]}],...extra});
 describe('blackjack dealer presentation',()=>{
+ it('lands at the same card center and size across auto-fit scales and screen offsets',()=>{
+  for(const scale of [.3,.54,.78,1,1.5,2])for(const offset of [0,83,256]){
+   const scene={left:offset,top:50,width:1280*scale,height:420*scale};
+   const card={left:offset+640*scale,top:50+310*scale,width:60*scale,height:84*scale};
+   const destination=cardDestination(scene,card)!;
+   expect(destination.x).toBeCloseTo(670/1280,10);expect(destination.y).toBeCloseTo(352/420,10);
+   expect(destination.width).toBeCloseTo(60/1280,10);expect(destination.height).toBeCloseTo(84/420,10);
+   expect(scene.left+destination.x*scene.width).toBeCloseTo(card.left+card.width/2,10);
+  }
+ });
+ it('does not start a delivery into a collapsed or hidden canvas',()=>{
+  const bounds={left:0,top:0,width:1280,height:420},card={left:640,top:320,width:60,height:84};
+  expect(cardDestination({...bounds,height:0},card)).toBeNull();
+  expect(cardDestination(bounds,{...card,width:0})).toBeNull();
+ });
  it('deals alternating hands and keeps the hole card face down',()=>{
   const plan=blackjackDealPlan(null,view());
   expect(plan.playerCounts).toEqual([0]);expect(plan.dealerCount).toBe(0);
