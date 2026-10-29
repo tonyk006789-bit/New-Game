@@ -46,3 +46,13 @@ Publication targets the existing authorized player project `new-game-test` and h
 Rollback: redeploy V51 deployment `dpl_2nsj5npVPyPBVtXhCh4VHYyA1LoW` or revert the V52 source commit and rebuild. No migration/data rollback is needed. Accepted rounds and receipts are preserved.
 
 Physical Android/iPhone orientation, address-bar behavior, background recovery, WebGL loss and thermal performance are not certified by these desktop browser checks. No native build/signing/device test was run. The large dealer renderer chunk and cold-start cost remain. This fixes reproduced layout jumps; it is not a guarantee of zero bugs on every device or every possible hand.
+
+### Deployed and verified
+
+- Source commit: `3c27e5f`, pushed to the existing repository's main branch.
+- `vercel deploy --prebuilt --prod --yes` through the existing CLI/gateway: READY, deployment `dpl_3J7P1Mxw5BLkJLk2LWr6SrEbMM56`.
+- Immutable URL: https://new-game-test-mnegy6fas-tonyk006789-7532.vercel.app/ ; alias https://new-game-test-topaz.vercel.app/ .
+- `node .local/verify-v52-live.mjs`: 27 deployed JS/CSS/model assets matched local SHA-256; no-store HTML and immutable asset caching confirmed; health 200, unauthenticated me 401, catalog 31, V50 historical profile retained.
+- Entry `/assets/index-B_B2qQWB.js`; CSS `/assets/index-BfMSjlMD.css`.
+- Live UI after Reload update: authenticated Royal Blackjack restored the existing settled hand and rendered the jointed 3D dealer. At 844×390, frame=693.333×390, felt height=220.8815, feedback height=34.6667. Screenshot: `reports/screenshots/v52/live-royal-phone.png`.
+- Hosted balance was 422.30 before and after verification; no hosted wagers submitted. Local test balance ended at 877.55 after four 0.25 slot/keno/feature stakes (Clockwork returned 1.50) and a 0.50 Royal deal plus 0.50 Double (zero return). Earlier blackjack checks used free previews.
