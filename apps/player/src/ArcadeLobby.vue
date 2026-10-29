@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {gameFacts} from './game-facts';
 import GameBrand from './GameBrand.vue';
 import {computed,nextTick,onBeforeUnmount,ref,watch} from 'vue';
 import {playSound} from './audio';
@@ -48,10 +49,10 @@ onBeforeUnmount(()=>cancelAnimationFrame(raf));
   <div ref="floor" class="hall-floor" :style="{backgroundImage:`url('${assets['lobby-hall'].url}')`}" tabindex="0" aria-label="Walk around the arcade with arrow keys or WASD. Enter plays the nearest cabinet." @pointerdown="walkFloor" @keydown="keyboard">
    <article v-for="game in machines" :key="game.id" class="game-card hall-machine" :class="[game.category.toLowerCase(),game.id,{approaching:selected===game.id}]" :style="{'--tile-color':game.color,left:`${game.spot.x}%`,top:`${game.spot.y}%`,zIndex:Math.round(game.spot.y)}">
     <button class="hall-cabinet-button" :data-game-id="game.id" data-own-sound :aria-label="`Explore ${game.name}`" :disabled="!running" @click="choose(game.id)">
-     <span class="machine-crown">{{game.detail}}</span>
+     <span class="machine-crown">{{gameFacts(game.id).preview?'FREE PREVIEW · ':''}}{{game.detail}}</span>
      <span v-if="['disco-diamonds','midnight-express','pirate-gold'].includes(game.id)" class="floor-new-badge">NEW</span><span class="machine-screen"><GamePoster :game="game.id" :name="game.name" floor /></span>
      <span class="machine-deck"><i></i><b><GameBrand :game="game.id"/></b><i></i></span>
-     <span class="machine-pedestal"><em>PLAY</em><span>✦</span><em>ENTER</em></span>
+     <span class="machine-pedestal"><em>{{gameFacts(game.id).preview?'PREVIEW':'PLAY'}}</em><span>✦</span><em>ENTER</em></span>
     </button>
     <button class="favorite-control" :class="{saved:favorites.includes(game.id)}" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" @click="emit('favorite',game.id)"><Icon name="star" :size="16" /></button>
    </article>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {gameFacts} from './game-facts';
 import GameBrand from './GameBrand.vue';
 import {computed,watch} from 'vue';
 import {catalog,isPremiumGame,type GameId} from '@new-game/contracts';
@@ -23,11 +24,11 @@ function open(id:GameId){if(!swiped&&props.running)emit('open',id);swiped=false;
   <div class="shelf-lights" aria-hidden="true"><i v-for="n in 24" :key="n" :style="{'--bulb':n}"/></div>
   <div class="casino-shelf-grid">
    <article v-for="(game,index) in visible" :key="game.id" class="shelf-game" data-depth-card :style="{'--tile-color':game.color}">
-    <button class="shelf-play" :data-game-id="game.id" data-own-sound :aria-label="`Play ${game.name}`" :disabled="!running" @click="open(game.id)">
+    <button class="shelf-play" :data-game-id="game.id" data-own-sound :aria-label="`${gameFacts(game.id).preview?'Preview':'Play'} ${game.name}`" :title="`${gameFacts(game.id).orientation} · ${gameFacts(game.id).mode} · From ${gameFacts(game.id).minimum}`" :disabled="!running" @click="open(game.id)">
      <GamePoster :game="game.id" :name="game.name" :priority="index<4"/>
-     <span v-if="isPremiumGame(game.id)" class="new-ribbon">PREMIUM</span>
+     <span v-if="isPremiumGame(game.id)" class="new-ribbon">{{gameFacts(game.id).preview?'FREE PREVIEW':'PREMIUM'}}</span>
      <span class="shelf-game-caption"><b><GameBrand :game="game.id"/></b><small>{{game.detail}}</small></span>
-     <span class="shelf-enter">PLAY <span>▶</span></span>
+     <span class="shelf-enter">{{gameFacts(game.id).preview?'PREVIEW':'PLAY'}} <span>▶</span></span>
     </button>
     <button class="shelf-favorite" :aria-label="`${favorites.includes(game.id)?'Remove':'Add'} ${game.name} ${favorites.includes(game.id)?'from':'to'} favorites`" :aria-pressed="favorites.includes(game.id)" data-own-sound @click="emit('favorite',game.id)">{{favorites.includes(game.id)?'♥':'♡'}}</button>
    </article>

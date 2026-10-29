@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import ArcadeSymbol from './ArcadeSymbol.vue';
 import {playSound} from './audio';
 import {symbolLabel} from './game-identity';
@@ -42,8 +42,9 @@ async function play(grid: string[][], matches: { row: number; count: number }[],
   }));
   if (token === generation) settle(grid, matches);
 }
+const resultLabel=computed(()=>rolling.value?'Reels spinning':`${columns.value.length} reels, ${rows.value} rows. `+Array.from({length:rows.value},(_,row)=>`Row ${row+1}: ${columns.value.map(column=>symbolLabel(props.theme||'temple-lights',column[row])).join(', ')}`).join('. '));
 defineExpose({ play, settle });
 watch(() => props.reducedMotion, value => { if (value && rolling.value) settle(); });
 onBeforeUnmount(() => settle());
 </script>
-<template><div ref="root" class="reel-frame kinetic-reels" :style="{gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, '--visible-rows':rows}" :class="{ 'reels-rolling': rolling }" role="img" :aria-label="`${columns.length} reel ${rows} row result`"><div v-for="(column, c) in columns" :key="c" class="reel-window" :class="{ 'reel-landed': landed.includes(c), 'reel-locked': locked?.includes(c) }"><div class="reel-strip"><div v-for="(symbol, r) in column" :key="r" class="symbol reel-symbol" :data-symbol="symbol" :aria-label="symbolLabel(theme||'temple-lights',symbol)" :class="[symbol, { 'matching-symbol': !rolling && (lines.some(line => line.row === r && c < line.count) || highlighted?.includes(r * columns.length + c)) }]"><ArcadeSymbol :symbol="symbol" :theme="theme" /></div></div><span v-if="locked?.includes(c)" class="reel-lock-label">LOCKED</span></div><div class="reel-glass" aria-hidden="true"></div></div></template>
+<template><div ref="root" class="reel-frame kinetic-reels" :style="{gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`, '--visible-rows':rows}" :class="{ 'reels-rolling': rolling }" role="img" :aria-label="resultLabel"><div v-for="(column, c) in columns" :key="c" class="reel-window" :class="{ 'reel-landed': landed.includes(c), 'reel-locked': locked?.includes(c) }"><div class="reel-strip"><div v-for="(symbol, r) in column" :key="r" class="symbol reel-symbol" :data-symbol="symbol" :style="{'--reveal-order':c}" :aria-label="symbolLabel(theme||'temple-lights',symbol)" :class="[symbol, { 'matching-symbol': !rolling && (lines.some(line => line.row === r && c < line.count) || highlighted?.includes(r * columns.length + c)) }]"><ArcadeSymbol :symbol="symbol" :theme="theme" /></div></div><span v-if="locked?.includes(c)" class="reel-lock-label">LOCKED</span></div><div class="reel-glass" aria-hidden="true"></div></div></template>

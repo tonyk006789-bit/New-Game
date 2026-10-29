@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GameFacts from './GameFacts.vue';
 import {symbolLabel} from './game-identity';
 import {computed,onMounted} from 'vue';
 import {cabinetGames,cabinetBase,usesStraightLines,isCabinetGame,reefChallengeProfile,stagingRules,hasLowStake,isFishGame,type StagingGame} from '@new-game/game-math';
@@ -54,7 +55,7 @@ const tiers=Object.values(reefChallengeProfile.tiers);
 onMounted(()=>{if(props.staked)void loadEnvironment().catch(()=>{});});
 </script>
 <template>
- <div class="game-rules">
+ <div class="game-rules"><GameFacts :game="game"/><p v-if="isFishGame(game)">Opening SPECIES stops auto fire. Close the guide, then turn AUTO on again when you are ready. Previously accepted hits still settle.</p>
   <p class="rules-mode">{{staked?'PLAY CREDITS':'GUEST / FREE PREVIEW'}} <span>• No cash or prizes of value</span></p>
   <h3>HOW TO PLAY</h3>
   <ol><li v-for="instruction in currentInstructions" :key="instruction">{{instruction}}</li></ol>

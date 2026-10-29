@@ -1,0 +1,26 @@
+/* V51: legible decisions, bounded feedback, no new perpetual animation. */
+.fixed-game-frame .game-preview.temple-game{height:auto;min-height:0;flex:1;display:flex;flex-direction:column;padding:8px 18px 0}
+.fixed-game-frame .temple-game .temple-scene-title{height:76px;min-height:76px;margin:0;flex:none}
+.fixed-game-frame .temple-game .kinetic-reels{height:auto!important;min-height:0;flex:1;width:calc(100% - 100px);margin:8px auto}
+.fixed-game-frame .temple-game .preview-controls{height:84px;min-height:84px;flex:none;margin:0;padding:6px 14px;gap:10px;flex-wrap:nowrap}
+.fixed-game-frame .temple-game .preview-notice{min-height:24px;height:24px;flex:none;margin:0;padding:4px}
+.fixed-game-frame[data-compact=true] .temple-game .preview-controls{height:calc(var(--touch-target) + 12px);min-height:calc(var(--touch-target) + 12px)}
+.fixed-game-frame .keno-game .keno-tools{gap:4px;flex-wrap:nowrap}.fixed-game-frame .keno-tools button{padding:5px 7px;font-size:12px;min-width:0}.keno-ticket-trigger{border-color:#c4a2ed!important;background:#362547!important;color:#fff1c6!important;white-space:nowrap}
+.fixed-game-frame[data-compact=true] .keno-game{grid-template-columns:350px minmax(0,1fr)}
+.fixed-game-frame[data-compact=true] .keno-tools button{font-size:calc(var(--phone-type)*.7);min-width:var(--touch-target);padding:5px 8px;flex:1}
+.fixed-game-frame[data-compact=true] .keno-intro{display:none!important}
+.fixed-game-frame[data-compact=true] .keno-page-tools{justify-self:end;gap:5px}
+.fixed-game-frame[data-compact=true] .keno-game[data-number-page-size="20"] .draw-track{display:none}
+.jackpot-target-hint.locked-target-info{display:flex;flex-direction:column;gap:4px;align-items:center;max-width:42%;text-align:center;pointer-events:none;padding:7px 16px;line-height:1.2;background:#17132bed;border-color:#b9e7ff}
+.locked-target-info b{font-size:16px;color:#eafaff}.locked-target-info small{font-size:11px;letter-spacing:.2px;color:#eee2ca}
+.fixed-game-frame[data-compact=true] .locked-target-info b{font-size:var(--phone-type)}.fixed-game-frame[data-compact=true] .locked-target-info small{font-size:calc(var(--phone-type)*.8)}
+.blackjack-move-hint{margin:0;padding:4px 12px;text-align:center;color:#f5dfb6;background:#181823;font-size:12px;line-height:1.3;flex:none}
+.blackjack-hand.current .hand-label{box-shadow:0 0 0 1px #f0dba7;background:#292431e8}
+.blackjack-hand.current .hand-label::before{content:'▸';color:#ffe1a1;margin-right:5px}
+.fixed-game-frame[data-compact=true] .blackjack-move-hint{font-size:calc(var(--phone-type)*.8);padding:3px 10px}
+.kinetic-reels:not(.reels-rolling) .matching-symbol>span,.kinetic-reels:not(.reels-rolling) .matching-symbol>svg{animation:award-lift-v51 .65s ease-out both;animation-delay:calc(var(--reveal-order,0)*.055s)}
+@keyframes award-lift-v51{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-3px) scale(1.055)}65%{transform:translateY(1px) scale(1.01)}}
+.arcade-app.reduce-motion .poster-thumbnail{transition:none}
+.arcade-app.reduce-motion .matching-symbol>span,.arcade-app.reduce-motion .matching-symbol>svg{animation:none!important}
+@media(prefers-reduced-motion:reduce){.matching-symbol>span,.matching-symbol>svg{animation:none!important}}
+@media(pointer:coarse){.arcade-app .shelf-favorite{width:48px;height:48px}.arcade-app .shelf-pagination>button{min-width:48px;min-height:48px}}
