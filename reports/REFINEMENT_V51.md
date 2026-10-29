@@ -52,3 +52,13 @@ Rollback: redeploy V50 player build `dpl_56WrVjCq97ZvGLh32D8yyWbSP7Pa`, or rever
 ## Remaining issues
 
 Real-phone cold start, long-session memory/thermal behavior, screen-reader behavior and native lifecycle remain unverified. The large dealer chunk and accumulated CSS layering are follow-up engineering work. Store screenshots and promotional footage do not establish live provider mechanics, production mathematics or motion-capture realism. The two extra blackjack variants remain free previews pending explicit credit-rule approval.
+
+### Deployed and verified
+
+- Source commit: `28ecaa8`.
+- Deployment: `dpl_2nsj5npVPyPBVtXhCh4VHYyA1LoW`, READY; immutable URL https://new-game-test-lxs23u8zx-tonyk006789-7532.vercel.app/ .
+- Public alias: https://new-game-test-topaz.vercel.app/ .
+- Entry: `/assets/index-B07d8RE4.js`; CSS: `/assets/index-DvMw5pCo.css`.
+- `node .local/verify-v51-live.mjs`: 27 deployed JS/CSS/model assets match local SHA-256 hashes; immutable asset cache headers and no-store HTML confirmed; health 200, unauthenticated me 401; catalog 31; existing V50 profile retained.
+- Live UI: session recovered after Reload update; Keno Quick Pick and ticket/return table rendered correctly; Premium shelf visibly distinguishes both FREE PREVIEW variants from Royal Blackjack. No console errors in that verification. Hosted balance remained 422.05; no hosted wagers submitted.
+- Screenshot: `reports/screenshots/v51/live-keno-ticket.png`.
