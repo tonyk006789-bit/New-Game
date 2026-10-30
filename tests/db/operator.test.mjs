@@ -23,6 +23,7 @@ const fixture=hierarchyFixture({db:control,call,signin,rootId:adminId,rootAuth:a
 async function create(parentId,username,auth){
  auth??=await fixture.auth(parentId);
  const r=await call('admin/accounts',{parentId,username,displayName:username,password:adminPassword,requestKey:randomUUID()},auth);assert.equal(r.status,201,JSON.stringify(r.data));
+ assert.equal(r.data.displayName,username);assert.match(r.data.publicId,/^\d+$/);assert.ok(r.data.createdAt);
  // Read through the same parent's real list immediately after commit, for
  // Main Admin -> Sub-contractor -> Agent -> Player alike.
  const list=await call(`operator/accounts?role=${r.data.role}&sort=created&order=desc&page=1`,undefined,auth);

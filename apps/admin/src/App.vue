@@ -71,13 +71,22 @@ function openCreate(){if(!canCreate.value)return;parentId.value=current.value!.i
 }
 async function create(){await run(async()=>{
  if(newPassword.value!==confirmPassword.value)throw new Error('Passwords do not match.');
- const result=await api<{id:string;username:string}>('admin/accounts',{parentId:parentId.value,username:NewUsername.parse(newUsername.value),displayName:newName.value,password:NewPassword.parse(newPassword.value),requestKey:createKey.value});
+ const result=await api<{id:string;username:string;role:Member['role'];displayName:string;publicId:string;createdAt:string}>('admin/accounts',{parentId:parentId.value,username:NewUsername.parse(newUsername.value),displayName:newName.value,password:NewPassword.parse(newPassword.value),requestKey:createKey.value});
  createOpen.value=false;newPassword.value='';confirmPassword.value='';
  // A saved account must not be hidden by the previous search or page. Refresh
  // the list directly: creation does not change the operator's wallet.
  query.value='';status.value='ALL';sort.value='created';order.value='desc';page.value=1;gotoPage.value=1;editor.value='';searchField.value='Account';
  notice.value=`Created ${result.username} with 0.00 credits. Showing newest accounts first.`;
- try{await loadPage();}catch(e){if(e instanceof ApiError&&e.status===401)throw e;throw new Error(`The account was saved, but the list could not refresh. Use search to reload it. ${(e as Error).message}`);}
+ try{
+  await loadPage();
+  // A completed create is authoritative.  On mobile, a tab can occasionally
+  // receive a stale list response while its operator page is being updated;
+  // preserve the newly committed direct child until the next fresh list wins.
+  if(isAccounts.value&&!members.value.items.some(member=>member.id===result.id)){
+   const item:Member={id:result.id,username:result.username,displayName:result.displayName,role:result.role,active:true,archived:false,branchEnabled:true,branch:result.displayName,createdAt:result.createdAt,canManage:true,canRedeem:true,canTransfer:true,canAdjust:current.value?.role==='MAIN_ADMIN',publicId:result.publicId,registeredIp:null,loginCount:'0',lastLogin:null,lastIp:null,manager:current.value?.username||null,wallet:{settled:'0',reserved:'0',available:'0',version:'0'}};
+   members.value={...members.value,total:(BigInt(members.value.total)+1n).toString(),items:[item,...members.value.items].slice(0,members.value.pageSize)};
+  }
+ }catch(e){if(e instanceof ApiError&&e.status===401)throw e;throw new Error(`The account was saved, but the list could not refresh. Its confirmed account ID is ${result.publicId}. ${(e as Error).message}`);}
 });}
 function openManage(member:Member,action:'EDIT_PROFILE'|'RESET_PASSWORD'|'SET_ACTIVE'|'SET_ARCHIVED'='EDIT_PROFILE'){selected.value=member;editName.value=member.displayName;resetPassword.value='';resetConfirm.value='';manageAction.value=action;editor.value='';manageKey.value=crypto.randomUUID();error.value='';manageOpen.value=true;}
 async function manage(){await run(async()=>{

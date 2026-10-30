@@ -35,9 +35,10 @@ export async function createAccount(req:Request,body:unknown){
    await db.query('INSERT INTO branch_ancestors(branch_id,ancestor_id,depth) SELECT $1,ancestor_id,depth+1 FROM branch_ancestors WHERE branch_id=$2',[branch,parent.branch_id]);
    await db.query('INSERT INTO branch_ancestors VALUES($1,$1,0)',[branch]);
   }
-  await db.query('INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash,registered_ip) VALUES($1,$2,$3,$4,true,$5,$6,$7)',[id,branch,role,data.displayName,data.username,hash,clientIp(req)]);
+  const created=(await db.query('INSERT INTO accounts(id,branch_id,role,display_name,active,username,password_hash,registered_ip) VALUES($1,$2,$3,$4,true,$5,$6,$7) RETURNING public_id::text,created_at',[id,branch,role,data.displayName,data.username,hash,clientIp(req)])).rows[0];
   await db.query('INSERT INTO wallets(id,account_id) VALUES($1,$2)',[randomUUID(),id]);
-  await audit(db,actor,'ACCOUNT_CREATED',{id,parentId:parent.id,role,username:data.username});return {id,role,username:data.username};
+  await audit(db,actor,'ACCOUNT_CREATED',{id,parentId:parent.id,role,username:data.username});
+  return {id,role,username:data.username,displayName:data.displayName,publicId:created.public_id,createdAt:created.created_at};
   });
  });
 }
